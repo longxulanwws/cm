@@ -1,6 +1,5 @@
 package com.ruisoft.cm.rbac.action;
 
-import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -83,8 +82,6 @@ public class CmDictAction extends BaseAction {
 	/**
 	 * 字典数据项加载缓存
 	 */
-	protected final static HashMap<String, String> DICT_ITEM_CACHE = new HashMap<String, String>();
-	
 	@RequestMapping(params = "m=gi")
 	public void getDictItem() {
 		try {
