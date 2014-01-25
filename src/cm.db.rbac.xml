@@ -25,7 +25,7 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
 						<property name="sql">
 							<value>
-<![CDATA[SELECT M.ID,M.HIGHER_ID PID,M.NAME TEXT,ICON_URI URL FROM CM_MENU M WHERE M.STATUS=1 AND M.ID!=1 ORDER BY HIGHER_ID,SEQ]]>
+<![CDATA[SELECT M.ID,M.HIGHER_ID PID,M.NAME TEXT,ICON_URI URL FROM CM_MENU M WHERE M.STATUS=1 AND M.ID!='000001' ORDER BY HIGHER_ID,SEQ]]>
 							</value>
 						</property>
 					</bean>
@@ -53,23 +53,6 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 							<value>
 <![CDATA[SELECT ITEM.NAME,ITEM.VALUE,ITEM.SEQ,ITEM.STATUS FROM CM_DICT_ITEM ITEM INNER JOIN CM_DICT_DEF DEF ON ITEM.DICT_DEF_ID=DEF.ID AND DEF.CODE={d} ORDER BY SEQ]]>
 							</value>
-						</property>
-					</bean>
-				</entry>
-				<entry key="stock.picking.query">
-					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
-						<property name="dmlType" value="cond" />
-						<property name="sql">
-							<value>
-<![CDATA[SELECT ID,CompanyID,DeptID,BusiOrgID,Code,Name,Type,MoveType,SendType,Origin,PurchaseID,SaleID,ProjectID,PartnerID,WarehoseID,PredDate,RecptINDate,QCDate,RecptOutDate,DealEndDate,State,InvoiceState,AutoPicking,BackOrderID,AccountDate,StockJournalID,MoveINUser,MoveOutUser,MoveDestined,CreateUser,CreateDate,WriteDate,WriteUser,Note FROM StockPicking]]>
-							</value>
-						</property>
-						<property name="conditions">
-							<map>
-								<entry key="code" value="" />
-								<entry key="origin" value="" />
-								<entry key="partnerid" value=":like(lr)" />
-							</map>
 						</property>
 					</bean>
 				</entry>
@@ -111,7 +94,7 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 							<map>
 								<entry key="name" value="str:like(lr):and" />
 								<entry key="shortfor" value=":like(lr)" />
-								<entry key="status" value="int" />
+								<entry key="status" value="" />
 							</map>
 						</property>
 					</bean>
@@ -127,7 +110,7 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 						<property name="conditions">
 							<map>
 								<entry key="name" value="str:like(lr):and" />
-								<entry key="status" value="int" />
+								<entry key="status" value="" />
 							</map>
 						</property>
 					</bean>
