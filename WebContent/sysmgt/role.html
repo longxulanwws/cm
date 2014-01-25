@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>机构维护</title>
+		<title>角色维护</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -32,13 +32,8 @@
                             }
                             return h;
                         },frozen:true},
-	                    {display:'名称',name:'name',width:80,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'简称',name:'shortfor',width:100,minWidth:60,align:'left',editor:{type:'text'}},
-	                   // {display:'主管人名称',name:'director',width:60,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'地址',name:'address',width:60,minWidth:60,align:'left',editor:{type:'text'}},
-		                {display:'联系电话',name:'tel',width:60,minWidth:60,align:'left',editor:{type:'text'}},
-		                {display:'传真',name:'fax',width:60,minWidth:60,align:'left',editor:{type:'text'}},
-		                {display:'邮编',name:'zipcode',width:60,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'名称',name:'name',width:180,minWidth:60,align:'left',editor:{type:'text'}},
+	                  //  {display:'是否继承',name:'isext',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'状态',name:'status',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'说明',name:'description',align:'left',editor:{type:'text'}}
 	                    //{display:'密码修改',isSort:false,width:100,render:function(rowdata,rowindex,value){
@@ -65,6 +60,7 @@
 //                     onToNext: toNext,
 //                     onToPrev: toPrev,
                     param_status:'rbac.status'
+                   
 				});
 				defGrid.options.dataAction = 'server';
 				appendAddBtn(openDictDef, "添加字典字义");
@@ -104,13 +100,11 @@
 					pageSize = defGrid.options.pageSize;
 				
 				var param = new Object();
-				param.name = $("#orgname").val();
-			    param.shortfor=$("#SHORTFOR").val();
-				
+				param.name = $("#name").val();
 				//param.code = $("#dictCode").val();
 				param.status = $("#dictStatus").val();
 
-				var data = JSON.stringify(reqObj('q','rbac.select.dict.def.queryOrg',JSON.stringify(param),'l',true,page,pageSize));
+				var data = JSON.stringify(reqObj('q','rbac.select.dict.def.queryRole',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=q", data, function(data) {
 					defGrid.set({data: data['data']});
 				});
@@ -142,22 +136,18 @@
 				toReset('#new_dict_def input,select,textarea');
 				addDialog = $.ligerDialog.open({
 					target:$("#new_dict_def"),
-					title:"新增机构",
+					title:"新增角色",
 					width:350,
-					height:500
+					height:370
 				});
 			}
 			function toAdd() {
 				var param = new Object();
 				param.name = $("#newName").val();
-				param.shortfor = $("#newShortfor").val();
-				param.address=$("#newAddress").val();
-				param.tel = $("#newTel").val();
-				param.fax=$("#newFax").val();
-				param.zipcode = $("#newZipcdoe").val();
+				//param.isext = $("#newIsext").val();
 				param.status = $("#newStatus").val();
 				param.desc=$("#newDesc").val();
-				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addOrg',JSON.stringify(param)));
+				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addrole',JSON.stringify(param)));
 				
 				ajaxSubmit("/cm/rbac/cm.do?m=a", data, function(data) {
 					if (data) {
@@ -177,7 +167,7 @@
 			}
 			function toModify(row) {
 				
-				 var param = JSON.stringify(reqObj('u','rbac.update.dict.def.updateOrg',row));
+				 var param = JSON.stringify(reqObj('u','rbac.update.dict.def.updaterole',row));
 					//alert(param);
 					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 						if (data) {
@@ -190,7 +180,7 @@
 					});
 			}
 			function toDel(row) {
-				 var param = JSON.stringify(reqObj('d','rbac.delete.dict.def.deleteorg',row));
+				 var param = JSON.stringify(reqObj('d','rbac.delete.dict.def.deleterole',row));
 					ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
 						if (data) {
 							if (parseInt(data['status']) > 0) {
@@ -220,8 +210,7 @@
 		<div id="layout_main">
 			<div position="center" id="a_center" title="机构列表">
 				<div id="query_cond" class="fields">
-					<label>名称</label><input type="text" class="s-text txt-def" id="orgname" />
-					<label>简称</label><input type="text" class="s-text txt-def" id="SHORTFOR" />
+					<label>名称</label><input type="text" class="s-text txt-def" id="name" />
 					<label>状态</label><select id="dictStatus" param="rbac.status" first=""></select>
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
 					<input type="button" value="清空" onclick="toReset('#query_cond input,select,textarea');" />
@@ -231,32 +220,16 @@
 		</div>
 		<div id="new_dict_def" style="display:none;overflow:hidden;">
 			<div class="lineD" style="margin-bottom:10px;">
-				<span class="title l-icon-add">添加机构</span>
+				<span class="title l-icon-add">添加角色</span>
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>名称</label></div>
 				<div class="dplD"><input type="text" class="s-text txt-def" id="newName" /></div>
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>简称</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newShortfor" /></div>
-			</div>
-			<div class="lineD">
-				<div class="labelD"><label>地址</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newAddress" /></div>
-			</div>
-			<div class="lineD">
-				<div class="labelD"><label>电话</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newTel" /></div>
-			</div>
-			<div class="lineD">
-				<div class="labelD"><label>传真</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newFax" /></div>
-			</div>
-			<div class="lineD">
-				<div class="labelD"><label>邮编</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newZipcdoe" /></div>
-			</div>
+			<!--  <div class="lineD">
+				<div class="labelD"><label>继承</label></div>
+				<div class="dplD"><select class="txt-def" id="newIsext" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
+			</div>-->
 			<div class="lineD">
 				<div class="labelD"><label>状态</label></div>
 				<div class="dplD"><select class="txt-def" id="newStatus" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
