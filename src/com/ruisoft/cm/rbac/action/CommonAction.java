@@ -140,6 +140,37 @@ public class CommonAction extends BaseAction {
 		}
 	}
 	
+	@RequestMapping(params = "m=ba")
+	public void batchAdd() {
+		JSONMap<String, Object> returnJson = new JSONMap<String, Object>(JSONMap.TYPE.OBJECT);
+		
+		try {
+			if (reqData == null)
+				reqData = getReqData();
+			// 查询实体名称
+			String entityName = reqData.getString("en");
+			if (entityName == null || SysCache.get(entityName) == null) {
+				returnJson.put("status", "-1");
+				returnJson.put("msg", "没有指定插入实体名称");
+			} else {
+				int r = baseDAO.batchAdd(reqData.getJSONArray("data"), entityName);
+				returnJson.put("status", r);
+			}
+		} catch (Exception e) {
+			LOG.error("执行插入操作发生错误", e);
+			returnJson.put("status", "-2");
+		} finally {
+			try {
+				response(returnJson);
+			} catch (IOException e) {
+				LOG.error("插入返回信息时发生错误", e);
+			}
+			reqData = null;
+		}
+	
+		
+	}
+	
 	@RequestMapping(params = "m=u")
 	public void update() {
 		JSONMap<String, Object> returnJson = new JSONMap<String, Object>(JSONMap.TYPE.OBJECT);
@@ -183,6 +214,35 @@ public class CommonAction extends BaseAction {
 				returnJson.put("msg", "没有指定删除实体名称");
 			} else {
 				int r = baseDAO.delete(reqData.getString("data"), entityName);
+				returnJson.put("status", r);
+			}
+		} catch (Exception e) {
+			LOG.error("执行删除操作发生错误", e);
+			returnJson.put("status", "-2");
+		} finally {
+			try {
+				response(returnJson);
+			} catch (IOException e) {
+				LOG.error("删除返回信息时发生错误", e);
+			}
+			reqData = null;
+		}
+	}
+	
+	@RequestMapping(params = "bd")
+	public void batchDelete() {
+		JSONMap<String, Object> returnJson = new JSONMap<String, Object>(JSONMap.TYPE.OBJECT);
+		
+		try {
+			if (reqData == null)
+				reqData = getReqData();
+			// 查询实体名称
+			String entityName = reqData.getString("en");
+			if (entityName == null || SysCache.get(entityName) == null) {
+				returnJson.put("status", "-1");
+				returnJson.put("msg", "没有指定删除实体名称");
+			} else {
+				int r = baseDAO.batchDelete(reqData.getJSONArray("data"), entityName);
 				returnJson.put("status", r);
 			}
 		} catch (Exception e) {

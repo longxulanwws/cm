@@ -7,12 +7,12 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.ruisoft.cm.rbac.dao.BaseDAO;
 import com.ruisoft.cm.rbac.entity.QueryEntity;
+import com.ruisoft.cm.rbac.util.JSONMap;
 
 public class ParamGenerator {
 	private static final Logger LOG = Logger.getLogger(ParamGenerator.class);
@@ -63,12 +63,13 @@ public class ParamGenerator {
 				}
 			}
 			
-			params = PARAM_RETURN.replaceFirst("\"p\"", new JSONArray(params).toString())
-					.replaceFirst("\"t\"", treeAttr);
+			params = PARAM_RETURN.replaceFirst("\\{p\\}", params)
+					.replaceFirst("\\{t\\}", treeAttr);
 			
 			if (needCache)
 				cache.put(id, params);
 			
+			LOG.debug(params);
 			return params;
 		} catch (JSONException e) {
 			LOG.error("生成字典项[".concat(id).concat("]发生错误"), e);
@@ -98,13 +99,13 @@ public class ParamGenerator {
 	}
 	
 	private String reorgParam(List<JSONObject> items) throws JSONException {
-		JSONObject item = new JSONObject();
+		JSONMap<String, String> item = new JSONMap<String, String>(JSONMap.TYPE.OBJECT);
+//		JSONObject item = new JSONObject();
 		for (JSONObject i : items) {
 			item.put(i.getString("value"), i.toString());
 		}
 
 		String param = item.toString();
-		LOG.debug(param);
 		return param;
 	}
 }
