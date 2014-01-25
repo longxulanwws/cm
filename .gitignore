@@ -1,5 +1,6 @@
 /build
-.settings
-.classpath
-.project
-.gitignore
+/.settings
+/.classpath
+/.project
+/.gitignore
+/.gitignore.bak
