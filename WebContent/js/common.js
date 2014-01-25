@@ -115,11 +115,10 @@ function getParam(paramName) {
 	
 	var param = ajaxSubmit(uri, d, function(data) {
 		if (!data) return {};
-		return data;
+		return toTree(data);
 	}, null, false);
 	eval("_dicts." + pn + " = param");
-	
-	return toTree(param);
+	return param;
 }
 /**
  * 将参数值转换为对应的名称
@@ -135,7 +134,7 @@ function paramRender(item, paramName, v) {
 	
 	var param = getParam(paramName);
 	if (param[v])
-		return $.parseJSON(param[v])["name"];
+		return param[v]["name"];
 	else
 		return "";
 }
@@ -146,13 +145,13 @@ function paramRender(item, paramName, v) {
  */
 function getData(paramName) {
 	if (paramName) {
-		param = getParam(paramName);
+		var param = getParam(paramName);
 		if (param) {
 			var p = new Array();
 			var item;
-			for (prop in param) {
-				item = $.parseJSON(param[prop]);
-				p.push(fillZero(item.seq) + ":" + param[prop]);
+			for (var prop in param) {
+				item = param[prop];
+				p.push(fillZero(item.seq) + ":" + JSON.stringify(param[prop]));
 			}
 			p.sort();
 			for (var i = 0; i < p.length; i++) {
@@ -170,6 +169,8 @@ var zeros = '00000000';
  * @returns 
  */
 function fillZero(seq) {
+	if (!seq)
+		seq = "1";
 	if (typeof seq === 'Number')
 		seq = seq.toString();
 	return zeros.substring(1, zeros.length - seq.length) + seq;
