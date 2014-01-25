@@ -214,10 +214,10 @@ function selectInjector() {
  * @param data array 线性列表
  */
 function toTree(data) {
-	if (data['t']) {
+	if (data['tree']) {
 		
 	}
-	return data['p'];
+	return data['param'];
 }
 /**
  * 向Grid组件中的Toolbar中添加按钮
