@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
@@ -18,6 +19,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ruisoft.cm.rbac.entity.AddEntity;
 import com.ruisoft.cm.rbac.entity.DMLEntity;
@@ -183,6 +186,28 @@ public class BaseDAO {
 		return add(new JSONObject(values), SysCache.get(id, aEntity));
 	}
 	
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
+	public int batchAdd(JSONArray values, AddEntity add) throws Exception {
+		String sql = add.getPreparedSQL();
+		LOG.debug("执行批量新增：" + sql);
+
+		if (tpl == null)
+			tpl = new JdbcTemplate(getDataSource());
+		
+		int counter = 0;
+		Object[] params = null;
+		for (int i = 0; i < values.length(); i++) {
+			params = getPreparedParam(values.getJSONObject(i), add);
+			counter += tpl.update(sql, params);
+		}
+		
+		return counter;
+	}
+	
+	public int batchAdd(JSONArray values, String id) throws Exception {
+		return batchAdd(values, SysCache.get(id, aEntity));
+	}
+	
 	public int update(JSONObject values, UpdateEntity update) throws Exception {
 		String sql = update.getPreparedSQL();
 		LOG.debug("执行更新：" + sql);
@@ -233,6 +258,33 @@ public class BaseDAO {
 	
 	public int delete(String values, String id) throws Exception {
 		return delete(new JSONObject(values), SysCache.get(id, dEntity));
+	}
+	
+
+	public int batchDelete(JSONArray values, DeleteEntity delete) throws Exception {
+		String sql = null;
+		if (tpl == null)
+			tpl = new JdbcTemplate(getDataSource());
+		
+		int counter = 0;
+		Object[] params = null;
+		for (int i = 0; i < values.length(); i++) {
+			if (DMLEntity.COND.equals(delete.getDmlType())) {
+				LOG.debug("执行批量删除：" + sql);
+				sql = delete.getSql(values.getJSONObject(i));
+				counter += tpl.update(sql);
+			} else {
+				params = getPreparedParam(values.getJSONObject(i), delete);
+				sql = delete.getPreparedSQL();
+				LOG.debug("执行批量删除：" + sql);
+				counter += tpl.update(sql, params);
+			}
+		}
+		return counter;
+	}
+	
+	public int batchDelete(JSONArray values, String id) throws Exception {
+		return batchDelete(values, SysCache.get(id, dEntity));
 	}
 	
 	protected Object[] getPreparedParam(JSONObject json, DMLEntity entity)
