@@ -99,8 +99,8 @@ public class ParamGenerator {
 	}
 	
 	private String reorgParam(List<JSONObject> items) throws JSONException {
-//		JSONMap<String, String> item = new JSONMap<String, String>(JSONMap.TYPE.OBJECT);
-		JSONObject item = new JSONObject();
+		JSONMap<String, String> item = new JSONMap<String, String>(JSONMap.TYPE.OBJECT);
+//		JSONObject item = new JSONObject();
 		for (JSONObject i : items) {
 			item.put(i.getString("value"), i.toString());
 		}
