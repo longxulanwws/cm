@@ -107,7 +107,7 @@ public class KeyGenerator {
 		} else if ("day".equals(arg)) {
 			return getDate("dd");
 		} else if ("org".equals(arg)) {
-			return fillStr(getOrg(), "0", 6);
+			return getOrg();
 		} else if (arg.startsWith("seq")) {
 			return getSeq(arg, keyId);
 		} else if ("uuid".equals(arg)) {

@@ -21,7 +21,7 @@
 			            {display:'供应商',name:'partner_id',width:290,align:'left'},
 			            {display:'预计到货日期',name:'pred_date',width:80},
 			            {display:'入库仓库',name:'warehose_id',width:290,align:'left'},
-			            {display:'收货人',name:'move_in_user',align:'left'}
+			            {display:'收货人',name:'move_in_user',render:sw_opt,align:'left'}
                     ],
                     pageSize:20,
                     usePager: true,
@@ -36,24 +36,17 @@
                     clickToEdit:false,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: toQuery,
+                    param_movein:'user'
 				});
 				appendAddBtn(openDictDef, "添加入库单");
 				appendModifyBtn(function(){}, "修改入库单");
 				$("#pageloading").hide();
 			});
-	        function beginEdit(rowid) { 
-	        	defGrid.beginEdit(rowid);
-	        }
-	        function cancelEdit(rowid) {
-	        	defGrid.cancelEdit(rowid);
-	        }
-	        function endEdit(rowid) {
-	            defGrid.endEdit(rowid);
-	            var row = defGrid.getRow(rowid);
-	            toModify(JSON.stringify(row));
-	        }
-			function switcher(item) {
-				return paramRender(item, defGrid.options.param_status, item.status);
+			function sw_opt(item) {
+				var swd = paramRender(item, defGrid.options.param_movein, item.move_in_user);
+				if (!swd)
+					swd = item.move_in_user;
+				return swd;
 			}
 			function toQuery(item, page, pageSize) {
 				if (!page)
@@ -71,29 +64,6 @@
 					defGrid.set({data: data['data']});
 				});
 			}
-			function toFirst() {
-				toQuery(null, 1);
-			}
-			function toLast() {
-				var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
-				if (defGrid.options.total % defGrid.options.pageSize > 0)
-					p += 1;
-				toQuery(null, p);
-			}
-			function toNext() {
-				var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
-				if (defGrid.options.total % defGrid.options.pageSize > 0)
-					p += 1;
-				if (defGrid.options.page == p)
-					return;
-				toQuery(null, defGrid.options.page + 1);
-			}
-			function toPrev() {
-				if (defGrid.options.page == 1)
-					return;
-				toQuery(null, defGrid.options.page - 1);
-			}
-			var addDialog;
 			function openDictDef() {
 				parent.f_addTab('new_stockp','新增入库单','./stock/new_stock_picking.html');
 			}

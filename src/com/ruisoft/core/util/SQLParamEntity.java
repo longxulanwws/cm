@@ -15,7 +15,7 @@ public class SQLParamEntity implements ParamEntity {
 	}
 	
 	/** 构造树型结构的属性名称  */
-	private String treeAttr = null;
+	private String treeAttr = "";
 
 	public String getTreeAttr() {
 		return treeAttr;

@@ -53,7 +53,7 @@ function ajaxSubmit(url, data, onSuccess, onError, async) {
 		contentType: "application/json; charset=utf-8",
 		data: data,
 		success: function(data) {
-			if (data['status'] === '0') {
+			if (data.status && data.status != '1') {
 				var msg = data['msg'];
 				if (!msg)
 					msg = "您的登录状态已失效，请重新登录。";

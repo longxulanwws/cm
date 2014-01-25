@@ -30,11 +30,16 @@
 				    {text:'清空',click:resetArea,icon:'clear'},
 					{line:true}
 				]});
+				var udata = getData('user');
 				$("#moveInS").ligerComboBox({
 					autocomplete: true,
-					columns:[{}]
+                    valueField:'value',
+                    textField:'name',
+                    data:udata,
+                    onSelected:function(v,t) {
+                        $("#moveInIdS").val(v);
+                    }
 				});
-
                	pGrid = $("#p-div").ligerGrid({
                     columns:[
 	                    {display:'商品编号',name:'code',width:90,minWidth:60,editor:{type:'popup',condition: {
@@ -110,7 +115,7 @@
 				param.partner = $("#partnerS").val();
 				param.preddate = $("#predDateS").val();
 				param.warehose = $("#warehouseS").val();
-				param.moveinuser = "1"; //$("#moveInS").val();
+				param.moveinuser = $("#moveInIdS").val();
 				param.note = $("#noteS").val();
 				param.createuser = $("#createUserCodeS").val();
 				param.createdate = $("#createDateS").val();
@@ -131,7 +136,7 @@
 		<div id="layout_main">
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">
 				<div id="d-menu"></div>
-				<div style="height:8px;"></div>
+				<div style="height:5px;"></div>
 				<form name="basic-form" method="post" id="basic_form">
 					<div class="line-div">
 						<div class="label-div"><label>入库单号</label></div>
@@ -149,7 +154,8 @@
 						<div class="label-div"><label>入库仓库</label></div>
 						<div class="in-div"><input type="text" id="warehouseS" ltype="text" class="diff" /></div>
 						<div class="label-div"><label>收货人</label></div>
-						<div class="in-div"><input type="text" id="moveInS" class="liger-combobox diff" /></div>
+						<div class="in-div"><input type="text" id="moveInS" ltype="combobox" class="diff" /></div>
+						<input type="hidden" id="moveInIdS" />
 					</div>
 					<div class="line-div" style="height:76px;">
 						<div class="label-div"><label>备注</label></div>

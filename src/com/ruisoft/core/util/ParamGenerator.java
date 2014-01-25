@@ -21,14 +21,14 @@ public class ParamGenerator {
 	
 	private static final String PARAM_RETURN = "{\"param\":{p},\"tree\":\"{t}\"}";
 	
-	private Map<String, ParamEntity> config = null;
+	private static Map<String, ParamEntity> config = null;
 
 	public Map<String, ParamEntity> getConfig() {
 		return config;
 	}
 
 	public void setConfig(Map<String, ParamEntity> config) {
-		this.config = config;
+		ParamGenerator.config = config;
 	}
 	
 	@Resource
