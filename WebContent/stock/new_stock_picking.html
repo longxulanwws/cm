@@ -30,16 +30,6 @@
 				    {text:'清空',click:resetArea,icon:'clear'},
 					{line:true}
 				]});
-				var udata = getData('user');
-				$("#moveInS").ligerComboBox({
-					autocomplete: true,
-                    valueField:'value',
-                    textField:'name',
-                    data:udata,
-                    onSelected:function(v,t) {
-                        $("#moveInIdS").val(v);
-                    }
-				});
                	pGrid = $("#p-div").ligerGrid({
                     columns:[
 	                    {display:'商品编号',name:'code',width:90,minWidth:60,editor:{type:'popup',condition: {
@@ -83,6 +73,16 @@
 					$('#createUserS').val(data['uname']);
 					$('#createUserCodeS').val(data['uid']);
 					$("#createDateS").val(data['date']);
+				}, null, false);
+				var udata = getData('user',{orgid:$("#deptCodeS").val()},false);
+				$("#moveInS").ligerComboBox({
+					autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:udata,
+                    onSelected:function(v,t) {
+                        $("#moveInIdS").val(v);
+                    }
 				});
 				$("#pageloading").hide();
 			});

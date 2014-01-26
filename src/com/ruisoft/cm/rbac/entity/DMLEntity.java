@@ -7,10 +7,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.ruisoft.core.CommonUtil;
+
 public abstract class DMLEntity {
+	private static final Logger LOG = Logger.getLogger(DMLEntity.class);
+	
 	public static final String QUERY_NORMAL = "NORMAL";
 	public static final String COND = "COND";
 	public static final String ADD = "ADD";
@@ -132,7 +137,7 @@ public abstract class DMLEntity {
 				String[] cfg = null;
 				for (String k : conditions.keySet()) {
 					condCfg = new ConditionConfig();
-					condCfg.setColName(k.toUpperCase());
+					condCfg.setColName(k);
 					
 					cfg = conditions.get(k).split("[,;:|]");
 					try {
@@ -143,7 +148,7 @@ public abstract class DMLEntity {
 						if (!"".equals(cfg[2])) // 条件连接类型(AND/OR)
 							condCfg.setLinkType(cfg[2].trim());
 					} catch (ArrayIndexOutOfBoundsException e) {
-						
+						LOG.debug("条件列[".concat(k).concat("]注入完成->").concat(condCfg.toString()));
 					} finally {
 						condConf.put(k, condCfg);
 					}
@@ -218,6 +223,10 @@ public abstract class DMLEntity {
 
 		public void setLinkType(String linkType) {
 			this.linkType = linkType.toUpperCase();
+		}
+		
+		public String toString() {
+			return CommonUtil.pojoString(this);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package com.ruisoft.core.util;
+package com.ruisoft.core.param;
 
 import com.ruisoft.cm.rbac.entity.QueryEntity;
 

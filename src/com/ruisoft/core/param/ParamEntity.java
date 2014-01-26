@@ -1,4 +1,4 @@
-package com.ruisoft.core.util;
+package com.ruisoft.core.param;
 
 public interface ParamEntity {
 }

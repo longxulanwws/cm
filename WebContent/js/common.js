@@ -97,27 +97,41 @@ var _dicts = {};
  * 由传入的参数代码获取参数配置信息
  * 
  * @param String paramName 参数代码
+ * @param Object query 查询条件对象，可选
+ * @param boolean needCache 是否缓存该参数，默认true
  * 
  * @returns obj 参数配置信息
  */
-function getParam(paramName) {
+function getParam(paramName, query, needCache) {
 	if (!paramName)
 		return {};
+
+	var ca = true;
+	if (needCache !== undefined)
+		ca = needCache;
 	
-	var pn = paramName;
-	pn = pn.replace(/\./, "_");
-	var cache = eval("_dicts['" + pn + "']");
-	if (cache)
-		return cache;
+	if (ca) {
+		var pn = paramName;
+		pn = pn.replace(/\./, "_");
+		var cache = eval("_dicts['" + pn + "']");
+		if (cache)
+			return cache;
+	}
 	
 	var uri = "/cm/rbac/cmDict.do?m=gi";
-	var d = '{"d":"' + paramName + '"}';
+
+	if (!query) {
+		query = new Object();
+	}
+	query.d = paramName;
 	
-	var param = ajaxSubmit(uri, d, function(data) {
+	var param = ajaxSubmit(uri, JSON.stringify(query), function(data) {
 		if (!data) return {};
 		return toTree(data);
 	}, null, false);
-	eval("_dicts." + pn + " = param");
+	
+	if (ca)
+		eval("_dicts." + pn + " = param");
 	return param;
 }
 /**
@@ -126,13 +140,16 @@ function getParam(paramName) {
  * @param item obj UI组件对象
  * @param paramName String 参数定义代码
  * @param v String 值
+ * @param Object query 查询条件对象，可选
+ * @param boolean needCache 是否缓存该参数，默认true
+ * 
  * @returns String 名称
  */
-function paramRender(item, paramName, v) {
+function paramRender(item, paramName, v, query, needCache) {
 	if (!paramName || !v)
 		return "";
 	
-	var param = getParam(paramName);
+	var param = getParam(paramName, query, needCache);
 	if (param[v])
 		return param[v]["name"];
 	else
@@ -141,11 +158,14 @@ function paramRender(item, paramName, v) {
 /**
  * 获取参数字典信息，提供给Select组件使用
  * @param paramName String 参数名称
+ * @param Object query 查询条件对象，可选
+ * @param boolean needCache 是否缓存该参数，默认true
+ * 
  * @returns {Array} 字典数据项数组，根据参数的seq升序排列
  */
-function getData(paramName) {
+function getData(paramName, query, needCache) {
 	if (paramName) {
-		var param = getParam(paramName);
+		var param = getParam(paramName, query, needCache);
 		if (param) {
 			var p = new Array();
 			var item;

@@ -75,9 +75,8 @@ public class BaseDAO {
 
 	public List<JSONObject> query(JSONObject json, QueryEntity query)
 			throws JSONException {
-		String sql = query.getPreparedSQL();
+		String sql = query.getSql(json);
 		LOG.debug("÷¥––≤È—Ø:" + sql);
-		Object[] info = getPreparedParam(json, query);
 		
 		if (tpl == null)
 			tpl = new JdbcTemplate(getDataSource());
@@ -85,6 +84,8 @@ public class BaseDAO {
 		if (QueryEntity.COND.equals(query.getDmlType())) {
 			return tpl.query(sql, new JSONMapper());
 		}
+		
+		Object[] info = getPreparedParam(json, query);
 		return tpl.query(sql, info, new JSONMapper());
 	}
 	

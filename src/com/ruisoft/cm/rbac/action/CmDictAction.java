@@ -18,7 +18,7 @@ import com.ruisoft.cm.rbac.dao.BaseDAO;
 import com.ruisoft.cm.rbac.entity.DMLEntity;
 import com.ruisoft.cm.rbac.util.JSONMap;
 import com.ruisoft.cm.rbac.util.SysCache;
-import com.ruisoft.core.util.ParamGenerator;
+import com.ruisoft.core.param.ParamGenerator;
 
 @Controller
 @RequestMapping("/rbac/cmDict.do")
