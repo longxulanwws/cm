@@ -58,7 +58,9 @@ function ajaxSubmit(url, data, onSuccess, onError, async) {
 				if (!msg)
 					msg = "您的登录状态已失效，请重新登录。";
 				alert(msg);
-				parent.location = "/cm/";
+				
+				if (data.status == '0')
+					parent.location = "/cm/";
 				return;
 			}
 			
@@ -236,6 +238,7 @@ function selectInjector() {
  */
 function toTree(data) {
 	if (data['tree']) {
+		var t = data['tree'];
 		
 	}
 	return data['param'];

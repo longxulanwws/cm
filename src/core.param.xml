@@ -28,6 +28,19 @@
 						</property>
 					</bean>
 				</entry>
+				<!-- 查询商品类型 -->
+				<entry key="product.type">
+					<bean class="com.ruisoft.core.param.SQLParamEntity">
+						<property name="sql">
+							<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+								<property name="sql">
+									<value><![CDATA[SELECT NAME,CODE,ID VALUE,'1' SEQ,'1' STATUS,SUBSTR(PATH,LENGTH(PATH)-3) PID,DETAIL LEAF FROM PRODUCT_CATEGORY]]></value>
+								</property>
+							</bean>
+						</property>
+						<property name="treeAttr" value="pid" />
+					</bean>
+				</entry>
 			</map>
 		</property>
 	</bean>

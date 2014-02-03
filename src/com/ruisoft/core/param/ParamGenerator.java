@@ -47,10 +47,7 @@ public class ParamGenerator {
 		String params = null, treeAttr = "";
 		boolean needCache = true;
 		try {
-			if (!config.containsKey(id)) {
-				// 参数字典表取值
-				params = genFormDict(id, args);
-			} else {
+			if (config.containsKey(id)) {
 				ParamEntity entity = config.get(id);
 			
 				if (entity instanceof SQLParamEntity) {
@@ -61,6 +58,9 @@ public class ParamGenerator {
 					params = generate((ListParamEntity) entity);
 					needCache = ((ListParamEntity) entity).isCache();
 				}
+			} else {
+				// 参数字典表取值
+				params = genFormDict(id, args);
 			}
 			
 			params = PARAM_RETURN.replaceFirst("\\{p\\}", params)

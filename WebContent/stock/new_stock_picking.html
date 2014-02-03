@@ -59,7 +59,7 @@
                     enabledEdit:true,
                     clickToEdit:false,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
-                    onReload: queryProd,
+                    onReload: queryProd
 				});
 				appendAddBtn(function(){
 					pGrid.addEditRow();
@@ -135,8 +135,8 @@
 		<div id="pageloading"></div>  
 		<div id="layout_main">
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">
-				<div id="d-menu"></div>
-				<div style="height:5px;"></div>
+				<div id="d-menu" class="toolbar"></div>
+				<div style="height:25px;"></div>
 				<form name="basic-form" method="post" id="basic_form">
 					<div class="line-div">
 						<div class="label-div"><label>入库单号</label></div>
