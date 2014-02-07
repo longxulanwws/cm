@@ -25,7 +25,16 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
 						<property name="sql">
 							<value>
-<![CDATA[SELECT M.ID,M.HIGHER_ID PID,M.NAME TEXT,ICON_URI URL FROM CM_MENU M WHERE M.STATUS=1 AND M.ID!='000001' ORDER BY HIGHER_ID,SEQ]]>
+<![CDATA[SELECT DISTINCT M.ID,M.HIGHER_ID  PID,M.NAME TEXT,cm_resource.URI URL 
+				FROM CM_MENU M ,cm_resource ,cm_user_role_rel ,cm_role_resource_rel       
+				WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID
+       				AND m.RESOURCE_ID=cm_role_resource_rel.RESOURCE_ID
+       				AND cm_resource.ID=m.RESOURCE_ID
+					AND M.STATUS='1' 
+					AND cm_resource.STATUS='1'
+					AND M.ID!='0000'
+					AND cm_user_role_rel.USER_ID={userId}
+ 					ORDER BY HIGHER_ID,SEQ]]>
 							</value>
 						</property>
 					</bean>
@@ -87,7 +96,7 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 						<property name="dmlType" value="cond" />
 						<property name="sql">
 							<value>
-<![CDATA[SELECT ID,NAME,SHORTFOR,HIGHER_ID,DIRECTOR,ADDRESS,TEL,FAX,ZIPCODE,STATUS,DESCRIPTION FROM cm_org]]>
+<![CDATA[SELECT ID,NAME,SHORTFOR,HIGHER_ID,ORG_TYPE,DIRECTOR,ADDRESS,TEL,FAX,ZIPCODE,STATUS,DESCRIPTION FROM cm_org]]>
 							</value>
 						</property>
 						<property name="conditions">
@@ -104,7 +113,7 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 						<property name="dmlType" value="cond" />
 						<property name="sql">
 							<value>
-<![CDATA[SELECT ID,NAME,IS_EXT,STATUS,DESCRIPTION FROM cm_role]]>
+<![CDATA[SELECT ID,CODE,NAME,IS_EXT,STATUS,DESCRIPTION FROM cm_role]]>
 							</value>
 						</property>
 						<property name="conditions">
@@ -130,6 +139,72 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 							<value>
 <![CDATA[SELECT ID,NAME,STATUS,DESCRIPTION FROM CM_ROLE where id  in (select ROLE_ID from cm_user_role_rel t where t.USER_ID={userid} )]]>
 							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dict.def.queryRoleResouce">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="sql">
+							<value>
+<![CDATA[SELECT ID,NAME FROM CM_RESOURCE where id not in (select RESOURCE_ID from CM_ROLE_RESOURCE_REL t where t.ROLE_ID={roleid} )]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dict.def.queryRoleResouceyes">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="sql">
+							<value>
+<![CDATA[SELECT ID,NAME FROM CM_RESOURCE where id  in (select RESOURCE_ID from CM_ROLE_RESOURCE_REL t where t.ROLE_ID={roleid} )]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dict.def.queryResource">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="dmlType" value="cond" />
+						<property name="sql">
+							<value>
+<![CDATA[SELECT ID,NAME,URI,TYPE,STATUS,DESCRIPTION FROM CM_RESOURCE]]>
+							</value>
+						</property>
+						<property name="conditions">
+							<map>
+								<entry key="name" value="str:like(lr):and" />
+								<entry key="status" value="int" />
+							</map>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dict.def.queryMenu">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="dmlType" value="cond" />
+						<property name="sql">
+							<value>
+<![CDATA[SELECT ID, CODE, NAME, HIGHER_ID, SEQ, RESOURCE_ID, ICON_URI, HINT, Path, Layer, Detail, STATUS, DESCRIPTIOIN FROM cm_menu]]>
+							</value>
+						</property>
+						<property name="conditions">
+							<map>
+								<entry key="name" value="str:like(lr):and" />
+								<entry key="status" value="int" />
+							</map>
+						</property>
+					</bean>
+				</entry>				
+				<entry key="dict.def.queryPartner">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="dmlType" value="cond" />
+						<property name="sql">
+							<value>
+<![CDATA[SELECT ID,TYPE,CODE,NAME,UUID_CODE,TAX_CODE,OF_TRADE,LEGAL_BODY,CREDIT_LEVEL,BANK,BANK_ACCOUNT,LINK_MAN,MOBILE,PHONE,FAX,DESCRIPTION FROM Cm_Partner]]>
+							</value>
+						</property>
+						<property name="conditions">
+							<map>
+								<entry key="name" value="str:like(lr):and" />
+								<entry key="code" value=":like(lr)" />
+							</map>
 						</property>
 					</bean>
 				</entry>
@@ -187,7 +262,7 @@ VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{m
 					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
 						<property name="sql">
 							<value>
-<![CDATA[INSERT INTO CM_org(ID,NAME,Shortfor,Address,Tel,Fax,Zipcode,Status,DESCRIPTION) VALUES({#org.id},{name},{shortfor},{address},{tel},{fax},{zipcode},{status},{desc})]]>
+<![CDATA[INSERT INTO CM_org(ID,Code,NAME,Shortfor,Org_Type,Higher_ID,Address,Tel,Fax,Zipcode,Status,DESCRIPTION) VALUES({#org.id},{code},{name},{shortfor},{org_type},{Higher_ID},{address},{tel},{fax},{zipcode},{status},{desc})]]>
 							</value>
 						</property>
 					</bean>
@@ -196,7 +271,7 @@ VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{m
 					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
 						<property name="sql">
 							<value>
-<![CDATA[INSERT INTO CM_role(ID,NAME,Status,DESCRIPTION) VALUES({#role.id},{name},{status},{desc})]]>
+<![CDATA[INSERT INTO CM_role(ID,CODE,NAME,Status,IS_EXT,DESCRIPTION) VALUES({#role.id},{code},{name},{status},{isext},{desc})]]>
 							</value>
 						</property>
 					</bean>
@@ -206,6 +281,44 @@ VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{m
 						<property name="sql">
 							<value>
 <![CDATA[INSERT INTO cm_user_role_rel(USER_ID,ROLE_ID) VALUES({userid},{roleid})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dict.def.addRoleResourceid">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+<![CDATA[INSERT INTO CM_ROLE_RESOURCE_REL(ROLE_ID,RESOURCE_ID) VALUES({roleid},{resourceid})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dict.def.addResource">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+<![CDATA[INSERT INTO CM_RESOURCE(ID,NAME,URI,TYPE,STATUS,DESCRIPTION) VALUES({id},{name},{uri},{type},{status},{desc})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dict.def.addMenu">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+<![CDATA[INSERT INTO CM_MENU (ID,CODE,NAME,HIGHER_ID,SEQ,RESOURCE_ID,ICON_URI,HINT,Path,Layer,Detail,STATUS,DESCRIPTIOIN)
+VALUES ({#menu.id},{code},{name},{higher_id},{seq:int},{resource_id},{icon_uri},{hint},{path},{layer:int},{detail},{status},{desc})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>				
+				<entry key="dict.def.addPartner">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+<![CDATA[INSERT INTO Cm_Partner(ID,Company_ID,Dept_ID,BusiOrg_ID,TYPE,CODE,NAME,UUID_CODE,TAX_CODE,OF_TRADE,LEGAL_BODY,CREDIT_LEVEL,BANK,BANK_ACCOUNT,LINK_MAN,MOBILE,PHONE,FAX,DESCRIPTION,Of_Region)
+ 				VALUES({#partner.id},{companyid},{deptid},{busiorgid},{type},{code},{name},{uuid_code},{tax_code},{of_trade},{legal_body},{credit_level},{bank},{bank_account},{link_man},{mobile},{phone},{fax},{description},{ofregion})]]>
 							</value>
 						</property>
 					</bean>
@@ -263,7 +376,7 @@ VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{m
 					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
 						<property name="sql">
 							<value>
-<![CDATA[UPDATE CM_ORG SET NAME={name},Shortfor={shortfor},Address={address},Tel={tel},Fax={fax},Zipcode={zipcode},STATUS={status},DESCRIPTION={description} WHERE ID={id}]]>
+<![CDATA[UPDATE CM_ORG SET code={code}, NAME={name},Shortfor={shortfor},org_type={org_type},Higher_ID={Higher_ID},Address={address},Tel={tel},Fax={fax},Zipcode={zipcode},STATUS={status},DESCRIPTION={description} WHERE ID={id}]]>
 							</value>
 						</property>
 					</bean>
@@ -272,7 +385,37 @@ VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{m
 					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
 						<property name="sql">
 							<value>
-<![CDATA[UPDATE CM_role SET NAME={name},STATUS={status},DESCRIPTION={description} WHERE ID={id}]]>
+<![CDATA[UPDATE CM_role SET CODE={code},NAME={name},STATUS={status},DESCRIPTION={description} WHERE ID={id}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dict.def.updateresource">
+					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+						<property name="sql">
+							<value>
+<![CDATA[UPDATE CM_RESOURCE SET NAME={name},URI={uri},TYPE={type},STATUS={status},DESCRIPTION={description} WHERE ID={id}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dict.def.updateMenu">
+					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+						<property name="sql">
+							<value>
+<![CDATA[UPDATE CM_MENU SET CODE ={code},NAME = {name},HIGHER_ID = {higher_id},SEQ = {seq},RESOURCE_ID = {resource_id},ICON_URI = {icon_uri},HINT = {hint},Path = {path},Layer = {layer},STATUS = {status},DESCRIPTIOIN = {descriptioin} WHERE ID={id}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>				
+				<entry key="dict.def.updatepartner">
+					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+						<property name="sql">
+							<value>
+<![CDATA[UPDATE Cm_Partner SET TYPE={type},CODE={code},NAME={name},
+UUID_CODE={uuid_code},TAX_CODE={tax_code},OF_TRADE={of_trade},
+LEGAL_BODY={legal_body},CREDIT_LEVEL={credit_level},BANK={bank},BANK_ACCOUNT={bank_account}
+,LINK_MAN={link_man},MOBILE={mobile},PHONE={phone},FAX={fax},DESCRIPTION={description}  WHERE ID={id}]]>
 							</value>
 						</property>
 					</bean>
@@ -338,6 +481,34 @@ VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{m
 						<property name="sql">
 							<value>
 <![CDATA[DELETE FROM cm_user_role_rel WHERE USER_ID={userid} and ROLE_ID={roleid}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dict.def.deleRoleResource">
+					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+						<property name="sql">
+							<value>
+<![CDATA[DELETE FROM CM_ROLE_RESOURCE_REL WHERE ROLE_ID={roleid} and RESOURCE_ID={resourceid}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dict.def.deleResource">
+					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+						<property name="sql">
+							<value>
+<![CDATA[DELETE FROM CM_RESOURCE WHERE ID={id} ]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				
+				<entry key="dict.def.deletepartner">
+					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+						<property name="sql">
+							<value>
+<![CDATA[DELETE FROM Cm_Partner WHERE ID={id} ]]>
 							</value>
 						</property>
 					</bean>

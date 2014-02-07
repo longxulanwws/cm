@@ -17,6 +17,36 @@
 						<property name="group" value="true" />
 					</bean>
 				</entry>
+				<entry key="user.id">
+					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+						<property name="rule" value="{seq(6)}" />
+						<property name="init" value="10" />
+					</bean>
+				</entry>
+				<entry key="org.id">
+					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+						<property name="rule" value="{seq(6)}" />
+						<property name="init" value="10" />
+					</bean>
+				</entry>
+				<entry key="role.id">
+					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+						<property name="rule" value="{seq(4)}" />
+						<property name="init" value="10" />
+					</bean>
+				</entry>
+				<entry key="menu.id">
+					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+						<property name="rule" value="{seq(4)}" />
+						<property name="init" value="10" />
+					</bean>
+				</entry>				
+				<entry key="partner.id">
+					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+						<property name="rule" value="{seq(6)}" />
+						<property name="init" value="10" />
+					</bean>
+				</entry>
 			</map>
 		</property>
 	</bean>
