@@ -177,7 +177,7 @@ function getData(paramName, query, needCache) {
 			}
 			p.sort();
 			for (var i = 0; i < p.length; i++) {
-				p[i] = $.parseJSON(p[i].replace(/^(?:\d+):/, ''));
+				p[i] = $.parseJSON(p[i].replace(/^[^:]+:/, ''));
 			}
 			return p;
 		}

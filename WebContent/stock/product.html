@@ -13,6 +13,8 @@
 		<script src="../js/json2.js" type="text/javascript"></script>
 		<script type="text/javascript">
 			var pTree, pGrid;
+			var pType = getData('product.type');
+			var pNode;
 			$(function() {
 				$("#layout_main").ligerLayout({
 					leftWidth:230,
@@ -27,8 +29,10 @@
 	                isExpand:false,
 	                checkbox:false,
 	                onSelect:function(data) {
-		                if (data.data && data.data.leaf == '1')
-		                	toQuery(data.data.code);
+		                if (data.data && data.data.leaf == '1') {
+		                	pNode = data.data.code;
+	                		toQuery();
+		                }
 		            },
 	                data:pType
 				});
@@ -41,10 +45,10 @@
 	                    {display:'规格/型号',name:'name',width:180,minWidth:60,align:'left'},
 	                    {display:'品牌',name:'name',width:180,minWidth:60,align:'left'},
 	                    {display:'性质',name:'name',width:180,minWidth:60,align:'left'},
-	                    {display:'计量单位',name:'name',width:180,minWidth:60,align:'left'},
-	                    {display:'副计量',name:'name',width:180,minWidth:60,align:'left'},
-	                    {display:'库存计量',name:'name',width:180,minWidth:60,align:'left'},
-	                    {display:'库存副计量',isSort:false,width:100}
+	                    {display:'计量单位',name:'name',width:180,minWidth:60,align:'left'}
+// 	                    {display:'副计量',name:'name',width:180,minWidth:60,align:'left'},
+// 	                    {display:'库存计量',name:'name',width:180,minWidth:60,align:'left'},
+// 	                    {display:'库存副计量',isSort:false,width:100}
                     ],
                     pageSize:20,
                     usePager: true,
@@ -63,31 +67,52 @@
 				appendAddBtn(toAdd);
 				appendModifyBtn(function(){});
 				appendDeleteBtn(function(){});
+				$("#detail_form").ligerForm();
+				$("#d-menu").ligerToolBar({items:[
+				    {text:'保存',click:toSave,icon:'add'},
+					{line:true},
+				    {text:'清空',click:resetArea,icon:'clear'},
+					{line:true}
+				]});
 				$("#pageloading").hide();
 			});
-			var pType = getData('product.type');
+			var detailDialog;
 			function toAdd() {
+				if (!pNode) {
+					$.ligerDialog.error('请先选择商品类型。','错误');
+					return;
+				}
+				detailDialog = $.ligerDialog.open({
+					target:$("#detail"),
+					title:"新增商品",
+					width:650,
+					height:360
+				});
 			}
 			function toDel() {
 			}
-			function toQuery(code) {
+			function toQuery() {
 				var page = pGrid.options.page;
 				var pageSize = pGrid.options.pageSize;
 
 				var param = new Object();
-				if (!code)
-					code = pTree.getSelected().data.code;
-				param.code = code;
+				if (!pNode)
+					pNode = pTree.getSelected().data.code;
+				param.code = pNode;
 
 				var data = JSON.stringify(reqObj('q','stock.select.product.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					pGrid.set({data: data['data']});
 				});
 			}
+			function toSave() {}
+			function resetArea() {}
 		</script>
 		<style>
 			.overflow-auto {overflow:auto;height:100%;}
 			.hidden {display:none;}
+			#detail{overflow:auto;height:100%;}
+			.l-dialog-win .l-dialog-content{padding:0 !important;}
 		</style>
 	</head>
 	<body>
@@ -103,6 +128,45 @@
 					<input type="button" value="取消" onclick="cancelHidden();" />
 				</div>
 			</div>
-		</div> 
+		</div>
+		<div id="detail">
+			<div id="d-menu"></div>
+			<div style="height:5px;"></div>
+			<form id="detail_form">
+				<div class="line-div">
+					<div class="label-div"><label>物料编号</label></div>
+					<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
+					<div class="label-div"><label>物料名称</label></div>
+					<div class="in-div"><input type="text" id="originS" ltype="text" class="diff" /></div>
+				</div>
+               	<div class="line-div">
+					<div class="label-div"><label>品牌</label></div>
+					<div class="in-div"><input type="text" id="partnerS" ltype="text" class="diff" /></div>
+					<div class="label-div"> <label>规格型号</label></div>
+					<div class="in-div"><input type="text" id="predDateS" ltype="text" class="diff" /></div>
+				</div>
+               	<div class="line-div">
+					<div class="label-div"><label>计量单位</label></div>
+					<div class="in-div"><select id="uomIdS" param="uom" first=""></select></div>
+					<div class="label-div"><label>单位精度</label></div>
+					<div class="in-div"><select id="uomPresS" param="uom_pres" first=""></select></div>
+				</div>
+               	<div class="line-div">
+					<div class="label-div"><label>物料性质</label></div>
+					<div class="in-div" style="width:72%;"><select id="typeS" param="product_category" first=""></select></div>
+				</div>
+				<div class="line-div" style="height:76px;">
+					<div class="label-div"><label>备注</label></div>
+					<div class="in-div" style="width:72%;">
+						<textarea id="" cols="73" rows="3" id="noteS"></textarea>
+					</div>
+				</div>
+				<input type="hidden" id="idS" />
+				<input type="hidden" id="companyIdS" />
+				<input type="hidden" id="stateS" value="1" />
+				<input type="hidden" id="createCompanyIdS" />
+				<input type="hidden" id="createUserS" />
+		    </form>
+		</div>
 	</body>
 </html>

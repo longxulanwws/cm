@@ -16,6 +16,9 @@
 			$(function(){
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
+ 						{display:'操作',isSort:false,width:60,render:function(rowdata,rowindex,value) {
+                        	return "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> "; 
+                        },frozen:true},
 	                    {display:'入库单号',name:'code',width:130,minWidth:60},
 	                    {display:'采购单号',name:'origin',width:130},
 			            {display:'供应商',name:'partner_id',width:290,align:'left'},
@@ -79,6 +82,10 @@
 					}
 				});
 			}
+			var printWin;
+			function toPrint(rowid) {
+				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+			}
 	    </script>
 		<style type="text/css">
 			label{margin: 5px 20px 5px 15px;}
@@ -89,6 +96,7 @@
 			.labelD {width:13%;position:relative;float:left;padding-top:3px;}
 			.dplD {width:36%;position:relative;float:left;}
 			.title{font-size:14px;font-weight:bold;background-position:left;padding-left:18px;}
+			.l-dialog-content-nopadding{padding:0 !important;}
 		</style>
 	</head>
 	<body style="padding:0;">
