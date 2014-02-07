@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>角色维护</title>
+		<title>资源维护</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -32,15 +32,12 @@
                             }
                             return h;
                         },frozen:true},
-                        {display:'编号',name:'code',width:180,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'名称',name:'name',width:180,minWidth:60,align:'left',editor:{type:'text'}},
-	                  //  {display:'是否继承',name:'isext',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
+                        {display:'资源ID',name:'id',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'名称',name:'name',width:100,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'位置',name:'uri',width:200,minWidth:150,align:'left',editor:{type:'text'}},
+	                    {display:'类型',name:'type',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'状态',name:'status',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
-	                    {display:'资源设置',isSort:false,width:100,render:function(rowdata,rowindex,value){
-							return "<a href='javascript:void(0);' class='opt-link' onclick='open2(" + rowindex + ")'>资源设置</a>";
-			            }},
-	                    {display:'说明',name:'description',width:200,align:'left',editor:{type:'text'}}
-	                    
+			            {display:'说明',name:'description',width:200,align:'left',editor:{type:'text'}}
                     ],
                     pageSize:10,
                     usePager: true,
@@ -62,7 +59,6 @@
 //                     onToNext: toNext,
 //                     onToPrev: toPrev,
                     param_status:'rbac.status'
-                   
 				});
 				defGrid.options.dataAction = 'server';
 				appendAddBtn(openDictDef, "添加字典字义");
@@ -102,11 +98,11 @@
 					pageSize = defGrid.options.pageSize;
 				
 				var param = new Object();
-				param.name = $("#name").val();
+			  
+				param.name = $("#dictName").val();
 				//param.code = $("#dictCode").val();
 				param.status = $("#dictStatus").val();
-
-				var data = JSON.stringify(reqObj('q','rbac.select.dict.def.queryRole',JSON.stringify(param),'l',true,page,pageSize));
+				var data = JSON.stringify(reqObj('q','rbac.select.dict.def.queryResource',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=q", data, function(data) {
 					defGrid.set({data: data['data']});
 				});
@@ -138,19 +134,20 @@
 				toReset('#new_dict_def input,select,textarea');
 				addDialog = $.ligerDialog.open({
 					target:$("#new_dict_def"),
-					title:"新增角色",
+					title:"新增资源",
 					width:350,
-					height:400
+					height:450
 				});
 			}
 			function toAdd() {
 				var param = new Object();
-				param.code=$("#newCode").val();
+				param.id=$("#resourceid").val();
 				param.name = $("#newName").val();
-				param.isext = $("#newIsext").val();
+				param.uri = $("#newUri").val();
+				param.type=$("#newType").val();
 				param.status = $("#newStatus").val();
 				param.desc=$("#newDesc").val();
-				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addrole',JSON.stringify(param)));
+				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addResource',JSON.stringify(param)));
 				
 				ajaxSubmit("/cm/rbac/cm.do?m=a", data, function(data) {
 					if (data) {
@@ -160,24 +157,15 @@
 							addDialog.hide();
 							toQuery();
 						});
-						} else if (parseInt(data['status']) == -1) {
-							$.ligerDialog.error('机构[' + $("#newName").val() + ']已存在<br>不能重复添加','错误');
-						} else {
+						}  else {
 							$.ligerDialog.error('保存失败');
 						}
 					}
 				});
 			}
-			function open2(rowid) {
-				 roleid = defGrid.getRow(rowid)['id'];;
-				 $.ligerDialog.open ({ height: 400,width:450, title:'角色资源设置',url: '/cm/sysmgt/role_menu.html?roleid='+roleid+'', isResize:true  });
-
-		            //parent.f_addTab('role_menu','资源设置','./sysmgt/role_menu.html?roleid='+roleid+'');
-		            
-		        }
 			function toModify(row) {
 				
-				 var param = JSON.stringify(reqObj('u','rbac.update.dict.def.updaterole',row));
+				 var param = JSON.stringify(reqObj('u','rbac.update.dict.def.updateresource',row));
 					//alert(param);
 					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 						if (data) {
@@ -190,7 +178,7 @@
 					});
 			}
 			function toDel(row) {
-				 var param = JSON.stringify(reqObj('d','rbac.delete.dict.def.deleterole',row));
+				 var param = JSON.stringify(reqObj('d','rbac.delete.dict.def.deleResource',row));
 					ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
 						if (data) {
 							if (parseInt(data['status']) > 0) {
@@ -218,9 +206,9 @@
 	<body style="padding:0;">
 		<div id="pageloading"></div>  
 		<div id="layout_main">
-			<div position="center" id="a_center" title="机构列表">
+			<div position="center" id="a_center" title="资源列表">
 				<div id="query_cond" class="fields">
-					<label>名称</label><input type="text" class="s-text txt-def" id="name" />
+					<label>名称</label><input type="text" class="s-text txt-def" id="dictName" />
 					<label>状态</label><select id="dictStatus" param="rbac.status" first=""></select>
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
 					<input type="button" value="清空" onclick="toReset('#query_cond input,select,textarea');" />
@@ -230,19 +218,23 @@
 		</div>
 		<div id="new_dict_def" style="display:none;overflow:hidden;">
 			<div class="lineD" style="margin-bottom:10px;">
-				<span class="title l-icon-add">添加角色</span>
+				<span class="title l-icon-add">添加资源</span>
+			</div>
+			<div class="lineD">
+				<div class="labelD"><label>资源ID</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="resourceid" /></div>
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>名称</label></div>
 				<div class="dplD"><input type="text" class="s-text txt-def" id="newName" /></div>
 			</div>
 			<div class="lineD">
-				<div class="labelD"><label>编号</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newCode" /></div>
+				<div class="labelD"><label>位置</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newUri" /></div>
 			</div>
-			  <div class="lineD">
-				<div class="labelD"><label>继承</label></div>
-				<div class="dplD"><select class="txt-def" id="newIsext" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
+			<div class="lineD">
+				<div class="labelD"><label>类型</label></div>
+			<div class="dplD"><select class="txt-def" id="newType" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>状态</label></div>

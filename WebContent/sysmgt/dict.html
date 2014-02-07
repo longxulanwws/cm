@@ -30,10 +30,11 @@
 	                    {display:'名称',name:'name',width:180,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'代码',name:'code',width:180,align:'left',editor:{type:'text'}},
 	                    {display:'状态',name:'status',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
-	                    {display:'说明',name:'description',align:'left',editor:{type:'text'}},
 	                    {display:'字典数据项',isSort:false,width:100,render:function(rowdata,rowindex,value){
 							return "<a href='javascript:void(0);' class='opt-link' onclick='openDictItem(" + rowindex + ")'>管理字典数据项</a>";
-			            }}
+			            }},
+	                    {display:'说明',name:'description',width:200,align:'left',editor:{type:'text'}}  
+	                    
                     ],
                     pageSize:10,
                     usePager: true,
@@ -136,7 +137,12 @@
 				});
 			}
 			function openDictItem(index) {
-				
+				alert('123123');
+				//userid = defGrid.getRow(rowid)['id'];;
+				// var userName
+				 //userName = defGrid.getRow(rowid)['name'];;
+		       parent.f_addTab('dictitem','管理字典数据项','./sysmgt/dictitem.html');
+		            
 			}
 			function toAdd() {
 				var url = "/cm/rbac/cmDict.do?m=a";

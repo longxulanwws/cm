@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>用户维护</title>
+		<title>资源维护</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -19,7 +19,7 @@
 
         $(function ()
         { 
-        	userid=window.location.toString().replace(/^[^?]+\?userid=/,'');
+        	roleid=window.location.toString().replace(/^[^?]+\?roleid=/,'');
         	
         	  defGrid= $("#listbox1").ligerListBox({
                 isShowCheckBox: true,
@@ -27,11 +27,11 @@
                 valueField: 'id',
                 textField: 'name',
                 valueFieldID: 'test1',
-                height: 140
+                height: 240
             });
         	var param = new Object();
-		    param.userid=userid;
-            var data = JSON.stringify(reqObj('q','rbac.select.dict.def.queryuserrole',JSON.stringify(param)));
+		    param.roleid=roleid;
+            var data = JSON.stringify(reqObj('q','rbac.select.dict.def.queryRoleResouce',JSON.stringify(param)));
             ajaxSubmit("/cm/rbac/cm.do?m=q", data, function(data) {
             	defGrid.set({data: data['data'].Rows});
 			},null,false);
@@ -42,10 +42,10 @@
                 valueField: 'id',
                 textField: 'name',
                 valueFieldID: 'test2',
-                height: 140
+                height: 240
             });
         	
-            var data2 = JSON.stringify(reqObj('q','rbac.select.dict.def.queryuserroleyes',JSON.stringify(param)));
+            var data2 = JSON.stringify(reqObj('q','rbac.select.dict.def.queryRoleResouceyes',JSON.stringify(param)));
             ajaxSubmit("/cm/rbac/cm.do?m=q", data2, function(data) {
             	defGrid2.set({data: data['data'].Rows});
 			}, null, false);
@@ -60,25 +60,27 @@
             box1.addItems(selecteds);
             
             var test2=$("#test2").val();
-            
+            //alert(test2);
             if( test2.indexOf(';')<0)
             {
 	            var param = new Object();
-			    param.roleid=test2;
-				param.userid = userid;
-				var param = JSON.stringify(reqObj('d','rbac.delete.dict.def.deleUserrole',JSON.stringify(param)));
+	            param.roleid=roleid;
+				param.resourceid = test2;
+				var param = JSON.stringify(reqObj('d','rbac.delete.dict.def.deleRoleResource',JSON.stringify(param)));
 					ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
 				});
            }
            else
            {
             	var result=test2.split(';');
+            	
             	for(var i=0;i<result.length;i++)
                 {
                 	var param = new Object();
-    			    param.roleid=result[i];
-    				param.userid = userid;
-    				var param = JSON.stringify(reqObj('d','rbac.delete.dict.def.deleUserrole',JSON.stringify(param)));
+    			    param.resourceid=result[i];
+    				param.roleid = roleid;
+    				//alert(param.resourceid);
+    				var param = JSON.stringify(reqObj('d','rbac.delete.dict.def.deleRoleResource',JSON.stringify(param)));
     					ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
     				});
             	}
@@ -92,13 +94,13 @@
             box1.removeItems(selecteds);
             box2.addItems(selecteds);
             var test1=$("#test1").val();
-
+           // alert(test1);
             if( test1.indexOf(';')<0)
             {
 	            var param = new Object();
-	            param.roleid=test1;
-				param.userid = userid;
-				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addUserRole',JSON.stringify(param)));
+	            param.roleid=roleid;
+				param.resourceid = test1;
+				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addRoleResourceid',JSON.stringify(param)));
 				    ajaxSubmit("/cm/rbac/cm.do?m=a", data, function(data) {
 				});
             }
@@ -108,9 +110,11 @@
 	           	for(var i=0;i<result.length;i++)
 		        {
 		           	var param = new Object();
-			        param.roleid=result[i];
-				    param.userid = userid;
-					var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addUserRole',JSON.stringify(param)));
+			        param.roleid=roleid;
+			        
+				    param.resourceid = result[i];
+				    //alert(param.resourceid);
+					var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addRoleResourceid',JSON.stringify(param)));
 					    ajaxSubmit("/cm/rbac/cm.do?m=a", data, function(data) {
 					});
 	           	}
@@ -143,17 +147,20 @@
     </style>
 </head>
 <body style="padding:10px"> 
-     <div style="margin:4px;float:left;">
-     未分配
+  
+     <div style="margin:4px;float:left; font: bold;">
+            未分配
          <div id="listbox1" ></div>  
      </div>
-     <div style="margin:4px;margin-top:24px;float:left;" class="middle">
+     <div style="margin:30px;margin-top:24px;float:left;" class="middle">
+          
           <input type="button" onclick="moveToRight()" value=">" />
-          <input type="button" onclick="moveToLeft()" value="<" />
+          <input type="button" onclick="moveToLeft()" value="<"  />
          <!--  <input type="button" onclick="moveAllToLeft()" value="<<" />
          <input type="button" onclick="moveAllToRight()" value=">>" /> -->
      </div>
-    <div style="margin:4px;float:left;">
+      
+    <div style="margin:4px;float:right;font: bold;">
     已分配
         <div id="listbox2"></div> 
     </div>

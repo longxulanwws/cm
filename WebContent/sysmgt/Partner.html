@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>角色维护</title>
+		<title>用户维护</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -32,15 +32,21 @@
                             }
                             return h;
                         },frozen:true},
-                        {display:'编号',name:'code',width:180,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'名称',name:'name',width:180,minWidth:60,align:'left',editor:{type:'text'}},
-	                  //  {display:'是否继承',name:'isext',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
-	                    {display:'状态',name:'status',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
-	                    {display:'资源设置',isSort:false,width:100,render:function(rowdata,rowindex,value){
-							return "<a href='javascript:void(0);' class='opt-link' onclick='open2(" + rowindex + ")'>资源设置</a>";
-			            }},
-	                    {display:'说明',name:'description',width:200,align:'left',editor:{type:'text'}}
-	                    
+                        {display:'单位类型',name:'type',width:50,minWidth:60,align:'left',editor:{type:'text'}},
+                        {display:'编号',name:'code',width:40,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'名称',name:'name',width:50,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'组织机构代码证号',name:'uuid_code',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'税号',name:'tax_code',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'所属行业',name:'of_trade',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'法人代表',name:'legal_body',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'信用级别',name:'credit_level',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'开户行',name:'bank',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'银行帐号',name:'bank_account',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'联系人',name:'link_man',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'手机号',name:'mobile',width:50,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'单位电话',name:'phone',width:50,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'单位传真',name:'fax',width:50,minWidth:60,align:'left',editor:{type:'text'}},
+			            {display:'说明',name:'description',width:100,align:'left',editor:{type:'text'}}
                     ],
                     pageSize:10,
                     usePager: true,
@@ -62,11 +68,23 @@
 //                     onToNext: toNext,
 //                     onToPrev: toPrev,
                     param_status:'rbac.status'
-                   
 				});
 				defGrid.options.dataAction = 'server';
-				appendAddBtn(openDictDef, "添加字典字义");
+				appendAddBtn(openUserDef, "添加用户");
 				$("#pageloading").hide();
+			
+			
+				var org_data = getData('org_list');
+				$("#org_combobox").ligerComboBox({
+					autocomplete: true,
+                	valueField:'value',
+                	textField:'name',
+                	data:org_data,
+                	onSelected:function(v,t) {
+                    	$("#orgid").val(v);
+                }
+			});
+			
 			});
 	        function beginEdit(rowid) { 
 	        	defGrid.beginEdit(rowid);
@@ -95,6 +113,7 @@
 			var getStatus = new function () {
 				return getData('rbac.status');
 			}
+			
 			function toQuery(item, page, pageSize) {
 				if (!page)
 					page = defGrid.options.page;
@@ -102,11 +121,11 @@
 					pageSize = defGrid.options.pageSize;
 				
 				var param = new Object();
-				param.name = $("#name").val();
+			    param.account=$("#AccountCode").val();
+				param.name = $("#userName").val();
 				//param.code = $("#dictCode").val();
 				param.status = $("#dictStatus").val();
-
-				var data = JSON.stringify(reqObj('q','rbac.select.dict.def.queryRole',JSON.stringify(param),'l',true,page,pageSize));
+				var data = JSON.stringify(reqObj('q','rbac.select.dict.def.queryPartner',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=q", data, function(data) {
 					defGrid.set({data: data['data']});
 				});
@@ -133,25 +152,59 @@
 					return;
 				toQuery(null, defGrid.options.page - 1);
 			}
+			//新增用户弹出窗口
 			var addDialog;
-			function openDictDef() {
-				toReset('#new_dict_def input,select,textarea');
+			//var index=1;
+			function openUserDef() {
+				
+				//index++;
+		    // parent.f_addTab('partner_add'+index+'','新增公司单位','./sysmgt/partner_add.html');
+		            
+				toReset('#new_user_def input,select,textarea');
 				addDialog = $.ligerDialog.open({
-					target:$("#new_dict_def"),
-					title:"新增角色",
-					width:350,
-					height:400
+					target:$("#new_user_def"),
+					title:"新增公司单位",
+					width:450,
+					height:550
 				});
 			}
+			//密码修改窗口
+			function open_Modfiy_PW(rowid) {
+	        	userid = defGrid.getRow(rowid)['id'];;
+	        	if (userid) {
+		        	toReset('#up_dict_pw input,select,textarea');
+					addDialog = $.ligerDialog.open({
+						target:$("#up_dict_pw"),
+						title:"密码修改",
+						width:350,
+						height:370
+					});
+	        	}
+			}
+			
+			// 新增保存处理
 			function toAdd() {
 				var param = new Object();
-				param.code=$("#newCode").val();
+				param.code=$("#code").val();
 				param.name = $("#newName").val();
-				param.isext = $("#newIsext").val();
-				param.status = $("#newStatus").val();
-				param.desc=$("#newDesc").val();
-				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addrole',JSON.stringify(param)));
-				
+				param.type = $("#newType").val();
+				param.uuid_code=$("#newuuid_code").val();
+				param.tax_code = $("#newTax_code").val();
+				param.of_trade=$("#newOf_trade").val();
+				param.legal_body=$("#newLegal_body").val();
+				param.credit_level=$("#newCredit_level").val();
+				param.bank=$("#newBank").val();
+				param.bank_account=$("#newBank_account").val();
+				param.link_man=$("#newLink_man").val();
+				param.mobile=$("#newMobile").val();
+				param.phone=$("#newPhone").val();
+				param.fax=$("#newFax").val();
+				param.description=$("#newDesc").val();
+				param.companyid='0001';
+				param.deptid='0001';
+				param.busiorgid='0001';
+				param.ofregion='0001';
+				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addPartner',JSON.stringify(param)));
 				ajaxSubmit("/cm/rbac/cm.do?m=a", data, function(data) {
 					if (data) {
 						//alert(parseInt(data['status']));
@@ -160,24 +213,16 @@
 							addDialog.hide();
 							toQuery();
 						});
-						} else if (parseInt(data['status']) == -1) {
-							$.ligerDialog.error('机构[' + $("#newName").val() + ']已存在<br>不能重复添加','错误');
-						} else {
+						}  else {
 							$.ligerDialog.error('保存失败');
 						}
 					}
 				});
 			}
-			function open2(rowid) {
-				 roleid = defGrid.getRow(rowid)['id'];;
-				 $.ligerDialog.open ({ height: 400,width:450, title:'角色资源设置',url: '/cm/sysmgt/role_menu.html?roleid='+roleid+'', isResize:true  });
-
-		            //parent.f_addTab('role_menu','资源设置','./sysmgt/role_menu.html?roleid='+roleid+'');
-		            
-		        }
-			function toModify(row) {
+			
+		   function toModify(row) {
 				
-				 var param = JSON.stringify(reqObj('u','rbac.update.dict.def.updaterole',row));
+				 var param = JSON.stringify(reqObj('u','rbac.update.dict.def.updatepartner',row));
 					//alert(param);
 					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 						if (data) {
@@ -189,8 +234,10 @@
 						}
 					});
 			}
+		   //删除时，判断此用户下是否已设置角色信息，删除时提示，将删除用户的角色设置信息
+		   //确认删除时，将用户下的角色设置信息一并删除。
 			function toDel(row) {
-				 var param = JSON.stringify(reqObj('d','rbac.delete.dict.def.deleterole',row));
+				 var param = JSON.stringify(reqObj('d','rbac.delete.dict.def.deletepartner',row));
 					ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
 						if (data) {
 							if (parseInt(data['status']) > 0) {
@@ -218,35 +265,66 @@
 	<body style="padding:0;">
 		<div id="pageloading"></div>  
 		<div id="layout_main">
-			<div position="center" id="a_center" title="机构列表">
+			<div position="center" id="a_center" title="用户列表">
 				<div id="query_cond" class="fields">
-					<label>名称</label><input type="text" class="s-text txt-def" id="name" />
-					<label>状态</label><select id="dictStatus" param="rbac.status" first=""></select>
+					<label>名称</label><input type="text" class="s-text txt-def" id="PartnerName" />
+					<label>编号</label><input type="text" class="s-text txt-def" id="PartnerCode" />
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
 					<input type="button" value="清空" onclick="toReset('#query_cond input,select,textarea');" />
 				</div>
 				<div id="query_list"></div>
 			</div>
 		</div>
-		<div id="new_dict_def" style="display:none;overflow:hidden;">
+		<div id="new_user_def" style="display:none;overflow:hidden;">
 			<div class="lineD" style="margin-bottom:10px;">
-				<span class="title l-icon-add">添加角色</span>
+				<span class="title l-icon-add">添加往来单位</span>
+			</div>
+			<div class="lineD">
+				<div class="labelD"><label>编号</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="code" /></div>
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>名称</label></div>
 				<div class="dplD"><input type="text" class="s-text txt-def" id="newName" /></div>
 			</div>
 			<div class="lineD">
-				<div class="labelD"><label>编号</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newCode" /></div>
-			</div>
-			  <div class="lineD">
-				<div class="labelD"><label>继承</label></div>
-				<div class="dplD"><select class="txt-def" id="newIsext" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
+				<div class="labelD"><label>单位类型</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newType" /></div>
 			</div>
 			<div class="lineD">
-				<div class="labelD"><label>状态</label></div>
-				<div class="dplD"><select class="txt-def" id="newStatus" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
+				<div class="labelD"><label>组织机构代码证号</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newuuid_code" /></div>
+			</div><div class="lineD">
+				<div class="labelD"><label>税号</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newTax_code" /></div>
+			</div><div class="lineD">
+				<div class="labelD"><label>所属行业</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newOf_trade" /></div>
+			</div><div class="lineD">
+				<div class="labelD"><label>法人代表</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newLegal_body" /></div>
+			</div><div class="lineD">
+				<div class="labelD"><label>信用级别</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newCredit_level" /></div>
+			</div><div class="lineD">
+				<div class="labelD"><label>开户行</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newBank" /></div>
+			</div><div class="lineD">
+				<div class="labelD"><label>银行帐号</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newBank_account" /></div>
+			</div><div class="lineD">
+				<div class="labelD"><label>联系人</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newLink_man" /></div>
+			</div><div class="lineD">
+				<div class="labelD"><label>手机号</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newMobile" /></div>
+			</div><div class="lineD">
+				<div class="labelD"><label>单位电话</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newPhone" /></div>
+			</div>
+			<div class="lineD">
+				<div class="labelD"><label>单位传真</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newFax" /></div>
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>说明</label></div>
@@ -254,9 +332,10 @@
 			</div>
 			<div class="lineD" style="margin-top:15px;padding-left:30%;">
 				<input type="button" value="保存" onclick="toAdd();" />
-				<input type="button" value="清空" onclick="toReset('#new_dict_def input,select,textarea')" />
+				<input type="button" value="清空" onclick="toReset('#new_user_def input,select,textarea')" />
 			</div>
 		</div>
+		
 		
 	</body>
 </html>
