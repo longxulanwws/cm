@@ -71,19 +71,19 @@ public class ParamGenerator {
 			
 			LOG.debug(params);
 			return params;
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			LOG.error("生成字典项[".concat(id).concat("]发生错误"), e);
 		}
 		
 		return null;
 	}
 		
-	public String genFormDict(String id, JSONObject args) throws JSONException {
+	public String genFormDict(String id, JSONObject args) throws Exception {
 		List<JSONObject> items = baseDAO.query(args, DICT_ITEM_QUERY);
 		return reorgParam(items);
 	}
 	
-	public String generate(SQLParamEntity entity, JSONObject args) throws JSONException {
+	public String generate(SQLParamEntity entity, JSONObject args) throws Exception {
 		if (args == null || args.isNull("d")) {
 			LOG.error("未提供目标参数定义名称");
 			return null;

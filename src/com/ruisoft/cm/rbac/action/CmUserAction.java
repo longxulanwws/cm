@@ -7,7 +7,6 @@ import java.util.Date;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -48,7 +47,6 @@ public class CmUserAction extends BaseAction {
 			else { // 登录成功
 				// 机构信息
 				// 添加用户信息
-				HttpSession session = request.getSession();
 				// 用户信息
 				session.setAttribute(SysConstants.USER_INFO.toString(), user);
 				// 菜单项
@@ -65,7 +63,6 @@ public class CmUserAction extends BaseAction {
 	
 	@RequestMapping(params = "method=getUserInfo")
 	public String getUserInfo() {
-		HttpSession session = request.getSession();
 		JSONObject user = (JSONObject) session.getAttribute(SysConstants.USER_INFO.toString());
 		
 		try {
@@ -89,7 +86,6 @@ public class CmUserAction extends BaseAction {
 	@RequestMapping(params = "method=logout")
 	public String logout(HttpServletRequest request,
 			HttpServletResponse response) {
-		HttpSession session = request.getSession();
 		session.removeAttribute(SysConstants.USER_INFO.toString());
 		try {
 			response.sendRedirect(request.getContextPath() + "/index.html");

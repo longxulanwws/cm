@@ -96,6 +96,7 @@ public class CommonAction extends BaseAction {
 		} catch (Exception e) {
 			LOG.error("执行查询操作发生错误", e);
 			returnJson.put("status", "-2");
+			returnJson.put("msg", "执行查询操作发生错误");
 		} finally {
 			try {
 				LOG.debug(returnJson);
@@ -125,11 +126,16 @@ public class CommonAction extends BaseAction {
 				returnJson.put("msg", "没有指定插入实体名称");
 			} else {
 				int r = baseDAO.add(reqData.getString("data"), entityName);
+				if (r < 1) {
+					r = -3;
+					returnJson.put("msg", "未能成功添加数据");
+				}
 				returnJson.put("status", r);
 			}
 		} catch (Exception e) {
 			LOG.error("执行插入操作发生错误", e);
 			returnJson.put("status", "-2");
+			returnJson.put("msg", "执行插入操作发生错误");
 		} finally {
 			try {
 				response(returnJson);
@@ -154,11 +160,16 @@ public class CommonAction extends BaseAction {
 				returnJson.put("msg", "没有指定插入实体名称");
 			} else {
 				int r = baseDAO.batchAdd(reqData.getJSONArray("data"), entityName);
+				if (r < reqData.getJSONArray("data").length()) {
+					r = -3;
+					returnJson.put("msg", "未能成功添加数据");
+				}
 				returnJson.put("status", r);
 			}
 		} catch (Exception e) {
 			LOG.error("执行插入操作发生错误", e);
 			returnJson.put("status", "-2");
+			returnJson.put("msg", "执行插入操作发生错误");
 		} finally {
 			try {
 				response(returnJson);
@@ -185,11 +196,16 @@ public class CommonAction extends BaseAction {
 				returnJson.put("msg", "没有指定更新实体名称");
 			} else {
 				int r = baseDAO.update(reqData.getString("data"), entityName);
+				if (r < 1) {
+					r = -3;
+					returnJson.put("msg", "未能成功添加数据");
+				}
 				returnJson.put("status", r);
 			}
 		} catch (Exception e) {
 			LOG.error("执行更新操作发生错误", e);
 			returnJson.put("status", "-2");
+			returnJson.put("msg", "执行更新操作发生错误");
 		} finally {
 			try {
 				response(returnJson);
@@ -214,11 +230,16 @@ public class CommonAction extends BaseAction {
 				returnJson.put("msg", "没有指定删除实体名称");
 			} else {
 				int r = baseDAO.delete(reqData.getString("data"), entityName);
+				if (r < 1) {
+					r = -3;
+					returnJson.put("msg", "未能成功添加数据");
+				}
 				returnJson.put("status", r);
 			}
 		} catch (Exception e) {
 			LOG.error("执行删除操作发生错误", e);
 			returnJson.put("status", "-2");
+			returnJson.put("msg", "执行删除操作发生错误");
 		} finally {
 			try {
 				response(returnJson);
@@ -243,11 +264,16 @@ public class CommonAction extends BaseAction {
 				returnJson.put("msg", "没有指定删除实体名称");
 			} else {
 				int r = baseDAO.batchDelete(reqData.getJSONArray("data"), entityName);
+				if (r < reqData.getJSONArray("data").length()) {
+					r = -3;
+					returnJson.put("msg", "未能成功添加数据");
+				}
 				returnJson.put("status", r);
 			}
 		} catch (Exception e) {
 			LOG.error("执行删除操作发生错误", e);
 			returnJson.put("status", "-2");
+			returnJson.put("msg", "执行删除操作发生错误");
 		} finally {
 			try {
 				response(returnJson);

@@ -3,11 +3,14 @@ package com.ruisoft.cm.rbac.dao;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
@@ -48,13 +51,24 @@ public class BaseDAO {
 	
 	@Resource
 	protected HttpServletRequest request = null;
-	
+
 	public HttpServletRequest getRequest() {
 		return request;
 	}
 
 	public void setRequest(HttpServletRequest request) {
 		this.request = request;
+	}
+	
+	@Resource
+	protected HttpSession session = null;
+	
+	public void setSession(HttpSession session) {
+		this.session = session;
+	}
+	
+	public HttpSession getSession() {
+		return session;
 	}
 	
 	@Resource
@@ -74,7 +88,7 @@ public class BaseDAO {
 	private DeleteEntity dEntity = null;
 
 	public List<JSONObject> query(JSONObject json, QueryEntity query)
-			throws JSONException {
+			throws Exception {
 		String sql = query.getSql(json);
 		LOG.debug("执行查询:" + sql);
 		
@@ -90,17 +104,17 @@ public class BaseDAO {
 	}
 	
 	public List<JSONObject> query(JSONObject json, String id)
-			throws JSONException {
+			throws Exception {
 		return query(json, SysCache.get(id, qEntity));
 	}
 	
 	public List<JSONObject> query(String str, QueryEntity query)
-			throws JSONException {
+			throws Exception {
 		return query(new JSONObject(str), query);
 	}
 	
 	public List<JSONObject> query(String str, String id)
-			throws JSONException {
+			throws Exception {
 		return query(new JSONObject(str), id);
 	}
 	
@@ -289,7 +303,7 @@ public class BaseDAO {
 	}
 	
 	protected Object[] getPreparedParam(JSONObject json, DMLEntity entity)
-			throws JSONException {
+			throws Exception {
 		Map<String, String> cond = entity.getConditions();
 		if (cond == null)
 			return new Object[0];
@@ -301,8 +315,10 @@ public class BaseDAO {
 		for (String k : cond.keySet()) {
 			datatype = cond.get(k);
 			
+			k = k.replaceFirst("~\\d+$", "");
+			
 			if (k.startsWith("#"))
-				val = parseSharp(k.substring(1));
+				val = parseSharp(k.substring(1), json);
 			else if (json.isNull(k))
 				val = null;
 			else if ("str".equals(datatype))
@@ -322,15 +338,50 @@ public class BaseDAO {
 		return params;
 	}
 	
-	private Object parseSharp(String key) {
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	
+	private Object parseSharp(String key, JSONObject json) throws Exception {
 		if (key.equals("uuid")) {
 			return KeyGenerator.getUUID();
 		} else if (key.equals("uuid32")) {
 			return KeyGenerator.get32UUID();
-		} else {
-			// 生成主键
-			return keyGenerator.getKeyByRule(key);
+		} else if (key.startsWith("session") || key.startsWith("request")) {
+			return parseHttp(key);
+		} else if (key.equals("current_date")) {
+			return DATE_FORMAT.format(new Date());
 		}
+		
+		// 生成主键
+		return keyGenerator.getKeyByRule(key, json);
+	}
+	
+	private Object parseHttp(String key) throws Exception {
+		Object obj;
+		if (key.startsWith("session"))
+			obj = session;
+		else
+			obj = request;
+		
+		String[] attrs = key.substring(8)
+				.replaceFirst("^(?:session|request)\\.", "").split("\\.");
+		
+		Object[] params = null;
+		Class<?>[] paramClass = null;
+		
+		for (String attr : attrs) {
+			if (obj instanceof HttpSession || obj instanceof HttpServletRequest) {
+				obj = obj.getClass().getMethod("getAttribute", String.class)
+						.invoke(obj, attr);
+			} else if (obj instanceof Map || obj instanceof JSONObject) {
+				obj = obj.getClass().getMethod("get", String.class)
+						.invoke(obj, attr);
+			} else {
+				obj = obj.getClass().getMethod("get".concat(attr.substring(0, 1)
+						.toUpperCase()).concat(attr.substring(1)), paramClass)
+							.invoke(obj, params);
+			}
+		}
+		return obj;
 	}
 	
 	protected DataSource getDataSource() {

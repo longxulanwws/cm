@@ -55,9 +55,11 @@ public class KeyGenerator {
 		return getUUID().replaceAll("-", "");
 	}
 	
-	public String getKeyByRule(String keyId) {
+	public String getKeyByRule(String keyId, JSONObject values)
+			throws Exception {
 		if (!keyConfig.containsKey(keyId))
-			throw new IllegalArgumentException("KEYID[".concat(keyId).concat("]不存在"));
+			throw new IllegalArgumentException("KEYID[".concat(keyId).concat(
+					"]不存在"));
 		
 		KeyEntity entity = keyConfig.get(keyId);
 		char[] rule = entity.getRule().toCharArray();
@@ -81,7 +83,7 @@ public class KeyGenerator {
 				type = "arg";
 			} else if (r == '}' && "arg".equals(type)) {
 				// 变量结束
-				key.append(invokeArg(sign.toString(), keyId));
+				key.append(invokeArg(sign.toString(), keyId, values));
 				type = null;
 				sign.delete(0, sign.length());
 			} else {
@@ -92,7 +94,8 @@ public class KeyGenerator {
 		return key.toString();
 	}
 	
-	private String invokeArg(String arg, String keyId) {
+	private String invokeArg(String arg, String keyId, JSONObject values)
+			throws Exception {
 		LOG.debug("arg = " + arg);
 		
 		if (arg.startsWith("date")) {
@@ -116,6 +119,8 @@ public class KeyGenerator {
 			return get32UUID();
 		} else if ("num".equals(arg)) {
 			return getSeq("seq", keyId);
+		} else if (arg.startsWith("$")) {
+			return values.getString(arg.substring(1));
 		}
 		
 		return null;
@@ -187,7 +192,7 @@ public class KeyGenerator {
 				}
 			}
 			return fillStr(val, entity.getFillChar(), len);
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			LOG.error("生成序号发生错误", e);
 		}
 		return null;

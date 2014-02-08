@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -16,7 +17,9 @@ import com.ruisoft.cm.rbac.util.JSONUtil;
 public abstract class BaseAction {
 	private static final Logger LOG = Logger.getLogger(BaseAction.class);
 	
-	protected HttpServletRequest request;
+	protected HttpServletRequest request = null;
+	
+	protected HttpSession session = null;
 	
 	protected HttpServletResponse response = null;
 
@@ -24,6 +27,7 @@ public abstract class BaseAction {
 	protected void setContext(HttpServletRequest request, HttpServletResponse response) {
 		this.request = request;
 		this.response = response;
+		this.session = request.getSession();
 	}
 	
 	protected final void response(String json)
