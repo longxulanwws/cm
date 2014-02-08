@@ -35,6 +35,7 @@
                         },frozen:true},
                         {display:'账号',name:'account',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'名称',name:'name',width:100,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'所属机构',name:'orgid',width:100,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'状态',name:'status',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    
 	                    {display:'密码修改',isSort:false,width:100,render:function(rowdata,rowindex,value){
@@ -209,7 +210,7 @@
 			// 新增保存处理
 			function toAdd() {
 				var param = new Object();
-				param.code=$("#code").val();
+				param.code=$("#account").val();
 			    param.account=$("#account").val();
 				param.name = $("#newName").val();
 				param.password = hex_md5($("#password").val()).toUpperCase();
@@ -295,10 +296,11 @@
 			<div class="lineD" style="margin-bottom:10px;">
 				<span class="title l-icon-add">添加用户</span>
 			</div>
-			<div class="lineD">
+			<!--  <div class="lineD">
 				<div class="labelD"><label>编号</label></div>
 				<div class="dplD"><input type="text" class="s-text txt-def" id="code" /></div>
 			</div>
+			-->
 			<div class="lineD">
 				<div class="labelD"><label>账号</label></div>
 				<div class="dplD"><input type="text" class="s-text txt-def" id="account" /></div>

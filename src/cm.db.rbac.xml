@@ -96,7 +96,7 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 						<property name="dmlType" value="cond" />
 						<property name="sql">
 							<value>
-<![CDATA[SELECT ID,NAME,SHORTFOR,HIGHER_ID,ORG_TYPE,DIRECTOR,ADDRESS,TEL,FAX,ZIPCODE,STATUS,DESCRIPTION FROM cm_org]]>
+<![CDATA[SELECT ID,CODE,NAME,SHORTFOR,HIGHER_ID,ORG_TYPE,DIRECTOR,ADDRESS,TEL,FAX,ZIPCODE,STATUS,DESCRIPTION FROM cm_org]]>
 							</value>
 						</property>
 						<property name="conditions">
