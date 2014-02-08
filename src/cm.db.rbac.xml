@@ -14,8 +14,7 @@
 					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
 						<property name="sql">
 							<value>
-<![CDATA[SELECT U.ID UID,U.ACCOUNT,U.NAME UNAME,O.ID OID,O.NAME ONAME,
-CASE WHEN U.STATUS=1 AND O.STATUS=1 THEN 1 ELSE 0 END STATUS
+<![CDATA[SELECT U.ID UID,U.ACCOUNT,U.NAME UNAME,O.ID OID,O.NAME ONAME,CASE WHEN U.STATUS=1 AND O.STATUS=1 THEN 1 ELSE 0 END STATUS
 FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={pwd:str}]]>
 							</value>
 						</property>
@@ -25,16 +24,9 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
 						<property name="sql">
 							<value>
-<![CDATA[SELECT DISTINCT M.ID,M.HIGHER_ID  PID,M.NAME TEXT,cm_resource.URI URL 
-				FROM CM_MENU M ,cm_resource ,cm_user_role_rel ,cm_role_resource_rel       
-				WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID
-       				AND m.RESOURCE_ID=cm_role_resource_rel.RESOURCE_ID
-       				AND cm_resource.ID=m.RESOURCE_ID
-					AND M.STATUS='1' 
-					AND cm_resource.STATUS='1'
-					AND M.ID!='0000'
-					AND cm_user_role_rel.USER_ID={userId}
- 					ORDER BY HIGHER_ID,SEQ]]>
+<![CDATA[SELECT DISTINCT M.Code ID,M.HIGHER_ID  PID,M.NAME TEXT,cm_resource.URI URL 
+FROM CM_MENU M ,cm_resource ,cm_user_role_rel ,cm_role_resource_rel
+WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID AND m.RESOURCE_ID=cm_role_resource_rel.RESOURCE_ID  AND cm_resource.ID=m.RESOURCE_ID AND M.STATUS='1'  AND cm_resource.STATUS='1' AND cm_user_role_rel.USER_ID={userId}  ORDER BY HIGHER_ID,SEQ]]>
 							</value>
 						</property>
 					</bean>
@@ -44,7 +36,7 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 						<property name="dmlType" value="cond" />
 						<property name="sql">
 							<value>
-<![CDATA[SELECT ID,NAME,CODE,STATUS,DESCRIPTION FROM CM_DICT_DEF]]>
+<![CDATA[SELECT ID,NAME,CODE,TYPE,STATUS,DESCRIPTION FROM CM_DICT_DEF]]>
 							</value>
 						</property>
 						<property name="conditions">
@@ -96,7 +88,7 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 						<property name="dmlType" value="cond" />
 						<property name="sql">
 							<value>
-<![CDATA[SELECT ID,NAME,SHORTFOR,HIGHER_ID,ORG_TYPE,DIRECTOR,ADDRESS,TEL,FAX,ZIPCODE,STATUS,DESCRIPTION FROM cm_org]]>
+<![CDATA[SELECT ID,CODE,NAME,SHORTFOR,HIGHER_ID,ORG_TYPE,DIRECTOR,ADDRESS,TEL,FAX,ZIPCODE,STATUS,DESCRIPTION FROM cm_org]]>
 							</value>
 						</property>
 						<property name="conditions">
@@ -181,7 +173,7 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 						<property name="dmlType" value="cond" />
 						<property name="sql">
 							<value>
-<![CDATA[SELECT ID, CODE, NAME, HIGHER_ID, SEQ, RESOURCE_ID, ICON_URI, HINT, Path, Layer, Detail, STATUS, DESCRIPTIOIN FROM cm_menu]]>
+<![CDATA[SELECT ID, CODE, NAME, HIGHER_ID, SEQ, RESOURCE_ID, ICON_URI, HINT, Path, Layer, Detail, STATUS, DESCRIPTIOIN FROM cm_menu order by code]]>
 							</value>
 						</property>
 						<property name="conditions">
@@ -216,7 +208,7 @@ FROM CM_USER U,CM_ORG O WHERE U.ORGID=O.ID AND U.ACCOUNT={uname} AND U.PASSWD={p
 					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
 						<property name="sql">
 							<value>
-<![CDATA[INSERT INTO CM_DICT_DEF(NAME,CODE,STATUS,DESCRIPTION) VALUES({name},{code},{status:int},{desc})]]>
+<![CDATA[INSERT INTO CM_DICT_DEF(ID,NAME,CODE,TYPE,STATUS,DESCRIPTION) VALUES({#dict.id},{name},{code},{type},{status:int},{desc})]]>
 							</value>
 						</property>
 					</bean>
@@ -331,7 +323,7 @@ VALUES ({#menu.id},{code},{name},{higher_id},{seq:int},{resource_id},{icon_uri},
 					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
 						<property name="sql">
 							<value>
-<![CDATA[UPDATE CM_DICT_DEF SET NAME={name},CODE={code},STATUS={status:int},DESCRIPTION={description} WHERE ID={id:int}]]>
+<![CDATA[UPDATE CM_DICT_DEF SET NAME={name},CODE={code},TYPE={type},STATUS={status:int},DESCRIPTION={description} WHERE ID={id:int}]]>
 							</value>
 						</property>
 					</bean>
@@ -503,6 +495,15 @@ LEGAL_BODY={legal_body},CREDIT_LEVEL={credit_level},BANK={bank},BANK_ACCOUNT={ba
 						</property>
 					</bean>
 				</entry>
+				<entry key="dict.def.deleMenu">
+					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+						<property name="sql">
+							<value>
+<![CDATA[DELETE FROM CM_MENU WHERE ID={id} ]]>
+							</value>
+						</property>
+					</bean>
+				</entry>				
 				
 				<entry key="dict.def.deletepartner">
 					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">

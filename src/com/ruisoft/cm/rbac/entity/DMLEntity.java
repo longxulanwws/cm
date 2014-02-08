@@ -167,6 +167,11 @@ public abstract class DMLEntity {
 					g = m;
 					t = "str";
 				}
+				
+				for (int i = 1;conditions.containsKey(g);i++) {
+					g = g.replaceFirst("~\\d+$", "").concat("~") + i;
+				}
+				
 				conditions.put(g, t);
 			}
 			
