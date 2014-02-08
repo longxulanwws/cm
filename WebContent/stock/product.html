@@ -105,7 +105,28 @@
 					pGrid.set({data: data['data']});
 				});
 			}
-			function toSave() {}
+			function toSave() {
+				var param = new Object();
+				param.type = $("#typeS").val();
+				param.categ_id = pNode;
+				param.name = $("#nameS").val();
+				param.specs = $("#specsS").val();
+				param.brand = $("#brandS").val();
+				param.uom_id = $("#uomIdS").val();
+				param.uom_precision = $("#uomPresS").val();
+				param.note = $("#noteS").val();
+				param.state = $("#stateS").val();
+				param.dept_id = '';
+				param.busiorg_id = '';
+				param.short_name = '';
+
+				var data = JSON.stringify(reqObj('a','stock.add.product',JSON.stringify(param)));
+				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+					$.ligerDialog.success('保存成功。');
+					detailDialog.hide();
+					toQuery();
+				});
+			}
 			function resetArea() {}
 		</script>
 		<style>
@@ -137,13 +158,13 @@
 					<div class="label-div"><label>物料编号</label></div>
 					<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
 					<div class="label-div"><label>物料名称</label></div>
-					<div class="in-div"><input type="text" id="originS" ltype="text" class="diff" /></div>
+					<div class="in-div"><input type="text" id="nameS" ltype="text" class="diff" /></div>
 				</div>
                	<div class="line-div">
 					<div class="label-div"><label>品牌</label></div>
-					<div class="in-div"><input type="text" id="partnerS" ltype="text" class="diff" /></div>
+					<div class="in-div"><input type="text" id="brandS" ltype="text" class="diff" /></div>
 					<div class="label-div"> <label>规格型号</label></div>
-					<div class="in-div"><input type="text" id="predDateS" ltype="text" class="diff" /></div>
+					<div class="in-div"><input type="text" id="specsS" ltype="text" class="diff" /></div>
 				</div>
                	<div class="line-div">
 					<div class="label-div"><label>计量单位</label></div>
@@ -166,6 +187,7 @@
 				<input type="hidden" id="stateS" value="1" />
 				<input type="hidden" id="createCompanyIdS" />
 				<input type="hidden" id="createUserS" />
+				<input type="hidden" id="categoryIdS" />
 		    </form>
 		</div>
 	</body>
