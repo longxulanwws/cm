@@ -17,6 +17,16 @@
 						<property name="group" value="true" />
 					</bean>
 				</entry>
+				<entry key="stock.product.id">
+					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+						<property name="rule" value="{seq(6)}" />
+					</bean>
+				</entry>
+				<entry key="stock.product.code">
+					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+						<property name="rule" value="{$type}{$categ_id}{seq(4)}" />
+					</bean>
+				</entry>
 				<entry key="user.id">
 					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
 						<property name="rule" value="{seq(6)}" />
