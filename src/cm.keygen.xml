@@ -40,7 +40,13 @@
 						<property name="rule" value="{seq(4)}" />
 						<property name="init" value="10" />
 					</bean>
-				</entry>				
+				</entry>
+				<entry key="dict.id">
+					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+						<property name="rule" value="{seq(4)}" />
+						<property name="init" value="10" />
+					</bean>
+				</entry>
 				<entry key="partner.id">
 					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
 						<property name="rule" value="{seq(6)}" />

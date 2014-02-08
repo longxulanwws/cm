@@ -36,7 +36,7 @@ WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID AND m.RESOURCE_ID=c
 						<property name="dmlType" value="cond" />
 						<property name="sql">
 							<value>
-<![CDATA[SELECT ID,NAME,CODE,STATUS,DESCRIPTION FROM CM_DICT_DEF]]>
+<![CDATA[SELECT ID,NAME,CODE,TYPE,STATUS,DESCRIPTION FROM CM_DICT_DEF]]>
 							</value>
 						</property>
 						<property name="conditions">
@@ -208,7 +208,7 @@ WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID AND m.RESOURCE_ID=c
 					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
 						<property name="sql">
 							<value>
-<![CDATA[INSERT INTO CM_DICT_DEF(NAME,CODE,STATUS,DESCRIPTION) VALUES({name},{code},{status:int},{desc})]]>
+<![CDATA[INSERT INTO CM_DICT_DEF(ID,NAME,CODE,TYPE,STATUS,DESCRIPTION) VALUES({#dict.id},{name},{code},{type},{status:int},{desc})]]>
 							</value>
 						</property>
 					</bean>
@@ -323,7 +323,7 @@ VALUES ({#menu.id},{code},{name},{higher_id},{seq:int},{resource_id},{icon_uri},
 					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
 						<property name="sql">
 							<value>
-<![CDATA[UPDATE CM_DICT_DEF SET NAME={name},CODE={code},STATUS={status:int},DESCRIPTION={description} WHERE ID={id:int}]]>
+<![CDATA[UPDATE CM_DICT_DEF SET NAME={name},CODE={code},TYPE={type},STATUS={status:int},DESCRIPTION={description} WHERE ID={id:int}]]>
 							</value>
 						</property>
 					</bean>
