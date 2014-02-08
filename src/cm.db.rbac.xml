@@ -503,6 +503,15 @@ LEGAL_BODY={legal_body},CREDIT_LEVEL={credit_level},BANK={bank},BANK_ACCOUNT={ba
 						</property>
 					</bean>
 				</entry>
+				<entry key="dict.def.deleMenu">
+					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+						<property name="sql">
+							<value>
+<![CDATA[DELETE FROM CM_MENU WHERE ID={id} ]]>
+							</value>
+						</property>
+					</bean>
+				</entry>				
 				
 				<entry key="dict.def.deletepartner">
 					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
