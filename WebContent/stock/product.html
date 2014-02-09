@@ -38,14 +38,13 @@
 				});
    				pGrid = $("#query_list").ligerGrid({
                     columns:[
-	                    {display:'分类',name:'name',width:180,minWidth:60,align:'left'},
-	                    {display:'类型',name:'name',width:180,minWidth:60,align:'left'},
-	                    {display:'编号',name:'code',width:180,minWidth:60,align:'left'},
-	                    {display:'名称',name:'name',width:180,minWidth:60,align:'left'},
-	                    {display:'规格/型号',name:'name',width:180,minWidth:60,align:'left'},
-	                    {display:'品牌',name:'name',width:180,minWidth:60,align:'left'},
-	                    {display:'性质',name:'name',width:180,minWidth:60,align:'left'},
-	                    {display:'计量单位',name:'name',width:180,minWidth:60,align:'left'}
+	                    {display:'类型',name:'categ_id',width:120,minWidth:60,align:'left',render:function(item){return paramRender(item,'product.type2',item.categ_id);}},
+	                    {display:'编号',name:'code',width:160,minWidth:60},
+	                    {display:'名称',name:'name',width:160,minWidth:60,align:'left'},
+	                    {display:'规格/型号',name:'specs',width:120,minWidth:60,align:'left'},
+	                    {display:'品牌',name:'brand',width:140,minWidth:60,align:'left'},
+	                    {display:'商品性质',name:'type',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'product_category',item.type);}},
+	                    {display:'计量单位',name:'uom_id',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'uom',item.uom_id);}}
 // 	                    {display:'副计量',name:'name',width:180,minWidth:60,align:'left'},
 // 	                    {display:'库存计量',name:'name',width:180,minWidth:60,align:'left'},
 // 	                    {display:'库存副计量',isSort:false,width:100}
@@ -76,6 +75,7 @@
 				]});
 				$("#pageloading").hide();
 			});
+			
 			var detailDialog;
 			function toAdd() {
 				if (!pNode) {

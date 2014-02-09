@@ -41,6 +41,18 @@
 						<property name="treeAttr" value="pid" />
 					</bean>
 				</entry>
+				<entry key="product.type2">
+					<bean class="com.ruisoft.core.param.SQLParamEntity">
+						<property name="sql">
+							<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+								<property name="sql">
+									<value><![CDATA[SELECT NAME,CODE VALUE,'1' SEQ,'1' STATUS FROM PRODUCT_CATEGORY]]></value>
+								</property>
+							</bean>
+						</property>
+						<property name="cache" value="true" />
+					</bean>
+				</entry>
 				<entry key="org_list">
 					<bean class="com.ruisoft.core.param.SQLParamEntity">
 						<property name="sql">
