@@ -355,8 +355,8 @@ VALUES ({#menu.id},{code},{name},{higher_id},{seq:int},{resource_id},{icon_uri},
 						<property name="sql">
 							<value>
 <![CDATA[UPDATE CM_DICT_ITEM SET CODE={code},DICT_DEF_ID={dict_def_id},
-HIGHER_ID={higher_id},NAME={name},VALUE={value},SEQ={seq},Path={path},
-Layer={layer},Detail={detail},STATUS={STATUS},DESCRIPTION={DESCRIPTION} WHERE ID={id:int}]]>
+HIGHER_ID={higher_id},NAME={name},VALUE={value},SEQ={seq:int},Path={path},
+Layer={layer:int},Detail={detail},STATUS={STATUS},DESCRIPTION={DESCRIPTION} WHERE ID={id}]]>
 							</value>
 						</property>
 					</bean>

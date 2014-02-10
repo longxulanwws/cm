@@ -41,8 +41,8 @@
                         {display:'显示顺序',name:'seq',width:80,minWidth:60,align:'left',editor:{type:'text'}},
                         {display:'分级码',name:'path',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'级数',name:'layer',width:100,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'明细否',name:'detail',width:80,minWidth:60,align:'left',editor:{type:'text'}},
-	                  //  {display:'明细否1',name:'detail',width:70,data:detail,render:switcher,editor:{type:'select',data:getDetail,textField:'name',valueField:'value',selectBoxHeight:50}},
+	                   // {display:'明细否',name:'detail',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'明细否',name:'detail',width:70,data:getyesOrno,render:switcher_yesOrNo,editor:{type:'select',data:getyesOrno,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'状态',name:'status',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
 			            {display:'说明',name:'description',width:200,align:'left',editor:{type:'text'}}
                     ],
@@ -65,7 +65,8 @@
 //                     onToLast: toLast,
 //                     onToNext: toNext,
 //                     onToPrev: toPrev,
-                    param_status:'rbac.status'
+                    param_status:'rbac.status',
+                    param_yesOrNo:'yesOrNo'
 				});
 				defGrid.options.dataAction = 'server';
 				appendAddBtn(openUserDef, "添加用户");
@@ -97,6 +98,12 @@
 			}
 			var getStatus = new function () {
 				return getData('rbac.status');
+			}
+			function switcher_yesOrNo(item) {
+				return paramRender(item, defGrid.options.param_yesOrNo, item.detail);
+			}
+			var getyesOrno = new function () {
+				return getData('yesOrNo');
 			}
 			function toQuery(item, page, pageSize) {
 				if (!page)
