@@ -48,6 +48,25 @@ WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID AND m.RESOURCE_ID=c
 						</property>
 					</bean>
 				</entry>
+				<entry key="dict.def.queryItem">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="dmlType" value="cond" />
+						<property name="sql">
+							<value>
+<![CDATA[SELECT ID,CODE,DICT_DEF_ID,HIGHER_ID,NAME,VALUE,SEQ,Path,Layer,Detail,STATUS,DESCRIPTION FROM cm_dict_item]]>
+							</value>
+						</property>
+						<property name="conditions">
+							<map>
+							   
+								<entry key="name" value="str:like(lr):and" />
+								<entry key="code" value=":like(lr)" />
+								<entry key="status" value="" />
+								 <entry key="dict_def_id" value="" />
+							</map>
+						</property>
+					</bean>
+				</entry>
 				<entry key="dict.item.query">
 					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
 						<property name="sql">
@@ -217,7 +236,10 @@ WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID AND m.RESOURCE_ID=c
 					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
 						<property name="sql">
 							<value>
-<![CDATA[INSERT INTO CM_DICT_ITEM(HIGHER_ID,DEF_ID,NAME,VALUE,SEQ,STATUS,DESCRIPTION) VALUES({pid:int},{did:int},{name},{val},{seq:int},{status:int},{desc})]]>
+<![CDATA[INSERT INTO CM_DICT_ITEM(ID,
+CODE,DICT_DEF_ID,HIGHER_ID,NAME,VALUE,SEQ,Layer,Detail,STATUS,DESCRIPTION)
+ VALUES({#dictitem.id},{code},{dict_def_id},{higher_id},{name},{val}
+ ,{seq:int},{detail},{layer:int},{status},{desc})]]>
 							</value>
 						</property>
 					</bean>
@@ -328,6 +350,17 @@ VALUES ({#menu.id},{code},{name},{higher_id},{seq:int},{resource_id},{icon_uri},
 						</property>
 					</bean>
 				</entry>
+				<entry key="dict.defitem.update">
+					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+						<property name="sql">
+							<value>
+<![CDATA[UPDATE CM_DICT_ITEM SET CODE={code},DICT_DEF_ID={dict_def_id},
+HIGHER_ID={higher_id},NAME={name},VALUE={value},SEQ={seq},Path={path},
+Layer={layer},Detail={detail},STATUS={STATUS},DESCRIPTION={DESCRIPTION} WHERE ID={id:int}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
 				<entry key="key.generator.reset">
 					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
 						<property name="sql">
@@ -427,17 +460,10 @@ LEGAL_BODY={legal_body},CREDIT_LEVEL={credit_level},BANK={bank},BANK_ACCOUNT={ba
 				</entry>
 				<entry key="dict.item.delete">
 					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
-						<property name="dmlType" value="cond" />
 						<property name="sql">
 							<value>
-<![CDATA[DELETE FROM CM_DICT_ITEM]]>
+<![CDATA[DELETE FROM CM_DICT_ITEM where ID={id}]]>
 							</value>
-						</property>
-						<property name="conditions">
-							<map>
-								<entry key="id" value="" />
-								<entry key="def_id" value="" />
-							</map>
 						</property>
 					</bean>
 				</entry>
