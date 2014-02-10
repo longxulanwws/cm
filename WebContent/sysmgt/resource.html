@@ -35,7 +35,7 @@
                         {display:'资源ID',name:'id',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'名称',name:'name',width:100,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'位置',name:'uri',width:200,minWidth:150,align:'left',editor:{type:'text'}},
-	                    {display:'类型',name:'type',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
+	                    {display:'类型',name:'type',width:70,data:getType,render:switcher_type,editor:{type:'select',data:getType,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'状态',name:'status',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
 			            {display:'说明',name:'description',width:200,align:'left',editor:{type:'text'}}
                     ],
@@ -58,7 +58,8 @@
 //                     onToLast: toLast,
 //                     onToNext: toNext,
 //                     onToPrev: toPrev,
-                    param_status:'rbac.status'
+                    param_status:'rbac.status',
+                    param_type:'rbac.org_type'
 				});
 				defGrid.options.dataAction = 'server';
 				appendAddBtn(openDictDef, "添加字典字义");
@@ -90,6 +91,12 @@
 			}
 			var getStatus = new function () {
 				return getData('rbac.status');
+			}
+			function switcher_type(item) {
+				return paramRender(item, defGrid.options.param_type, item.type);
+			}
+			var getType = new function () {
+				return getData('rbac.org_type');
 			}
 			function toQuery(item, page, pageSize) {
 				if (!page)
@@ -234,7 +241,7 @@
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>类型</label></div>
-			<div class="dplD"><select class="txt-def" id="newType" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
+			<div class="dplD"><select class="txt-def" id="newType" param="rbac.org_type" default="1" style="margin-right: 30px;"></select></div>
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>状态</label></div>
