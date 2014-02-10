@@ -13,6 +13,7 @@
 		<script src="../js/json2.js" type="text/javascript"></script>
 		<script type="text/javascript">
 			var defGrid;
+			var defid;
 			$(function(){
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
@@ -29,7 +30,6 @@
                         },frozen:true},
 	                    {display:'名称',name:'name',width:180,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'代码',name:'code',width:180,align:'left',editor:{type:'text'}},
-	                    {display:'字典分类',name:'type',width:80,align:'left',editor:{type:'text'}},
 	                    {display:'状态',name:'status',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'字典数据项',isSort:false,width:100,render:function(rowdata,rowindex,value){
 							return "<a href='javascript:void(0);' class='opt-link' onclick='openDictItem(" + rowindex + ")'>管理字典数据项</a>";
@@ -138,28 +138,24 @@
 				});
 			}
 			function openDictItem(index) {
-				alert('123123');
-				//userid = defGrid.getRow(rowid)['id'];;
-				// var userName
-				 //userName = defGrid.getRow(rowid)['name'];;
-		       parent.f_addTab('dictitem','管理字典数据项','./sysmgt/dictitem.html');
+				 defid = defGrid.getRow(index)['id'];
+				 var defName
+				 defName = defGrid.getRow(index)['name'];
+		       parent.f_addTab('dictitem'+defName+'','管理字典数据项('+defName+')','./sysmgt/dictitem.html?defid='+defid+'');
 		            
 			}
 			function toAdd() {
 				var url = "/cm/rbac/cmDict.do?m=a";
 				var def = '{"name":"' + $("#newName").val()
-					+ '","type":"' + $("#newType").val() 
-					+ '","code":"' + $("#newCode").val() 
-					+ '","status":"'+ $("#newStatus").val() 
-					+ '","desc":"'	+ $("#newDesc").val() + '"}';
+					+ '","code":"' + $("#newCode").val() + '","status":"'
+					+ $("#newStatus").val() + '","desc":"'
+					+ $("#newDesc").val() + '"}';
 				ajaxSubmit(url, def, function(data) {
 					if (data) {
 						if (parseInt(data['result']) > 0) {
 							$.ligerDialog.success('保存成功', '操作完成', function() {
 								addDialog.hide();
-								toQuery();
 							});
-							
 						} else if (parseInt(data['result']) == -1) {
 							$.ligerDialog.error('字典[' + $("#newCode").val() + ']已存在<br>不能重复添加','错误');
 						} else {
@@ -230,10 +226,6 @@
 				<div class="labelD"><label>字典代码</label></div>
 				<div class="dplD"><input type="text" class="s-text txt-def" id="newCode" /></div>
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>字典类型</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newType" /></div>
-			</div>			
 			<div class="lineD">
 				<div class="labelD"><label>状态</label></div>
 				<div class="dplD"><select class="txt-def" id="newStatus" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
