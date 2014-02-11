@@ -35,8 +35,9 @@
                         },frozen:true},
                         {display:'账号',name:'account',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'名称',name:'name',width:100,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'所属机构',name:'orgid',width:100,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'状态',name:'status',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
+	                   // {display:'所属机构',name:'orgid',width:100,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'所属机构',name:'orgid',width:80,minWidth:60,data:get_org_list,render:switcher_org,editor:{type:'select',data:get_org_list,textField:'name',valueField:'value',selectBoxHeight:50}},
+		                {display:'状态',name:'status',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    
 	                    {display:'密码修改',isSort:false,width:100,render:function(rowdata,rowindex,value){
 							return "<a href='javascript:void(0);' class='opt-link' onclick='open_Modfiy_PW(" + rowindex + ")'>密码修改</a>";
@@ -65,21 +66,21 @@
 //                     onToLast: toLast,
 //                     onToNext: toNext,
 //                     onToPrev: toPrev,
-                    param_status:'rbac.status'
+                    param_status:'rbac.status',
+                    param_org:'org_list'
 				});
 				defGrid.options.dataAction = 'server';
 				appendAddBtn(openUserDef, "添加用户");
 				$("#pageloading").hide();
 			
-			
-				var org_data = getData('org_list');
+				//var org_data = getData('org_list');
 				$("#org_combobox").ligerComboBox({
 					autocomplete: true,
                 	valueField:'value',
                 	textField:'name',
-                	data:org_data,
+                	data:get_org_list,
                 	onSelected:function(v,t) {
-                    	$("#orgid").val(v);
+                    $("#orgid").val(v);
                 }
 			});
 			
@@ -111,6 +112,13 @@
 			var getStatus = new function () {
 				return getData('rbac.status');
 			}
+			function switcher_org(item) {
+				return paramRender(item, defGrid.options.param_org, item.orgid);
+			}
+			var get_org_list=new function () {
+				return getData('org_list');
+			}
+ 
 			//用户的角色维护弹出窗
 			 function open_Set_role(rowid) {
 				 userid = defGrid.getRow(rowid)['id'];;
@@ -209,6 +217,7 @@
 			});}
 			// 新增保存处理
 			function toAdd() {
+				return alert($("#orgid").val());
 				var param = new Object();
 				param.code=$("#account").val();
 			    param.account=$("#account").val();
@@ -314,7 +323,7 @@
 				<div class="dplD"><input type="password" class="s-text txt-def" id="password" /></div>
 			</div>
 			<div class="lineD">
-				<div class="labelD"><label>组织</label></div>
+				<div class="labelD"><label>机构</label></div>
 			<div class="dplD">
 			<input type="text" id="org_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
 						<input type="hidden" id="orgid" />

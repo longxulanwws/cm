@@ -90,7 +90,7 @@ WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID AND m.RESOURCE_ID=c
 						<property name="dmlType" value="cond" />
 						<property name="sql">
 							<value>
-<![CDATA[SELECT ID,Account,NAME,STATUS,DESCRIPTION FROM CM_User]]>
+<![CDATA[SELECT ID,Account,NAME,ORGID,STATUS,DESCRIPTION FROM CM_User]]>
 							</value>
 						</property>
 						<property name="conditions">
