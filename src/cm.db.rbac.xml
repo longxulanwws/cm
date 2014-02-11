@@ -401,7 +401,7 @@ Layer={layer:int},Detail={detail},STATUS={STATUS},DESCRIPTION={DESCRIPTION} WHER
 					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
 						<property name="sql">
 							<value>
-<![CDATA[UPDATE CM_ORG SET code={code}, NAME={name},Shortfor={shortfor},org_type={org_type},Higher_ID={Higher_ID},Address={address},Tel={tel},Fax={fax},Zipcode={zipcode},STATUS={status},DESCRIPTION={description} WHERE ID={id}]]>
+<![CDATA[UPDATE CM_ORG SET code={code}, NAME={name},Shortfor={shortfor},org_type={org_type},Higher_ID={higher_id},Address={address},Tel={tel},Fax={fax},Zipcode={zipcode},STATUS={status},DESCRIPTION={description} WHERE ID={id}]]>
 							</value>
 						</property>
 					</bean>
