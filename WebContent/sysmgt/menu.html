@@ -43,7 +43,7 @@
                         {display:'分级码',name:'path',width:80,minWidth:60,align:'left',editor:{type:'text'}},
                         {display:'级数',name:'layer',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                   
-	                    {display:'明细否',name:'detail',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
+	                    {display:'明细否',name:'detail',width:70,data:getdetail,render:switcher_detail,editor:{type:'select',data:getdetail,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'状态',name:'status',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'说明',name:'descriptioin',width:200,align:'left',editor:{type:'text'}}
                     ],
@@ -66,7 +66,8 @@
 //                     onToLast: toLast,
 //                     onToNext: toNext,
 //                     onToPrev: toPrev,
-                    param_status:'rbac.status'
+                    param_status:'rbac.status',
+                    param_detail:'yesOrNo'
                    
 				});
 				defGrid.options.dataAction = 'server';
@@ -99,6 +100,12 @@
 			}
 			var getStatus = new function () {
 				return getData('rbac.status');
+			}
+			function switcher_detail(item) {
+				return paramRender(item, defGrid.options.param_detail, item.detail);
+			}
+			var getdetail = new function () {
+				return getData('yesOrNo');
 			}
 			function toQuery(item, page, pageSize) {
 				if (!page)
@@ -268,7 +275,9 @@
 				<div class="in-div"><input type="text" class="s-text txt-def" id="newLayer" /></div>
 			 
 				<div class="label-div"><label>明细否</label></div>
-				<div class="in-div"><input type="text" class="s-text txt-def" id="newDetail" /></div>
+				<div class="in-div">
+				<select class="txt-def" id="newDetail" param="yesOrNo" default="1" style="margin-right: 30px;"></select>
+				</div>
 			</div>
 			<div class="line-div">
 				<div class="label-div"><label>状态</label></div>

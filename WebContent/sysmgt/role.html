@@ -34,7 +34,7 @@
                         },frozen:true},
                         {display:'编号',name:'code',width:180,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'名称',name:'name',width:180,minWidth:60,align:'left',editor:{type:'text'}},
-	                  //  {display:'是否继承',name:'isext',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
+	                    {display:'是否继承',name:'is_ext',width:70,data:getIsext,render:switcher_ext,editor:{type:'select',data:getIsext,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'状态',name:'status',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'资源设置',isSort:false,width:100,render:function(rowdata,rowindex,value){
 							return "<a href='javascript:void(0);' class='opt-link' onclick='open2(" + rowindex + ")'>资源设置</a>";
@@ -61,7 +61,8 @@
 //                     onToLast: toLast,
 //                     onToNext: toNext,
 //                     onToPrev: toPrev,
-                    param_status:'rbac.status'
+                    param_status:'rbac.status',
+                    param_isext:'yesOrNo'
                    
 				});
 				defGrid.options.dataAction = 'server';
@@ -94,6 +95,12 @@
 			}
 			var getStatus = new function () {
 				return getData('rbac.status');
+			}
+			function switcher_ext(item) {
+				return paramRender(item, defGrid.options.param_isext, item.is_ext);
+			}
+			var getIsext = new function () {
+				return getData('yesOrNo');
 			}
 			function toQuery(item, page, pageSize) {
 				if (!page)
@@ -242,7 +249,7 @@
 			</div>
 			  <div class="lineD">
 				<div class="labelD"><label>继承</label></div>
-				<div class="dplD"><select class="txt-def" id="newIsext" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
+				<div class="dplD"><select class="txt-def" id="newIsext" param="yesOrNo" default="1" style="margin-right: 30px;"></select></div>
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>状态</label></div>
