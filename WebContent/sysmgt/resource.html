@@ -62,8 +62,19 @@
                     param_type:'rbac.org_type'
 				});
 				defGrid.options.dataAction = 'server';
-				appendAddBtn(openDictDef, "添加字典字义");
+				appendAddBtn(openDictDef, "添加机构字义");
 				$("#pageloading").hide();
+				
+			
+				$("#orgType_combobox").ligerComboBox({
+					autocomplete: true,
+	            	valueField:'value',
+	            	textField:'name',
+	            	data:getType,
+	            	onSelected:function(v,t) {
+	                	$("#newType").val(v);
+	            		}
+				});
 			});
 	        function beginEdit(rowid) { 
 	        	defGrid.beginEdit(rowid);
@@ -241,7 +252,10 @@
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>类型</label></div>
-			<div class="dplD"><select class="txt-def" id="newType" param="rbac.org_type" default="1" style="margin-right: 30px;"></select></div>
+			<!--  <div class="dplD"><select class="txt-def" id="newType" param="rbac.org_type" default="1" style="margin-right: 30px;"></select></div>
+			-->
+			<div class="dplD"><input type="text" id="orgType_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+				<input type="hidden" id="newType" />	
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>状态</label></div>
