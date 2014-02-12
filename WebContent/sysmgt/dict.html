@@ -134,7 +134,7 @@
 					target:$("#new_dict_def"),
 					title:"新增字典定义",
 					width:350,
-					height:370
+					height:400
 				});
 			}
 			function openDictItem(index) {
@@ -145,19 +145,25 @@
 		            
 			}
 			function toAdd() {
-				var url = "/cm/rbac/cmDict.do?m=a";
-				var def = '{"name":"' + $("#newName").val()
-					+ '","code":"' + $("#newCode").val() + '","status":"'
-					+ $("#newStatus").val() + '","desc":"'
-					+ $("#newDesc").val() + '"}';
-				ajaxSubmit(url, def, function(data) {
+				var param = new Object();
+				param.name = $("#newName").val();
+				param.code =  $("#newCode").val();
+				param.status =  $("#newStatus").val();
+				param.desc=$("#newDesc").val();
+				param.type=$("#newType").val();
+				
+				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.add',JSON.stringify(param)));
+				
+				ajaxSubmit("/cm/rbac/cm.do?m=a", data, function(data) {
 					if (data) {
-						if (parseInt(data['result']) > 0) {
+						//alert(parseInt(data['status']));
+						if (parseInt(data['status']) > 0) {
 							$.ligerDialog.success('保存成功', '操作完成', function() {
-								addDialog.hide();
-							});
-						} else if (parseInt(data['result']) == -1) {
-							$.ligerDialog.error('字典[' + $("#newCode").val() + ']已存在<br>不能重复添加','错误');
+							addDialog.hide();
+							toQuery();
+						});
+						} else if (parseInt(data['status']) == -1) {
+							$.ligerDialog.error('用户[' + $("#newName").val() + ']已存在<br>不能重复添加','错误');
 						} else {
 							$.ligerDialog.error('保存失败');
 						}
@@ -225,6 +231,10 @@
 			<div class="lineD">
 				<div class="labelD"><label>字典代码</label></div>
 				<div class="dplD"><input type="text" class="s-text txt-def" id="newCode" /></div>
+			</div>
+			<div class="lineD">
+				<div class="labelD"><label>类型</label></div>
+				<div class="dplD"><input type="text" class="s-text txt-def" id="newType" /></div>
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>状态</label></div>
