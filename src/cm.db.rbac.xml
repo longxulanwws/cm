@@ -208,7 +208,7 @@ WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID AND m.RESOURCE_ID=c
 						<property name="dmlType" value="cond" />
 						<property name="sql">
 							<value>
-<![CDATA[SELECT ID,TYPE,CODE,NAME,UUID_CODE,TAX_CODE,OF_TRADE,LEGAL_BODY,CREDIT_LEVEL,BANK,BANK_ACCOUNT,LINK_MAN,MOBILE,PHONE,FAX,DESCRIPTION FROM Cm_Partner]]>
+<![CDATA[SELECT ID,Dept_ID,TYPE,CODE,NAME,UUID_CODE,TAX_CODE,OF_TRADE,LEGAL_BODY,CREDIT_LEVEL,BANK,BANK_ACCOUNT,LINK_MAN,MOBILE,PHONE,FAX,DESCRIPTION FROM Cm_Partner]]>
 							</value>
 						</property>
 						<property name="conditions">

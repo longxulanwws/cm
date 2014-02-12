@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>用户维护</title>
+		<title>公司往来单位维护</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -32,15 +32,20 @@
                             }
                             return h;
                         },frozen:true},
-                        {display:'单位类型',name:'type',width:50,minWidth:60,align:'left',editor:{type:'text'}},
+                        //{display:'单位类型',name:'type',width:50,minWidth:60,align:'left',editor:{type:'text'}},
+                        {display:'单位类型',name:'type',width:80,minWidth:60,data:get_type_list,render:switcher_type,editor:{type:'select',data:get_type_list,textField:'name',valueField:'value',selectBoxHeight:50}},
                         {display:'编号',name:'code',width:40,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'名称',name:'name',width:50,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'组织机构代码证号',name:'uuid_code',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'所属机构',name:'dept_id',width:80,minWidth:60,data:get_org_list,render:switcher_org,editor:{type:'select',data:get_org_list,textField:'name',valueField:'value',selectBoxHeight:50}},
+		                {display:'组织机构代码证号',name:'uuid_code',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'税号',name:'tax_code',width:80,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'所属行业',name:'of_trade',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    //{display:'所属行业',name:'of_trade',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'所属行业',name:'of_trade',width:80,minWidth:60,data:get_trade_list,render:switcher_trade,editor:{type:'select',data:get_trade_list,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'法人代表',name:'legal_body',width:80,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'信用级别',name:'credit_level',width:80,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'开户行',name:'bank',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    //{display:'信用级别',name:'credit_level',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'信用级别',name:'credit_level',width:80,minWidth:60,data:get_level_list,render:switcher_level,editor:{type:'select',data:get_level_list,textField:'name',valueField:'value',selectBoxHeight:50}},
+	                    {display:'开户行',name:'bank',width:80,minWidth:60,data:get_bank_list,render:switcher_bank,editor:{type:'select',data:get_bank_list,textField:'name',valueField:'value',selectBoxHeight:50}},
+	                    //{display:'开户行',name:'bank',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'银行帐号',name:'bank_account',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'联系人',name:'link_man',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'手机号',name:'mobile',width:50,minWidth:60,align:'left',editor:{type:'text'}},
@@ -67,24 +72,67 @@
 //                     onToLast: toLast,
 //                     onToNext: toNext,
 //                     onToPrev: toPrev,
-                    param_status:'rbac.status'
+                    param_status:'rbac.status',
+                    param_org:'org_list',
+                    param_type:'unit_type',
+                    param_trade:'Industry',
+                    param_level:'credit_rating',
+                    param_bank:'bank_account'
 				});
 				defGrid.options.dataAction = 'server';
 				appendAddBtn(openUserDef, "添加用户");
 				$("#pageloading").hide();
 			
 			
-				var org_data = getData('org_list');
+				//var org_data = getData('org_list');
 				$("#org_combobox").ligerComboBox({
 					autocomplete: true,
                 	valueField:'value',
                 	textField:'name',
-                	data:org_data,
+                	data:get_org_list,
                 	onSelected:function(v,t) {
-                    	$("#orgid").val(v);
+                    	$("#Dept_ID").val(v);
+                }
+			   });
+				   
+				$("#type_combobox").ligerComboBox({
+					autocomplete: true,
+                	valueField:'value',
+                	textField:'name',
+                	data:get_type_list,
+                	onSelected:function(v,t) {
+                    	$("#newType").val(v);
                 }
 			});
-			
+				
+				$("#trade_combobox").ligerComboBox({
+					autocomplete: true,
+                	valueField:'value',
+                	textField:'name',
+                	data:get_trade_list,
+                	onSelected:function(v,t) {
+                    	$("#newOf_trade").val(v);
+                }
+			});
+				$("#lecel_combobox").ligerComboBox({
+					autocomplete: true,
+                	valueField:'value',
+                	textField:'name',
+                	data:get_level_list,
+                	onSelected:function(v,t) {
+                    	$("#newCredit_level").val(v);
+                }
+			});
+
+				$("#bank_combobox").ligerComboBox({
+					autocomplete: true,
+                	valueField:'value',
+                	textField:'name',
+                	data:get_bank_list,
+                	onSelected:function(v,t) {
+                    	$("#newBank").val(v);
+                }
+			});
 			});
 	        function beginEdit(rowid) { 
 	        	defGrid.beginEdit(rowid);
@@ -113,7 +161,40 @@
 			var getStatus = new function () {
 				return getData('rbac.status');
 			}
-			
+			function switcher_org(item) {
+				return paramRender(item, defGrid.options.param_org, item.dept_id);
+			}
+			var get_org_list=new function () {
+				return getData('org_list');
+			}
+
+			function switcher_type(item) {
+				return paramRender(item, defGrid.options.param_type, item.type);
+			}
+			var get_type_list=new function () {
+				return getData('unit_type');
+			}
+
+			function switcher_trade(item) {
+				return paramRender(item, defGrid.options.param_trade, item.of_trade);
+			}
+			var get_trade_list=new function () {
+				return getData('Industry');
+			}
+
+			function switcher_level(item) {
+				return paramRender(item, defGrid.options.param_level, item.credit_level);
+			}
+			var get_level_list=new function () {
+				return getData('credit_rating');
+			}
+
+			function switcher_bank(item) {
+				return paramRender(item, defGrid.options.param_bank, item.bank);
+			}
+			var get_bank_list=new function () {
+				return getData('bank_account');
+			}
 			function toQuery(item, page, pageSize) {
 				if (!page)
 					page = defGrid.options.page;
@@ -163,8 +244,8 @@
 				toReset('#new_user_def input,select,textarea');
 				addDialog = $.ligerDialog.open({
 					target:$("#new_user_def"),
-					title:"新增公司单位",
-					width:450,
+					title:"新增往来单位",
+					width:650,
 					height:550
 				});
 			}
@@ -201,7 +282,7 @@
 				param.fax=$("#newFax").val();
 				param.description=$("#newDesc").val();
 				param.companyid='0001';
-				param.deptid='0001';
+				param.deptid=$("#Dept_ID").val();
 				param.busiorgid='0001';
 				param.ofregion='0001';
 				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addPartner',JSON.stringify(param)));
@@ -276,61 +357,73 @@
 			</div>
 		</div>
 		<div id="new_user_def" style="display:none;overflow:hidden;">
-			<div class="lineD" style="margin-bottom:10px;">
+			<div class="line-div" style="margin-bottom:10px;">
 				<span class="title l-icon-add">添加往来单位</span>
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>编号</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="code" /></div>
+			<div class="line-div">
+				<div class="label-div"><label>编号</label></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="code" /></div>
+				
+				<div class="label-div"><label>名称</label></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newName" /></div>
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>名称</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newName" /></div>
+		
+			<div class="line-div">
+				<div class="label-div"><label>所属机构</label></div>
+				<div class="in-div"><input type="text" id="org_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+				<input type="hidden" id="Dept_ID" />
+				
+				<div class="label-div"><label>单位类型</label></div>
+				<div class="in-div"><input type="text" id="type_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+				<input type="hidden" id="newType" />
+			</div>	
+			<div class="line-div">
+				<div class="label-div"><label>组织机构代码证号</label></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newuuid_code" /></div>
+			
+				<div class="label-div"><label>税号</label></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newTax_code" /></div>
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>单位类型</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newType" /></div>
+			<div class="line-div">
+				<div class="label-div"><label>所属行业</label></div>
+			    <div class="in-div"><input type="text" id="trade_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+				<input type="hidden" id="newOf_trade" />
+			
+				<div class="label-div"><label>法人代表</label></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newLegal_body" /></div>
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>组织机构代码证号</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newuuid_code" /></div>
-			</div><div class="lineD">
-				<div class="labelD"><label>税号</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newTax_code" /></div>
-			</div><div class="lineD">
-				<div class="labelD"><label>所属行业</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newOf_trade" /></div>
-			</div><div class="lineD">
-				<div class="labelD"><label>法人代表</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newLegal_body" /></div>
-			</div><div class="lineD">
-				<div class="labelD"><label>信用级别</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newCredit_level" /></div>
-			</div><div class="lineD">
-				<div class="labelD"><label>开户行</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newBank" /></div>
-			</div><div class="lineD">
-				<div class="labelD"><label>银行帐号</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newBank_account" /></div>
-			</div><div class="lineD">
-				<div class="labelD"><label>联系人</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newLink_man" /></div>
-			</div><div class="lineD">
-				<div class="labelD"><label>手机号</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newMobile" /></div>
-			</div><div class="lineD">
-				<div class="labelD"><label>单位电话</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newPhone" /></div>
+			<div class="line-div">
+				<div class="label-div"><label>信用级别</label></div>
+			    <div class="in-div"><input type="text" id="lecel_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+				<input type="hidden" id="newCredit_level" />
+			
+				<div class="label-div"><label>开户行</label></div>
+			    <div class="in-div"><input type="text" id="bank_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+				<input type="hidden" id="newBank" />
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>单位传真</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newFax" /></div>
+			<div class="line-div">
+				<div class="label-div"><label>银行帐号</label></div>
+				  <div class="in-div"><input type="text" class="s-text txt-def" id="newBank_account" /></div>
+			
+				<div class="label-div"><label>联系人</label></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newLink_man" /></div>
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>说明</label></div>
-				<div class="dplD"><textarea cols="24" rows="5" id="newDesc"></textarea></div>
+			<div class="line-div">
+				<div class="label-div"><label>手机号</label></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newMobile" /></div>
+			
+				<div class="label-div"><label>单位电话</label></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newPhone" /></div>
 			</div>
-			<div class="lineD" style="margin-top:15px;padding-left:30%;">
+			<div class="line-div">
+				<div class="label-div"><label>单位传真</label></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newFax" /></div>
+			</div>
+			<div class="line-div">
+				<div class="label-div"><label>说明</label></div>
+				<div class="in-div"><textarea cols="24" rows="5" id="newDesc"></textarea></div>
+			</div>
+			<div class="line-div" style="margin-top:70px;padding-left:40%;">
 				<input type="button" value="保存" onclick="toAdd();" />
 				<input type="button" value="清空" onclick="toReset('#new_user_def input,select,textarea')" />
 			</div>
