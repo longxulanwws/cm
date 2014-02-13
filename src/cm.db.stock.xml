@@ -42,6 +42,30 @@
 						</property>
 					</bean>
 				</entry>
+				<entry key="move.query">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="dmlType" value="cond" />
+						<property name="sql">
+							<value>
+<![CDATA[SELECT ID,Company_ID,Dept_ID,BusiOrg_ID,Picking_ID,Origin,Purchase_ID,
+ Purchase_Line_ID,Sale_ID,Sale_Line_ID,Type,Product_ID,Code,Name,Partner_ID,
+ Ware_Hose_ID,Location_ID, Product_Uom, Price_Currency, Source_Price_Unit,
+ Price_Unit, Tar_Product_Qty, Product_Qty, Pred_Date, Real_Date,
+ Move_End_Date, QC_Type, QC_Flag, State, Inventory_State, Valuation_State, Busi_Batch, Auto_Picking,
+ Note, CreateUser, CreateDate, WriteDate, WriteUser  FROM Stock_Move]]>
+							</value>
+						</property>
+						<property name="conditions">
+							<map>
+							
+								<entry key="name" value="str:like(lr):and" />
+								<entry key="origin" value=":like(lr)" />
+								<entry key="state" value="" />
+								<entry key="ware_hose_id" value="" />
+							</map>
+						</property>
+					</bean>
+				</entry>
 			</map>
 		</property>
 		<property name="add">
