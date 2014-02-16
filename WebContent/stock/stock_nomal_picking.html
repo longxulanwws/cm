@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>产品入库单</title>
+		<title>正常出库</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -19,11 +19,11 @@
  						{display:'操作',isSort:false,width:60,render:function(rowdata,rowindex,value) {
                         	return "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> "; 
                         },frozen:true},
-	                    {display:'入库单号',name:'code',width:130,minWidth:60},
+	                    {display:'出库单号',name:'code',width:130,minWidth:60},
 	                    {display:'产品单号',name:'origin',width:130},
-			            {display:'入库日期',name:'pred_date',width:80},
-			            {display:'入库仓库',name:'warehose_id',width:290,align:'left'},
-			            {display:'收货人',name:'move_in_user',render:sw_opt,align:'left'}
+			            {display:'出库日期',name:'pred_date',width:80},
+			            {display:'出库仓库',name:'warehose_id',width:290,align:'left'},
+			            {display:'出货人',name:'move_in_user',render:sw_opt,align:'left'}
                     ],
                     pageSize:20,
                     usePager: true,
@@ -40,8 +40,8 @@
                     onReload: toQuery,
                     param_movein:'user'
 				});
-				appendAddBtn(openDictDef, "添加入库单");
-				appendModifyBtn(function(){}, "修改入库单");
+				appendAddBtn(openDictDef, "添加出库单");
+				appendModifyBtn(function(){}, "修改出库单");
 				$("#pageloading").hide();
 			});
 			function sw_opt(item) {
@@ -59,14 +59,14 @@
 				var param = new Object();
 				param.code = $("#codeQ").val();
 				param.origin = $("#originQ").val();
-                param.move_type='02';
-				var data = JSON.stringify(reqObj('q','stock.select.picking_product.query',JSON.stringify(param),'l',true,page,pageSize));
+                param.move_type='10';
+				var data = JSON.stringify(reqObj('q','stock.select.picking_nomal.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					defGrid.set({data: data['data']});
 				});
 			}
 			function openDictDef() {
-				parent.f_addTab('new_product','新增成品入库单','./stock/new_stock_product_picking.html');
+				parent.f_addTab('new_nomal','新增正常出库出库单','./stock/new_stock_nomal_picking.html');
 			}
 			function toModify(row) {
 				var url = "/cm/rbac/cmDict.do?m=u";
@@ -82,7 +82,7 @@
 			}
 			var printWin;
 			function toPrint(rowid) {
-				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_product_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_nomal_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
 			}
 	    </script>
 		<style type="text/css">
@@ -102,7 +102,7 @@
 		<div id="layout_main">
 			<div position="center" id="a_center" title="入库单列表">
 				<div id="query_cond" class="fields">
-					<label>入库单号</label><input type="text" class="s-text txt-def" id="codeQ" />
+					<label>出库单号</label><input type="text" class="s-text txt-def" id="codeQ" />
 					<label>产品单号</label><input type="text" class="s-text txt-def" id="originQ" />
 					<!-- <label>供应商</label><input type="text" class="s-text txt-def" id="partnerQ" />
 					 -->

@@ -61,6 +61,23 @@
 						</property>
 					</bean>
 				</entry>
+				<entry key="picking_nomal.query">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="dmlType" value="cond" />
+						<property name="sql">
+							<value>
+<![CDATA[SELECT ID,Company_ID,Dept_ID,BusiOrg_ID,Code,Name,Type,Move_Type,Send_Type,Origin,Purchase_ID,Sale_ID,Project_ID,Partner_ID,Warehose_ID,Pred_Date,Recpt_IN_Date,QC_Date,Recpt_Out_Date,Deal_End_Date,State,Invoice_State,Auto_Picking,Back_Order_ID,Account_Date,Stock_Journal_ID,Move_IN_User,Move_Out_User,Move_Destined,Note,CreateUser,CreateDate,WriteDate,WriteUser FROM Stock_Picking ]]>
+							</value>
+						</property>
+						<property name="conditions">
+							<map>
+								<entry key="code" value="" />
+								<entry key="origin" value="" />
+								<entry key="move_type" value="" />
+							</map>
+						</property>
+					</bean>
+				</entry>
 				<entry key="product.query">
 					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
 						<property name="dmlType" value="cond" />
@@ -125,6 +142,16 @@ VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{m
 					</bean>
 				</entry>
 				<entry key="picking_pocket.add">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+<![CDATA[INSERT INTO Stock_Picking(ID,Company_ID,Dept_ID,BusiOrg_ID,Code,Name,Type,Move_Type,Send_Type,Origin,Purchase_ID,Sale_ID,Project_ID,Warehose_ID,Pred_Date,Recpt_IN_Date,QC_Date,Recpt_Out_Date,Deal_End_Date,State,Invoice_State,Auto_Picking,Back_Order_ID,Account_Date,Stock_Journal_ID,Move_IN_User,Move_Out_User,Move_Destined,Note,CreateUser,CreateDate,WriteDate,WriteUser)
+VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{movetype},{sendtype},{origin},{purchase},{sale},{project},{warehose},{preddate},{recptindate},{qcdate},{recptoutdate},{dealenddate},{state},{invoicestate},{autopicking},{backorder},{accountdate},{stockjournal},{moveinuser},{moveoutuser},{movedestined},{note},{createuser},{createdate},{writedate},{writeuser})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="picking_nomal.add">
 					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
 						<property name="sql">
 							<value>
