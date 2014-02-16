@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<title>产品入库单</title>
+		
+		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
+		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
+		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
+		<script src="../js/jquery.js" type="text/javascript"></script>
+		<script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
+		<script src="../js/common.js" type="text/javascript"></script>
+		<script src="../js/json2.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			var defGrid;
+			$(function(){
+               	defGrid = $("#query_list").ligerGrid({
+                    columns:[
+ 						{display:'操作',isSort:false,width:60,render:function(rowdata,rowindex,value) {
+                        	return "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> "; 
+                        },frozen:true},
+	                    {display:'入库单号',name:'code',width:130,minWidth:60},
+	                    {display:'产品单号',name:'origin',width:130},
+			            {display:'入库日期',name:'pred_date',width:80},
+			            {display:'入库仓库',name:'warehose_id',width:290,align:'left'},
+			            {display:'收货人',name:'move_in_user',render:sw_opt,align:'left'}
+                    ],
+                    pageSize:20,
+                    usePager: true,
+                    width:'100%',
+                    height:'99%',
+                    dataAction:'server',
+                    checkbox:false,
+                    rownumbers:false,
+                    fixedCellHeight:false,
+                    colDraggable:true,
+                    enabledEdit:true,
+                    clickToEdit:false,
+                    onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
+                    onReload: toQuery,
+                    param_movein:'user'
+				});
+				appendAddBtn(openDictDef, "添加入库单");
+				appendModifyBtn(function(){}, "修改入库单");
+				$("#pageloading").hide();
+			});
+			function sw_opt(item) {
+				var swd = paramRender(item, defGrid.options.param_movein, item.move_in_user);
+				if (!swd)
+					swd = item.move_in_user;
+				return swd;
+			}
+			function toQuery(item, page, pageSize) {
+				if (!page)
+					page = defGrid.options.page;
+				if (!pageSize)
+					pageSize = defGrid.options.pageSize;
+				
+				var param = new Object();
+				param.code = $("#codeQ").val();
+				param.origin = $("#originQ").val();
+                param.move_type='02';
+				var data = JSON.stringify(reqObj('q','stock.select.picking_product.query',JSON.stringify(param),'l',true,page,pageSize));
+				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+					defGrid.set({data: data['data']});
+				});
+			}
+			function openDictDef() {
+				parent.f_addTab('new_stockp','新增成品入库单','./stock/new_stock_product_picking.html');
+			}
+			function toModify(row) {
+				var url = "/cm/rbac/cmDict.do?m=u";
+				ajaxSubmit(url, row, function(data) {
+					if (data) {
+						if (parseInt(data['result']) > 0) {
+							$.ligerDialog.success('保存成功');
+						} else {
+							$.ligerDialog.error('保存失败');
+						}
+					}
+				});
+			}
+			var printWin;
+			function toPrint(rowid) {
+				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_product_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+			}
+	    </script>
+		<style type="text/css">
+			label{margin: 5px 20px 5px 15px;}
+			.fields{height:35px;padding-top:5px;}
+			.dict-info{width: 260px;padding: 10px;}
+			.diff {margin:3px 0;}
+			.lineD {width:99%;float:left;position:relative;overflow:hidden;margin:10px 0 2px 2px}
+			.labelD {width:13%;position:relative;float:left;padding-top:3px;}
+			.dplD {width:36%;position:relative;float:left;}
+			.title{font-size:14px;font-weight:bold;background-position:left;padding-left:18px;}
+			.l-dialog-content-nopadding{padding:0 !important;}
+		</style>
+	</head>
+	<body style="padding:0;">
+		<div id="pageloading"></div>  
+		<div id="layout_main">
+			<div position="center" id="a_center" title="入库单列表">
+				<div id="query_cond" class="fields">
+					<label>入库单号</label><input type="text" class="s-text txt-def" id="codeQ" />
+					<label>产品单号</label><input type="text" class="s-text txt-def" id="originQ" />
+					<!-- <label>供应商</label><input type="text" class="s-text txt-def" id="partnerQ" />
+					 -->
+					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
+					<input type="button" value="清空" onclick="toReset('#codeQ,#originQ,#partnerQ');" />
+				</div>
+				<div id="query_list"></div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<title>新增生产领用出库单</title>
+		
+		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
+		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
+		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
+		<script src="../js/jquery.js" type="text/javascript"></script>
+		<script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
+		<script src="../js/common.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			var pGrid;
+			$(function(){
+				$("#layout_main").ligerLayout({
+					bottomHeight: "46%",
+					allowBottomResize:false
+                });
+				$("form").ligerForm();
+// 				$(".readonly").each(function(index) {
+// 					$(this).attr("style","width:178px;");
+// 				});
+				$(".l-textarea").each(function(index){
+					$(this).removeClass("l-textarea");
+				});
+				$("#d-menu").ligerToolBar({items:[
+				    {text:'保存',click:toAdd,icon:'add'},
+					{line:true},
+				    {text:'清空',click:resetArea,icon:'clear'},
+					{line:true}
+				]});
+               	pGrid = $("#p-div").ligerGrid({
+                    columns:[
+	                    {display:'商品编号',name:'code',width:90,minWidth:60,editor:{type:'popup',condition: {
+							fields: [{ name: 'CompanyName', label: '客户' }]
+						},
+						grid: getGridOptions(true),
+						valueField: 'CustomerID',
+						textField: 'CustomerID'}},
+	                    {display:'品名',name:'origin',width:100},
+			            {display:'规格/型号',name:'partnerid',width:50},
+			            {display:'待入库数量',name:'preddate',align:'right',editor:{type:'text'}},
+			            {display:'入库数量',name:'warehoseid',align:'right',editor:{type:'text'}},
+			            {display:'单位',name:'moverinuser',editor:{type:'select'}},
+			            {display:'单价',name:'moverinuser',align:'right',editor:{type:'text'}},
+			            {display:'产成品单价',name:'moverinuser',align:'right',editor:{type:'text'}},
+			            {display:'金额',name:'moverinuser',align:'right'}
+                    ],
+                    pageSize:20,
+                    usePager: true,
+                    width:'100%',
+                    height:'100%',
+                    dataAction:'server',
+                    checkbox:false,
+                    rownumbers:false,
+                    fixedCellHeight:false,
+                    colDraggable:false,
+                    enabledEdit:true,
+                    clickToEdit:false,
+                    onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
+                    onReload: queryProd
+				});
+				appendAddBtn(function(){
+					pGrid.addEditRow();
+					$(".l-grid2 .l-grid-body-inner").attr("style", "");
+				}, "添加商品明细");
+				appendModifyBtn(function(){}, "修改商品明细");
+				appendDeleteBtn(function(){}, "删除商品明细");
+				ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
+					$('#deptS').val(data['oname']);
+					$('#deptCodeS').val(data['oid']);
+					$('#createUserS').val(data['uname']);
+					$('#createUserCodeS').val(data['uid']);
+					$("#createDateS").val(data['date']);
+				}, null, false);
+				var udata = getData('user',{orgid:$("#deptCodeS").val()},false);
+				$("#moveInS").ligerComboBox({
+					autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:udata,
+                    onSelected:function(v,t) {
+                        $("#moveInIdS").val(v);
+                    }
+				});
+				$("#pageloading").hide();
+			});
+			function resetArea() {
+				toReset('#a_center input:not(.readonly),select,textarea');
+			}
+			function getGridOptions(checkbox) {
+				var options = {
+					columns: [{display: '顾客', name: 'CustomerID', align: 'left', width: 100, minWidth: 60 },
+						{ display: '公司名', name: 'CompanyName', minWidth: 120, width: 100 },
+						{ display: '联系名', name: 'ContactName', minWidth: 140, width: 100 },
+						{ display: '电话', name: 'Phone', width: 100 },
+						{ display: '城市', name: 'City', width: 100 },
+						{ display: '国家', name: 'Country', width: 100 }
+					], switchPageSizeApplyComboBox: false,
+					pageSize: 10,
+					checkbox: checkbox
+				};
+				return options;
+			}
+			function queryProd() {}
+			function toAdd() {
+				var param = new Object();
+				param.company = "";
+				param.dept = $("#deptCodeS").val();
+				param.busiorg = "";
+				param.name = "";
+				param.type = "1";
+				param.origin = $("#originS").val();
+				//param.partner = $("#partnerS").val();
+				param.preddate = $("#predDateS").val();
+				param.warehose = $("#warehouseS").val();
+				param.moveinuser = $("#moveInIdS").val();
+				param.note = $("#noteS").val();
+				param.createuser = $("#createUserCodeS").val();
+				param.createdate = $("#createDateS").val();
+				param.movetype='11';
+				var data = JSON.stringify(reqObj('a','stock.add.picking_pocket.add',JSON.stringify(param)));
+				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+					$.ligerDialog.success('保存成功', '操作完成', function() {
+						parent.tabManager.removeTabItem("new_stockp");
+					});
+				});
+			}
+	    </script>
+		<style type="text/css">
+			.center-height{height: 100%;}
+		</style>
+	</head>
+	<body style="padding:0;">
+		<div id="pageloading"></div>  
+		<div id="layout_main">
+			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">
+				<div id="d-menu" class="toolbar"></div>
+				<div style="height:25px;"></div>
+				<form name="basic-form" method="post" id="basic_form">
+					<div class="line-div">
+						<div class="label-div"><label>出库单号</label></div>
+						<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
+						<div class="label-div"><label>产品单号</label></div>
+						<div class="in-div"><input type="text" id="originS" ltype="text" class="diff" /></div>
+					</div>
+                	<div class="line-div">
+						<!--  <div class="label-div"><label>供应商</label></div>
+						<div class="in-div"><input type="text" id="partnerS" ltype="text" class="diff" /></div>
+						-->
+						<div class="label-div"> <label>出库日期</label></div>
+						<div class="in-div"><input type="text" id="predDateS" ltype="date" class="diff" /></div>
+					</div>
+                	<div class="line-div">
+						<div class="label-div"><label>出库仓库</label></div>
+						<div class="in-div"><input type="text" id="warehouseS" ltype="text" class="diff" /></div>
+						<div class="label-div"><label>收货人</label></div>
+						<div class="in-div"><input type="text" id="moveInS" ltype="combobox" class="diff" /></div>
+						<input type="hidden" id="moveInIdS" />
+					</div>
+					<div class="line-div" style="height:76px;">
+						<div class="label-div"><label>备注</label></div>
+						<div class="in-div" style="width:72%;">
+							<textarea id="" cols="73" rows="3" id="noteS"></textarea>
+						</div>
+					</div>
+					<div class="line-div">
+						<div class="label-div"><label>制单部门</label></div>
+						<div class="in-div"><input type="text" id="deptS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+						<input type="hidden" id="deptCodeS" />
+						<div class="label-div"><label>制单人</label></div>
+						<div class="in-div"><input type="text" id="createUserS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+						<input type="hidden" id="createUserCodeS" />
+					</div>
+					<div class="line-div">
+						<div class="label-div"><label>制单日期</label></div>
+						<div class="in-div"><input type="text" id="createDateS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+					</div>
+			    </form>
+			</div>
+			<div position="bottom" id="a_right" title="选择出库商品">
+				<div id="p-div"></div>
+			</div>
+		</div>
+	</body>
+</html>
