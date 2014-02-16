@@ -43,11 +43,11 @@
 	                    {display:'名称',name:'name',width:160,minWidth:60,align:'left'},
 	                    {display:'规格/型号',name:'specs',width:120,minWidth:60,align:'left'},
 	                    {display:'品牌',name:'brand',width:140,minWidth:60,align:'left'},
-	                    {display:'商品性质',name:'type',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'product_category',item.type);}},
+	                   // {display:'商品性质',name:'type',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'product_category',item.type);}},
 	                    {display:'计量单位',name:'uom_id',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'uom',item.uom_id);}}
-// 	                    {display:'副计量',name:'name',width:180,minWidth:60,align:'left'},
-// 	                    {display:'库存计量',name:'name',width:180,minWidth:60,align:'left'},
-// 	                    {display:'库存副计量',isSort:false,width:100}
+						// 	{display:'副计量',name:'name',width:180,minWidth:60,align:'left'},
+						// 	{display:'库存计量',name:'name',width:180,minWidth:60,align:'left'},
+						// 	{display:'库存副计量',isSort:false,width:100}
                     ],
                     pageSize:20,
                     usePager: true,
@@ -168,14 +168,15 @@
 				</div>
                	<div class="line-div">
 					<div class="label-div"><label>计量单位</label></div>
-					<div class="in-div"><select id="uomIdS" param="uom" first=""></select></div>
+					<div class="in-div"><select id="uomIdS" param="uom" ></select></div>
 					<div class="label-div"><label>单位精度</label></div>
-					<div class="in-div"><select id="uomPresS" param="uom_pres" first=""></select></div>
+					<div class="in-div"><select id="uomPresS" param="uom_pres" ></select></div>
 				</div>
-               	<div class="line-div">
+               	<!-- <div class="line-div">
 					<div class="label-div"><label>物料性质</label></div>
 					<div class="in-div" style="width:72%;"><select id="typeS" param="product_category" first=""></select></div>
 				</div>
+				 -->
 				<div class="line-div" style="height:76px;">
 					<div class="label-div"><label>备注</label></div>
 					<div class="in-div" style="width:72%;">
