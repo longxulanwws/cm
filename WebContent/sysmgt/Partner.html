@@ -32,20 +32,16 @@
                             }
                             return h;
                         },frozen:true},
-                        //{display:'单位类型',name:'type',width:50,minWidth:60,align:'left',editor:{type:'text'}},
                         {display:'单位类型',name:'type',width:80,minWidth:60,data:get_type_list,render:switcher_type,editor:{type:'select',data:get_type_list,textField:'name',valueField:'value',selectBoxHeight:50}},
                         {display:'编号',name:'code',width:40,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'名称',name:'name',width:50,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'所属机构',name:'dept_id',width:80,minWidth:60,data:get_org_list,render:switcher_org,editor:{type:'select',data:get_org_list,textField:'name',valueField:'value',selectBoxHeight:50}},
 		                {display:'组织机构代码证号',name:'uuid_code',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'税号',name:'tax_code',width:80,minWidth:60,align:'left',editor:{type:'text'}},
-	                    //{display:'所属行业',name:'of_trade',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'所属行业',name:'of_trade',width:80,minWidth:60,data:get_trade_list,render:switcher_trade,editor:{type:'select',data:get_trade_list,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'法人代表',name:'legal_body',width:80,minWidth:60,align:'left',editor:{type:'text'}},
-	                    //{display:'信用级别',name:'credit_level',width:80,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'信用级别',name:'credit_level',width:80,minWidth:60,data:get_level_list,render:switcher_level,editor:{type:'select',data:get_level_list,textField:'name',valueField:'value',selectBoxHeight:50}},
+	                    //{display:'信用级别',name:'credit_level',width:80,minWidth:60,data:get_level_list,render:switcher_level,editor:{type:'select',data:get_level_list,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'开户行',name:'bank',width:80,minWidth:60,data:get_bank_list,render:switcher_bank,editor:{type:'select',data:get_bank_list,textField:'name',valueField:'value',selectBoxHeight:50}},
-	                    //{display:'开户行',name:'bank',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'银行帐号',name:'bank_account',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'联系人',name:'link_man',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'手机号',name:'mobile',width:50,minWidth:60,align:'left',editor:{type:'text'}},
@@ -393,37 +389,41 @@
 				<div class="in-div"><input type="text" class="s-text txt-def" id="newLegal_body" /></div>
 			</div>
 			<div class="line-div">
-				<div class="label-div"><label>信用级别</label></div>
+				<!--  <div class="label-div"><label>信用级别</label></div>
 			    <div class="in-div"><input type="text" id="lecel_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
 				<input type="hidden" id="newCredit_level" />
-			
+			-->
 				<div class="label-div"><label>开户行</label></div>
 			    <div class="in-div"><input type="text" id="bank_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
 				<input type="hidden" id="newBank" />
-			</div>
-			<div class="line-div">
+				
 				<div class="label-div"><label>银行帐号</label></div>
 				  <div class="in-div"><input type="text" class="s-text txt-def" id="newBank_account" /></div>
 			
-				<div class="label-div"><label>联系人</label></div>
-				<div class="in-div"><input type="text" class="s-text txt-def" id="newLink_man" /></div>
 			</div>
 			<div class="line-div">
+				
+				<div class="label-div"><label>联系人</label></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newLink_man" /></div>
+				
 				<div class="label-div"><label>手机号</label></div>
 				<div class="in-div"><input type="text" class="s-text txt-def" id="newMobile" /></div>
 			
-				<div class="label-div"><label>单位电话</label></div>
-				<div class="in-div"><input type="text" class="s-text txt-def" id="newPhone" /></div>
 			</div>
 			<div class="line-div">
+				
+				<div class="label-div"><label>单位电话</label></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newPhone" /></div>
+				
 				<div class="label-div"><label>单位传真</label></div>
 				<div class="in-div"><input type="text" class="s-text txt-def" id="newFax" /></div>
+			
 			</div>
 			<div class="line-div">
 				<div class="label-div"><label>说明</label></div>
 				<div class="in-div"><textarea cols="24" rows="5" id="newDesc"></textarea></div>
 			</div>
-			<div class="line-div" style="margin-top:70px;padding-left:40%;">
+			<div class="line-div" style="margin-top:80px;padding-left:40%;">
 				<input type="button" value="保存" onclick="toAdd();" />
 				<input type="button" value="清空" onclick="toReset('#new_user_def input,select,textarea')" />
 			</div>

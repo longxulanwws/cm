@@ -331,8 +331,8 @@ VALUES ({#menu.id},{code},{name},{higher_id},{seq:int},{resource_id},{icon_uri},
 					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
 						<property name="sql">
 							<value>
-<![CDATA[INSERT INTO Cm_Partner(ID,Company_ID,Dept_ID,BusiOrg_ID,TYPE,CODE,NAME,UUID_CODE,TAX_CODE,OF_TRADE,LEGAL_BODY,CREDIT_LEVEL,BANK,BANK_ACCOUNT,LINK_MAN,MOBILE,PHONE,FAX,DESCRIPTION,Of_Region)
- 				VALUES({#partner.id},{companyid},{deptid},{busiorgid},{type},{code},{name},{uuid_code},{tax_code},{of_trade},{legal_body},{credit_level},{bank},{bank_account},{link_man},{mobile},{phone},{fax},{description},{ofregion})]]>
+<![CDATA[INSERT INTO Cm_Partner(ID,Company_ID,Dept_ID,BusiOrg_ID,TYPE,CODE,NAME,UUID_CODE,TAX_CODE,OF_TRADE,LEGAL_BODY,BANK,BANK_ACCOUNT,LINK_MAN,MOBILE,PHONE,FAX,DESCRIPTION,Of_Region)
+ 				VALUES({#partner.id},{companyid},{deptid},{busiorgid},{type},{code},{name},{uuid_code},{tax_code},{of_trade},{legal_body},{bank},{bank_account},{link_man},{mobile},{phone},{fax},{description},{ofregion})]]>
 							</value>
 						</property>
 					</bean>
@@ -439,7 +439,7 @@ Layer={layer:int},Detail={detail},STATUS={status},DESCRIPTION={description} WHER
 							<value>
 <![CDATA[UPDATE Cm_Partner SET TYPE={type},CODE={code},NAME={name},
 UUID_CODE={uuid_code},TAX_CODE={tax_code},OF_TRADE={of_trade},
-LEGAL_BODY={legal_body},CREDIT_LEVEL={credit_level},BANK={bank},BANK_ACCOUNT={bank_account}
+LEGAL_BODY={legal_body},BANK={bank},BANK_ACCOUNT={bank_account}
 ,LINK_MAN={link_man},MOBILE={mobile},PHONE={phone},FAX={fax},DESCRIPTION={description}  WHERE ID={id}]]>
 							</value>
 						</property>
