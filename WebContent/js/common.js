@@ -74,6 +74,7 @@ function ajaxSubmit(url, data, onSuccess, onError, async) {
 				r = onError(data);
 			else
 				alert("[严重错误] 向服务器提交请求失败！");
+//				alert(JSON.stringify(data));
 		}
 	});
 	return r;
