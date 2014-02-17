@@ -94,6 +94,7 @@
 					return;
 				}
 				resetArea();
+				
 				detailDialog = $.ligerDialog.open({
 					target:$("#detail"),
 					title:"新增商品",
@@ -137,8 +138,6 @@
 						return;
 					}
 				});
-				liger.get('detail_form').showInvalid();
-				
 				if (!valid) return;
 				
 				var param = new Object();
@@ -167,6 +166,10 @@
 				$("#detail input:not(.readonly),select,textarea").each(function(index, element) {
 					$(element.parentNode).removeClass("l-text-invalid");
 				});
+
+				$('#uomIdS_txt').addClass("required");
+				$('#uomPresS_txt').addClass("required");
+				$('#typeS_txt').addClass("required");
 			}
 			function toSelect(rowindex) {
 				if (!parent) {
@@ -238,7 +241,7 @@
 				</div>
                	<div class="line-div">
 					<div class="label-div"><label>计量单位</label></div>
-					<div class="in-div"><select id="uomIdS" param="uom" first="" validate="required:true"></select></div>
+					<div class="in-div"><select id="uomIdS" param="uom" first=""></select></div>
 					<div class="label-div"><label>单位精度</label></div>
 					<div class="in-div"><select id="uomPresS" param="uom_pres" first=""></select></div>
 				</div>
