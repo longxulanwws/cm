@@ -8,6 +8,10 @@
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
 		<script src="../js/jquery.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
+		<script src="../js/validate/messages_zh.js" type="text/javascript"></script>
+		<script src="../js/validate/validate.js" type="text/javascript"></script>
 		<script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
 		<script src="../js/common.js" type="text/javascript"></script>
 		<script src="../js/json2.js" type="text/javascript"></script>
@@ -16,6 +20,7 @@
 			var pType = getData('product.type');
 			var pNode;
 			$(function() {
+				var opt = window.location.toString().replace(/^[^?]+\?o=/, '');
 				$("#layout_main").ligerLayout({
 					leftWidth:230,
 					allowLeftCollapse:false,
@@ -38,16 +43,22 @@
 				});
    				pGrid = $("#query_list").ligerGrid({
                     columns:[
+						{display:'操作',isSort:false,width:60,render:function(rowdata,rowindex,value) {
+							if (opt === 's')
+								return "<a href='javascript:void(0);' class='opt-link' onclick='toSelect(".concat(rowindex).concat(")'>选择</a>");
+							return "<a href='javascript:void(0);' class='opt-link' onclick='toUpdate(".concat(rowindex).concat(")'>修改</a> ")
+						        .concat("<a href='javascript:void(0);' class='opt-link' onclick='toDel(").concat(rowindex).concat(")'>删除</a> "); 
+						},frozen:true},
 	                    {display:'类型',name:'categ_id',width:120,minWidth:60,align:'left',render:function(item){return paramRender(item,'product.type2',item.categ_id);}},
 	                    {display:'编号',name:'code',width:160,minWidth:60},
 	                    {display:'名称',name:'name',width:160,minWidth:60,align:'left'},
 	                    {display:'规格/型号',name:'specs',width:120,minWidth:60,align:'left'},
 	                    {display:'品牌',name:'brand',width:140,minWidth:60,align:'left'},
-	                   // {display:'商品性质',name:'type',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'product_category',item.type);}},
+	                    {display:'商品性质',name:'type',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'product_category',item.type);}},
 	                    {display:'计量单位',name:'uom_id',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'uom',item.uom_id);}}
-						// 	{display:'副计量',name:'name',width:180,minWidth:60,align:'left'},
-						// 	{display:'库存计量',name:'name',width:180,minWidth:60,align:'left'},
-						// 	{display:'库存副计量',isSort:false,width:100}
+// 	                    {display:'副计量',name:'name',width:180,minWidth:60,align:'left'},
+// 	                    {display:'库存计量',name:'name',width:180,minWidth:60,align:'left'},
+// 	                    {display:'库存副计量',isSort:false,width:100}
                     ],
                     pageSize:20,
                     usePager: true,
@@ -63,12 +74,12 @@
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: toQuery,
    	   			});
-				appendAddBtn(toAdd);
-				appendModifyBtn(function(){});
-				appendDeleteBtn(function(){});
+   	   			if (opt !== 's')
+					appendAddBtn(toAdd);
+				
 				$("#detail_form").ligerForm();
 				$("#d-menu").ligerToolBar({items:[
-				    {text:'保存',click:toSave,icon:'add'},
+				    {text:'保存',click:toSave,icon:'save'},
 					{line:true},
 				    {text:'清空',click:resetArea,icon:'clear'},
 					{line:true}
@@ -82,6 +93,7 @@
 					$.ligerDialog.error('请先选择商品类型。','错误');
 					return;
 				}
+				resetArea();
 				detailDialog = $.ligerDialog.open({
 					target:$("#detail"),
 					title:"新增商品",
@@ -89,7 +101,17 @@
 					height:360
 				});
 			}
-			function toDel() {
+			function toDel(row) {
+				var url = "/cm/rbac/cm.do?m=d";
+				ajaxSubmit(url, row, function(data) {
+					if (data) {
+						if (parseInt(data['result']) > 0) {
+							$.ligerDialog.success('删除成功');
+						} else {
+							$.ligerDialog.error('删除失败');
+						}
+					}
+				});
 			}
 			function toQuery() {
 				var page = pGrid.options.page;
@@ -98,13 +120,14 @@
 				var param = new Object();
 				if (!pNode)
 					pNode = pTree.getSelected().data.code;
-				param.code = pNode;
+				param.categ_id = pNode;
 
 				var data = JSON.stringify(reqObj('q','stock.select.product.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					pGrid.set({data: data['data']});
 				});
 			}
+			function toUpdate() {}
 			function toSave() {
 				var param = new Object();
 				param.type = $("#typeS").val();
@@ -127,7 +150,39 @@
 					toQuery();
 				});
 			}
-			function resetArea() {}
+			function resetArea() {
+				toReset("#detail input:not(.readonly),select,textarea");
+			}
+			function toSelect(rowindex) {
+				if (!parent) {
+					return;
+				}
+				var rowdata = pGrid.getRow(rowindex);
+
+				if (!parent.c_row) {
+					parent.c_row = parent.pGrid.getSelectedRow();
+					if (!parent.c_row) {
+						alert("新增入库单页选择入库商品列表中没有有效的行。");
+						return;
+					}
+				}
+				
+				parent.c_row.code = rowdata.code;
+				parent.c_row.name = rowdata.name;
+				parent.c_row.specs = rowdata.specs;
+				parent.c_row.categ_id = rowdata.categ_id;
+				
+				var retRow = parent.curRow.element;
+				retRow.value = rowdata.code;
+				var td = retRow.parentNode.parentNode
+				var id = td.id.replace(/\|/g, '\\|').replace(/.$/, '');
+				td = td.nextSibling;
+				$(td.firstChild).text(rowdata.name);
+				td = td.nextSibling;
+				$(td.firstChild).text(rowdata.specs);
+
+				parent.selDialog.hide();
+			}
 		</script>
 		<style>
 			.overflow-auto {overflow:auto;height:100%;}
@@ -150,15 +205,15 @@
 				</div>
 			</div>
 		</div>
-		<div id="detail">
+		<div id="detail" style="display:hidden;">
 			<div id="d-menu"></div>
 			<div style="height:5px;"></div>
-			<form id="detail_form">
+			<form id="detail_form" class="liger-form" data-validate="{}">
 				<div class="line-div">
 					<div class="label-div"><label>物料编号</label></div>
 					<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
 					<div class="label-div"><label>物料名称</label></div>
-					<div class="in-div"><input type="text" id="nameS" ltype="text" class="diff" /></div>
+					<div class="in-div"><input type="text" id="nameS" ltype="text" class="diff required" /></div>
 				</div>
                	<div class="line-div">
 					<div class="label-div"><label>品牌</label></div>
@@ -168,15 +223,14 @@
 				</div>
                	<div class="line-div">
 					<div class="label-div"><label>计量单位</label></div>
-					<div class="in-div"><select id="uomIdS" param="uom" ></select></div>
+					<div class="in-div"><select id="uomIdS" param="uom" first=""></select></div>
 					<div class="label-div"><label>单位精度</label></div>
-					<div class="in-div"><select id="uomPresS" param="uom_pres" ></select></div>
+					<div class="in-div"><select id="uomPresS" param="uom_pres" first=""></select></div>
 				</div>
-               	<!-- <div class="line-div">
+               	<div class="line-div">
 					<div class="label-div"><label>物料性质</label></div>
 					<div class="in-div" style="width:72%;"><select id="typeS" param="product_category" first=""></select></div>
 				</div>
-				 -->
 				<div class="line-div" style="height:76px;">
 					<div class="label-div"><label>备注</label></div>
 					<div class="in-div" style="width:72%;">

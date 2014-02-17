@@ -11,41 +11,33 @@
 		<script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
 		<script src="../js/common.js" type="text/javascript"></script>
 		<script type="text/javascript">
-			var pGrid;
+			var pGrid, c_row;
 			$(function(){
 				$("#layout_main").ligerLayout({
 					bottomHeight: "46%",
 					allowBottomResize:false
                 });
 				$("form").ligerForm();
-// 				$(".readonly").each(function(index) {
-// 					$(this).attr("style","width:178px;");
-// 				});
 				$(".l-textarea").each(function(index){
 					$(this).removeClass("l-textarea");
 				});
 				$("#d-menu").ligerToolBar({items:[
-				    {text:'保存',click:toAdd,icon:'add'},
+				    {text:'保存',click:toAdd,icon:'save'},
 					{line:true},
 				    {text:'清空',click:resetArea,icon:'clear'},
 					{line:true}
 				]});
                	pGrid = $("#p-div").ligerGrid({
                     columns:[
-	                    {display:'商品编号',name:'code',width:90,minWidth:60,editor:{type:'popup',condition: {
-							fields: [{ name: 'CompanyName', label: '客户' }]
-						},
-						grid: getGridOptions(true),
-						valueField: 'CustomerID',
-						textField: 'CustomerID'}},
-	                    {display:'品名',name:'origin',width:100},
-			            {display:'规格/型号',name:'partnerid',width:50},
-			            {display:'待入库数量',name:'preddate',align:'right',editor:{type:'text'}},
-			            {display:'入库数量',name:'warehoseid',align:'right',editor:{type:'text'}},
-			            {display:'单位',name:'moverinuser',editor:{type:'select'}},
-			            {display:'采购单价',name:'moverinuser',align:'right',editor:{type:'text'}},
-			            {display:'入库单价',name:'moverinuser',align:'right',editor:{type:'text'}},
-			            {display:'金额',name:'moverinuser',align:'right'}
+						{display:'商品编号',name:'code',width:90,editor:{type:'popup',onButtonClick:selectProduct},textField:'code',valueField:'categ_id'},
+	                    {display:'品名',name:'name',width:100},
+			            {display:'规格/型号',name:'specs',width:50},
+			            {display:'待入库数量',name:'num1',align:'right',editor:{type:'text'}},
+			            {display:'入库数量',name:'num2',align:'right',editor:{type:'text'}},
+			            {display:'单位',name:'uom_id',editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}},
+			            {display:'采购单价',name:'price1',align:'right',editor:{type:'text'}},
+			            {display:'入库单价',name:'price2',align:'right',editor:{type:'text'}},
+			            {display:'金额',name:'total',align:'right'}
                     ],
                     pageSize:20,
                     usePager: true,
@@ -63,7 +55,8 @@
 				});
 				appendAddBtn(function(){
 					pGrid.addEditRow();
-					$(".l-grid2 .l-grid-body-inner").attr("style", "");
+					c_row = pGrid.getRow(pGrid.rows.length - 1);
+// 					$(".l-grid2 .l-grid-body-inner").attr("style", "");
 				}, "添加商品明细");
 				appendModifyBtn(function(){}, "修改商品明细");
 				appendDeleteBtn(function(){}, "删除商品明细");
@@ -89,19 +82,10 @@
 			function resetArea() {
 				toReset('#a_center input:not(.readonly),select,textarea');
 			}
-			function getGridOptions(checkbox) {
-				var options = {
-					columns: [{display: '顾客', name: 'CustomerID', align: 'left', width: 100, minWidth: 60 },
-						{ display: '公司名', name: 'CompanyName', minWidth: 120, width: 100 },
-						{ display: '联系名', name: 'ContactName', minWidth: 140, width: 100 },
-						{ display: '电话', name: 'Phone', width: 100 },
-						{ display: '城市', name: 'City', width: 100 },
-						{ display: '国家', name: 'Country', width: 100 }
-					], switchPageSizeApplyComboBox: false,
-					pageSize: 10,
-					checkbox: checkbox
-				};
-				return options;
+			var curRow, selDialog;
+			function selectProduct() {
+				curRow = this;
+				selDialog = $.ligerDialog.open({height:600,width:800,url:'./product.html?o=s',title:'选择商品'});
 			}
 			function queryProd() {}
 			function toAdd() {
