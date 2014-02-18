@@ -117,6 +117,30 @@
 						</property>
 					</bean>
 				</entry>
+				<entry key="move.query">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="dmlType" value="cond" />
+						<property name="sql">
+							<value>
+<![CDATA[SELECT ID,Company_ID,Dept_ID,BusiOrg_ID,Picking_ID,Origin,Purchase_ID,
+ Purchase_Line_ID,Sale_ID,Sale_Line_ID,Type,Product_ID,Code,Name,Partner_ID,
+ Ware_Hose_ID,Location_ID, Product_Uom, Price_Currency, Source_Price_Unit,
+ Price_Unit, Tar_Product_Qty, Product_Qty, Pred_Date, Real_Date,
+ Move_End_Date, QC_Type, QC_Flag, State, Inventory_State, Valuation_State, Busi_Batch, Auto_Picking,
+ Note, CreateUser, CreateDate, WriteDate, WriteUser  FROM Stock_Move]]>
+							</value>
+						</property>
+						<property name="conditions">
+							<map>
+							
+								<entry key="name" value="str:like(lr):and" />
+								<entry key="origin" value=":like(lr)" />
+								<entry key="state" value="" />
+								<entry key="ware_hose_id" value="" />
+							</map>
+						</property>
+					</bean>
+				</entry>
 			</map>
 		</property>
 		<property name="add">
@@ -127,6 +151,36 @@
 							<value>
 <![CDATA[INSERT INTO Stock_Picking(ID,Company_ID,Dept_ID,BusiOrg_ID,Code,Name,Type,Move_Type,Send_Type,Origin,Purchase_ID,Sale_ID,Project_ID,Partner_ID,Warehose_ID,Pred_Date,Recpt_IN_Date,QC_Date,Recpt_Out_Date,Deal_End_Date,State,Invoice_State,Auto_Picking,Back_Order_ID,Account_Date,Stock_Journal_ID,Move_IN_User,Move_Out_User,Move_Destined,Note,CreateUser,CreateDate,WriteDate,WriteUser)
 VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{movetype},{sendtype},{origin},{purchase},{sale},{project},{partner},{warehose},{preddate},{recptindate},{qcdate},{recptoutdate},{dealenddate},{state},{invoicestate},{autopicking},{backorder},{accountdate},{stockjournal},{moveinuser},{moveoutuser},{movedestined},{note},{createuser},{createdate},{writedate},{writeuser})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+					<entry key="picking_product.add">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+<![CDATA[INSERT INTO Stock_Picking(ID,Company_ID,Dept_ID,BusiOrg_ID,Code,Name,Type,Move_Type,Send_Type,Origin,Purchase_ID,Sale_ID,Project_ID,Warehose_ID,Pred_Date,Recpt_IN_Date,QC_Date,Recpt_Out_Date,Deal_End_Date,State,Invoice_State,Auto_Picking,Back_Order_ID,Account_Date,Stock_Journal_ID,Move_IN_User,Move_Out_User,Move_Destined,Note,CreateUser,CreateDate,WriteDate,WriteUser)
+VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{movetype},{sendtype},{origin},{purchase},{sale},{project},{warehose},{preddate},{recptindate},{qcdate},{recptoutdate},{dealenddate},{state},{invoicestate},{autopicking},{backorder},{accountdate},{stockjournal},{moveinuser},{moveoutuser},{movedestined},{note},{createuser},{createdate},{writedate},{writeuser})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="picking_pocket.add">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+<![CDATA[INSERT INTO Stock_Picking(ID,Company_ID,Dept_ID,BusiOrg_ID,Code,Name,Type,Move_Type,Send_Type,Origin,Purchase_ID,Sale_ID,Project_ID,Warehose_ID,Pred_Date,Recpt_IN_Date,QC_Date,Recpt_Out_Date,Deal_End_Date,State,Invoice_State,Auto_Picking,Back_Order_ID,Account_Date,Stock_Journal_ID,Move_IN_User,Move_Out_User,Move_Destined,Note,CreateUser,CreateDate,WriteDate,WriteUser)
+VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{movetype},{sendtype},{origin},{purchase},{sale},{project},{warehose},{preddate},{recptindate},{qcdate},{recptoutdate},{dealenddate},{state},{invoicestate},{autopicking},{backorder},{accountdate},{stockjournal},{moveinuser},{moveoutuser},{movedestined},{note},{createuser},{createdate},{writedate},{writeuser})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="picking_nomal.add">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+<![CDATA[INSERT INTO Stock_Picking(ID,Company_ID,Dept_ID,BusiOrg_ID,Code,Name,Type,Move_Type,Send_Type,Origin,Purchase_ID,Sale_ID,Project_ID,Warehose_ID,Pred_Date,Recpt_IN_Date,QC_Date,Recpt_Out_Date,Deal_End_Date,State,Invoice_State,Auto_Picking,Back_Order_ID,Account_Date,Stock_Journal_ID,Move_IN_User,Move_Out_User,Move_Destined,Note,CreateUser,CreateDate,WriteDate,WriteUser)
+VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{movetype},{sendtype},{origin},{purchase},{sale},{project},{warehose},{preddate},{recptindate},{qcdate},{recptoutdate},{dealenddate},{state},{invoicestate},{autopicking},{backorder},{accountdate},{stockjournal},{moveinuser},{moveoutuser},{movedestined},{note},{createuser},{createdate},{writedate},{writeuser})]]>
 							</value>
 						</property>
 					</bean>
@@ -179,7 +233,7 @@ VALUES({#stock.product.id},{#session.USER_INFO.oid},{dept_id},{busiorg_id},{type
 		</property>
 		<property name="delete">
 			<map>
-			</map>	
+			</map>
 		</property>
 	</bean>
 </beans>

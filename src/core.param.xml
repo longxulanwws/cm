@@ -34,7 +34,7 @@
 						<property name="sql">
 							<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
 								<property name="sql">
-									<value><![CDATA[SELECT NAME,CODE,ID VALUE,'1' SEQ,'1' STATUS,SUBSTR(PATH,LENGTH(PATH)-3) PID,DETAIL LEAF FROM PRODUCT_CATEGORY]]></value>
+									<value><![CDATA[SELECT NAME,CODE,ID VALUE,'1' SEQ,STATUS,SUBSTR(PATH,LENGTH(PATH)-3) PID,DETAIL LEAF FROM PRODUCT_CATEGORY]]></value>
 								</property>
 							</bean>
 						</property>
@@ -46,7 +46,7 @@
 						<property name="sql">
 							<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
 								<property name="sql">
-									<value><![CDATA[SELECT NAME,CODE VALUE,'1' SEQ,'1' STATUS FROM PRODUCT_CATEGORY]]></value>
+									<value><![CDATA[SELECT NAME,CODE VALUE,'1' SEQ,STATUS FROM PRODUCT_CATEGORY]]></value>
 								</property>
 							</bean>
 						</property>
@@ -60,11 +60,6 @@
 								<property name="dmlType" value="cond" />
 								<property name="sql">
 									<value><![CDATA[SELECT NAME,ID VALUE,ID SEQ,STATUS FROM CM_ORG]]></value>
-								</property>
-								<property name="conditions">
-									<map>
-										<entry key="orgid" value="int" />
-									</map>
 								</property>
 							</bean>
 						</property>

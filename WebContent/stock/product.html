@@ -11,7 +11,6 @@
 		<script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
 		<script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
 		<script src="../js/validate/messages_zh.js" type="text/javascript"></script>
-		<script src="../js/validate/validate.js" type="text/javascript"></script>
 		<script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
 		<script src="../js/common.js" type="text/javascript"></script>
 		<script src="../js/json2.js" type="text/javascript"></script>
@@ -84,6 +83,7 @@
 				    {text:'清空',click:resetArea,icon:'clear'},
 					{line:true}
 				]});
+
 				$("#pageloading").hide();
 			});
 			
@@ -94,6 +94,7 @@
 					return;
 				}
 				resetArea();
+				
 				detailDialog = $.ligerDialog.open({
 					target:$("#detail"),
 					title:"新增商品",
@@ -129,6 +130,16 @@
 			}
 			function toUpdate() {}
 			function toSave() {
+				var valid = true;
+				$('*[id$="S"]').each(function(index, element) {
+					if (!$(this).rules()) return;
+					if (!$(element).valid()) {
+						valid = false;
+						return;
+					}
+				});
+				if (!valid) return;
+				
 				var param = new Object();
 				param.type = $("#typeS").val();
 				param.categ_id = pNode;
@@ -152,6 +163,13 @@
 			}
 			function resetArea() {
 				toReset("#detail input:not(.readonly),select,textarea");
+				$("#detail input:not(.readonly),select,textarea").each(function(index, element) {
+					$(element.parentNode).removeClass("l-text-invalid");
+				});
+
+				$('#uomIdS_txt').addClass("required");
+				$('#uomPresS_txt').addClass("required");
+				$('#typeS_txt').addClass("required");
 			}
 			function toSelect(rowindex) {
 				if (!parent) {
@@ -213,13 +231,13 @@
 					<div class="label-div"><label>物料编号</label></div>
 					<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
 					<div class="label-div"><label>物料名称</label></div>
-					<div class="in-div"><input type="text" id="nameS" ltype="text" class="diff required" /></div>
+					<div class="in-div"><input type="text" id="nameS" ltype="text" class="required diff" /></div>
 				</div>
                	<div class="line-div">
 					<div class="label-div"><label>品牌</label></div>
-					<div class="in-div"><input type="text" id="brandS" ltype="text" class="diff" /></div>
+					<div class="in-div"><input type="text" id="brandS" ltype="text" class="diff required" /></div>
 					<div class="label-div"> <label>规格型号</label></div>
-					<div class="in-div"><input type="text" id="specsS" ltype="text" class="diff" /></div>
+					<div class="in-div"><input type="text" id="specsS" ltype="text" class="required diff" /></div>
 				</div>
                	<div class="line-div">
 					<div class="label-div"><label>计量单位</label></div>
@@ -247,3 +265,6 @@
 		</div>
 	</body>
 </html>
+<script type="text/javascript">
+	selectInjector();
+</script>
