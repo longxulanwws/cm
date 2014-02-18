@@ -46,7 +46,7 @@
 							if (opt === 's')
 								return "<a href='javascript:void(0);' class='opt-link' onclick='toSelect(".concat(rowindex).concat(")'>选择</a>");
 							return "<a href='javascript:void(0);' class='opt-link' onclick='toUpdate(".concat(rowindex).concat(")'>修改</a> ")
-						        .concat("<a href='javascript:void(0);' class='opt-link' onclick='toDel(").concat(rowindex).concat(")'>删除</a> "); 
+						        .concat("<a href='javascript:void(0);' class='opt-link' onclick='deleteRow(").concat(rowindex).concat(")'>删除</a> "); 
 						},frozen:true},
 	                    {display:'类型',name:'categ_id',width:120,minWidth:60,align:'left',render:function(item){return paramRender(item,'product.type2',item.categ_id);}},
 	                    {display:'编号',name:'code',width:160,minWidth:60},
@@ -102,15 +102,25 @@
 					height:360
 				});
 			}
-			function toDel(row) {
-				var url = "/cm/rbac/cm.do?m=d";
-				ajaxSubmit(url, row, function(data) {
-					if (data) {
-						if (parseInt(data['result']) > 0) {
+			function deleteRow(rowid) {
+	            $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
+		            if (!r)
+			            return;
+	                var row = pGrid.getRow(rowid);
+	                if (row['__status'] !== 'add')
+	                	toDel(JSON.stringify(row));
+	                pGrid.deleteRow(rowid);
+	            })
+	        }
+		 function toDel(row) {
+				var param = JSON.stringify(reqObj('d','stock.delete.product.delete',row));
+				ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
+				if (data) {
+						if (parseInt(data['status']) > 0) {
 							$.ligerDialog.success('删除成功');
-						} else {
-							$.ligerDialog.error('删除失败');
-						}
+							} else {
+								$.ligerDialog.error('删除失败');
+							}
 					}
 				});
 			}
