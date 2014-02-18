@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>库点盘存</title>
+		<title>库存统计</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -19,11 +19,10 @@
                     columns:[
 							{display:'商品编号',name:'code',width:130,minWidth:60},
 		                    {display:'品	名',name:'name',width:130,minWidth:60},
-		                    {display:'规格型号',name:'origin',width:130},
+		                    {display:'规格型号',name:'specs',width:130},
 				            {display:'单	位',name:'product_uom',width:80,align:'left'},
 				            {display:'仓	库',name:'ware_hose_id',width:80},
-				            {display:'数	量',name:'tar_product_qty',width:80,align:'left'},
-				            {display:'占用数	量',name:'product_qty',width:80,align:'left'},
+				            {display:'库存数量',name:'product_qty',width:80,align:'left'},
 				            {display:'状	态',name:'state',width:80,align:'left'}
                     ],
                     pageSize:10,
