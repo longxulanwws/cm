@@ -19,6 +19,7 @@
  						{display:'操作',isSort:false,width:60,render:function(rowdata,rowindex,value) {
                         	return "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> "; 
                         },frozen:true},
+                        {display:'入库单状态',name:'state',width:100,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
 	                    {display:'入库单号',name:'code',width:130,minWidth:60},
 	                    {display:'采购单号',name:'origin',width:130},
 			            {display:'供应商',name:'partner_id',width:190,align:'left'},
