@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>质检</title>
+		<title>收货</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -20,8 +20,8 @@
  							var h = "";
  							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
  							 var row = defGrid.getRow(rowindex);
- 							 if(row.state == '10' )
-                               h += "<a href='javascript:void(0);' id='quality' class='opt-link' onclick='Quality(" + rowindex + ")'>提交入库</a> "; 
+ 							 if(row.state == '21' )
+                               h += "<a href='javascript:void(0);' id='quality' class='opt-link' onclick='Quality(" + rowindex + ")'>确认入库</a> "; 
                         	return h; 
                         },frozen:true},
                         {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
@@ -82,7 +82,7 @@
 		         
 				var row = defGrid.getRow(rowid);
 				$('#id').val(row.id);
-				$('#state').val(21);
+				$('#state').val(20);
 				var param1=new Object();
 				param1.id=$('#id').val();
 				param1.state=$('#state').val();

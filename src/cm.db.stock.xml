@@ -20,9 +20,9 @@
 						</property>
 						<property name="conditions">
 							<map>
-								<entry key="code" value="" />
-								<entry key="origin" value="" />
-								<entry key="partnerid" value=":like(lr)" />
+								<entry key="code" value=":like(lr)" />
+								<entry key="origin" value=":like(lr)" />
+								<entry key="partner_id" value=":like(lr)" />
 							</map>
 						</property>
 					</bean>
