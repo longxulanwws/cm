@@ -89,10 +89,10 @@
 			}
 			function queryProd() {}
 			function toAdd() {
-				if (pGrid.rows.length === 0) {
-					ligerDialog.error('请添加入库商品。','错误');
-					return;
-				}
+				//if (pGrid.rows.length === 0) {
+				//	ligerDialog.error('请添加入库商品。','错误');
+					//return;
+				//}
 				var param = new Object();
 				param.company = "";
 				param.dept = $("#deptCodeS").val();
@@ -108,16 +108,17 @@
 				param.createuser = $("#createUserCodeS").val();
 				param.createdate = $("#createDateS").val();
 				param.state="00";
+				param.movetype="01";
 				var data = JSON.stringify(reqObj('a','stock.add.picking.add',JSON.stringify(param)));
-				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+				ajaxSubmit("/cm/rbac/cm.do?m=a", data, function(data) {
 					// batch add
-					var data = JSON.stringify(reqObj('ba','stock.add.picking_move.add',JSON.stringify(pGrid.rows)));
-					alert(data);
-					ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
-						$.ligerDialog.success('保存成功', '操作完成', function() {
-							parent.tabManager.removeTabItem("new_stockp");
-						});
-					});
+					//var data = JSON.stringify(reqObj('ba','stock.add.picking_move.add',JSON.stringify(pGrid.rows)));
+					//alert(data);
+					//ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
+					//	$.ligerDialog.success('保存成功', '操作完成', function() {
+						//	parent.tabManager.removeTabItem("new_stockp");
+						//});
+					//});
 				});
 			}
 	    </script>
