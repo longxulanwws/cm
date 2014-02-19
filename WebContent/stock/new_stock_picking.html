@@ -32,8 +32,8 @@
 						{display:'商品编号',name:'code',width:90,editor:{type:'popup',onButtonClick:selectProduct},textField:'code',valueField:'categ_id'},
 	                    {display:'品名',name:'name',width:100},
 			            {display:'规格/型号',name:'specs',width:50},
-			            {display:'采购数量',name:'num1',align:'right',editor:{type:'text'}},
-			            {display:'入库数量',name:'num2',align:'right',editor:{type:'text'}},
+			            {display:'采购数量',name:'tar_product_qty',align:'right',editor:{type:'text'}},
+			            {display:'入库数量',name:'product_qty',align:'right',editor:{type:'text'}},
 			            {display:'单位',name:'uom_id',editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}},
 			            {display:'采购单价',name:'price1',align:'right',editor:{type:'text'}},
 			            {display:'入库单价',name:'price2',align:'right',editor:{type:'text'}},
@@ -85,10 +85,14 @@
 			var curRow, selDialog;
 			function selectProduct() {
 				curRow = this;
-				selDialog = $.ligerDialog.open({height:600,width:800,isResize: true,url:'./product_stock.html?o=s',title:'选择商品'});
+				selDialog = $.ligerDialog.open({height:600,width:800,isResize: true,url:'../sysmgt/product_query.html?o=s',title:'选择商品'});
 			}
 			function queryProd() {}
 			function toAdd() {
+				if (pGrid.rows.length === 0) {
+					ligerDialog.error('请添加入库商品。','错误');
+					return;
+				}
 				var param = new Object();
 				param.company = "";
 				param.dept = $("#deptCodeS").val();
@@ -105,8 +109,13 @@
 				param.createdate = $("#createDateS").val();
 				var data = JSON.stringify(reqObj('a','stock.add.picking.add',JSON.stringify(param)));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
-					$.ligerDialog.success('保存成功', '操作完成', function() {
-						parent.tabManager.removeTabItem("new_stockp");
+					// batch add
+					var data = JSON.stringify(reqObj('ba','stock.add.picking_move.add',JSON.stringify(pGrid.rows)));
+					alert(data);
+					ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
+						$.ligerDialog.success('保存成功', '操作完成', function() {
+							parent.tabManager.removeTabItem("new_stockp");
+						});
 					});
 				});
 			}

@@ -88,7 +88,9 @@
 						</property>
 						<property name="conditions">
 							<map>
-								<entry key="categ_id" value="" />
+								<entry key="code" value=":like(lr)" />
+								<entry key="name" value=":like(lr)" />
+								<entry key="specs" value=":like(lr)" />
 							</map>
 						</property>
 					</bean>
@@ -155,6 +157,16 @@ VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{m
 						</property>
 					</bean>
 				</entry>
+				<entry key="picking_move.add">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+<![CDATA[INSERT INTO stock_move (ID, Company_ID, Dept_ID, BusiOrg_ID,)
+VALUES ({#uuid},{company},{dept},{busiorg})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>				
 					<entry key="picking_product.add">
 					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
 						<property name="sql">
@@ -229,15 +241,24 @@ VALUES({#stock.product.id},{#session.USER_INFO.oid},{dept_id},{busiorg_id},{type
 		</property>
 		<property name="update">
 			<map>
+			<entry key="product">
+					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+						<property name="sql">
+							<value>
+<![CDATA[UPDATE PRODUCT_PRODUCT SET NAME={name},BRAND={brand},SPECS={specs},UOM_ID={uom_id},UOM_PRECISION={uom_precision:int},TYPE={type},NOTE={note} WHERE CODE={code}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
 			</map>	
 		</property>
 		<property name="delete">
 			<map>
-			<entry key="product.delete">
+				<entry key="product">
 					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
 						<property name="sql">
 							<value>
-<![CDATA[DELETE FROM PRODUCT_PRODUCT WHERE ID={id} ]]>
+<![CDATA[DELETE FROM PRODUCT_PRODUCT WHERE CODE={code}]]>
 							</value>
 						</property>
 					</bean>

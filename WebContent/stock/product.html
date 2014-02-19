@@ -46,7 +46,7 @@
 							if (opt === 's')
 								return "<a href='javascript:void(0);' class='opt-link' onclick='toSelect(".concat(rowindex).concat(")'>选择</a>");
 							return "<a href='javascript:void(0);' class='opt-link' onclick='toUpdate(".concat(rowindex).concat(")'>修改</a> ")
-						        .concat("<a href='javascript:void(0);' class='opt-link' onclick='deleteRow(").concat(rowindex).concat(")'>删除</a> "); 
+						        .concat("<a href='javascript:void(0);' class='opt-link' onclick='toDel(").concat(rowindex).concat(")'>删除</a> "); 
 						},frozen:true},
 	                    {display:'类型',name:'categ_id',width:120,minWidth:60,align:'left',render:function(item){return paramRender(item,'product.type2',item.categ_id);}},
 	                    {display:'编号',name:'code',width:160,minWidth:60},
@@ -76,7 +76,7 @@
    	   			if (opt !== 's')
 					appendAddBtn(toAdd);
 				
-				$("#detail_form").ligerForm();
+				//$("#detail_form").ligerForm();
 				$("#d-menu").ligerToolBar({items:[
 				    {text:'保存',click:toSave,icon:'save'},
 					{line:true},
@@ -102,27 +102,18 @@
 					height:360
 				});
 			}
-			function deleteRow(rowid) {
-	            $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
+			function toDel(rowindex) {
+				 $.ligerDialog.confirm('您确定要删除该商品吗？', function(r) {
 		            if (!r)
 			            return;
-	                var row = pGrid.getRow(rowid);
-	                if (row['__status'] !== 'add')
-	                	toDel(JSON.stringify(row));
-	                pGrid.deleteRow(rowid);
-	            })
-	        }
-		 function toDel(row) {
-				var param = JSON.stringify(reqObj('d','stock.delete.product.delete',row));
-				ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
-				if (data) {
-						if (parseInt(data['status']) > 0) {
-							$.ligerDialog.success('删除成功');
-							} else {
-								$.ligerDialog.error('删除失败');
-							}
-					}
-				});
+					var row = pGrid.getRow(rowindex);
+					var param = {code:row.code};
+					var data = JSON.stringify(reqObj('d','stock.delete.product',JSON.stringify(param)));
+					ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+						$.ligerDialog.success('删除成功。');
+						toQuery();
+					});
+				 });
 			}
 			function toQuery() {
 				var page = pGrid.options.page;
@@ -138,7 +129,30 @@
 					pGrid.set({data: data['data']});
 				});
 			}
-			function toUpdate() {}
+			var isU = false;
+			function toUpdate(rowindex) {
+				resetArea();
+				var row = pGrid.getRow(rowindex);
+				$('#codeS').val(row.code);
+				$('#nameS').val(row.name);
+				$('#brandS').val(row.brand);
+				$('#specsS').val(row.specs);
+				$('#uomIdS').val(row.uom_id);
+				$('#uomIdS_txt').val($('#uomIdS option:selected').text());
+				$('#uomPresS').val(row.uom_precision);
+				$('#uomPresS_txt').val($('#uomPresS option:selected').text());
+				$('#typeS').val(row.type);
+				$('#typeS_txt').val($('#typeS option:selected').text());
+				$('#noteS').val(row.note);
+				
+				detailDialog = $.ligerDialog.open({
+					target:$("#detail"),
+					title:"修改商品",
+					width:650,
+					height:360
+				});
+				isU = true;
+			}
 			function toSave() {
 				var valid = true;
 				$('*[id$="S"]').each(function(index, element) {
@@ -158,13 +172,23 @@
 				param.brand = $("#brandS").val();
 				param.uom_id = $("#uomIdS").val();
 				param.uom_precision = $("#uomPresS").val();
-				param.note = $("#noteS").val();
+				param.note = $("#noteS").val().replace(/(?=[^\\])\n/g, '\\n');
 				param.state = $("#stateS").val();
 				param.dept_id = '';
 				param.busiorg_id = '';
 				param.short_name = '';
+				param.code = $("#codeS").val();
 
-				var data = JSON.stringify(reqObj('a','stock.add.product',JSON.stringify(param)));
+				var type, entity;
+				if (isU) {
+					type = 'u';
+					entity = 'stock.update.product';
+					isU = false;
+				} else {
+					type = 'a';
+					entity = 'stock.add.product';
+				}
+				var data = JSON.stringify(reqObj(type,entity,JSON.stringify(param)));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					$.ligerDialog.success('保存成功。');
 					detailDialog.hide();
@@ -262,7 +286,7 @@
 				<div class="line-div" style="height:76px;">
 					<div class="label-div"><label>备注</label></div>
 					<div class="in-div" style="width:72%;">
-						<textarea id="" cols="73" rows="3" id="noteS"></textarea>
+						<textarea cols="73" rows="3" id="noteS"></textarea>
 					</div>
 				</div>
 				<input type="hidden" id="idS" />
