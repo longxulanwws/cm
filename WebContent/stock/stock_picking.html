@@ -16,8 +16,13 @@
 			$(function(){
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
- 						{display:'操作',isSort:false,width:60,render:function(rowdata,rowindex,value) {
-                        	return "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> "; 
+ 						{display:'操作',isSort:false,width:90,render:function(rowdata,rowindex,value) {
+ 							var h = "";
+ 							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
+ 							 var row = defGrid.getRow(rowindex);
+ 							 if(row.state == '00' || row.state == 'null')
+                               h += "<a href='javascript:void(0);' id='quality' class='opt-link' onclick='Quality(" + rowindex + ")'>提交质检</a> "; 
+                        	return h; 
                         },frozen:true},
                         {display:'入库单状态',name:'state',width:100,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
 	                    {display:'入库单号',name:'code',width:130,minWidth:60},
@@ -71,18 +76,31 @@
 			function openDictDef() {
 				parent.f_addTab('new_stockp','新增入库单','./stock/new_stock_picking.html');
 			}
-			function toModify(row) {
-				var url = "/cm/rbac/cmDict.do?m=u";
-				ajaxSubmit(url, row, function(data) {
-					if (data) {
-						if (parseInt(data['result']) > 0) {
-							$.ligerDialog.success('保存成功');
-						} else {
-							$.ligerDialog.error('保存失败');
+			function Quality(rowid) {
+			   if(window.confirm('您确定要提交该项数据吗？')==true)
+		         
+				var row = defGrid.getRow(rowid);
+				$('#id').val(row.id);
+				$('#state').val(11);
+				var param1=new Object();
+				param1.id=$('#id').val();
+				param1.state=$('#state').val();
+				
+				 var param = JSON.stringify(reqObj('u','stock.update.pickingQuality.update',JSON.stringify(param1)));
+				
+					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+						if (data) {
+							if (parseInt(data['status']) > 0) {
+								//$.ligerDialog.success('提交成功');
+								$("#quality").hide();
+								toQuery();
+							} else {
+								$.ligerDialog.error('提交失败');
+							}
 						}
-					}
-				});
-			}
+					});
+	        }
+		
 			var printWin;
 			function toPrint(rowid) {
 				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
@@ -101,6 +119,8 @@
 		</style>
 	</head>
 	<body style="padding:0;">
+	<input type="hidden" id="id" />
+	<input type="hidden" id="state" />
 		<div id="pageloading"></div>  
 		<div id="layout_main">
 			<div position="center" id="a_center" title="入库单列表">

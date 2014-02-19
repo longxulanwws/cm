@@ -107,6 +107,7 @@
 				param.note = $("#noteS").val();
 				param.createuser = $("#createUserCodeS").val();
 				param.createdate = $("#createDateS").val();
+				param.state="00";
 				var data = JSON.stringify(reqObj('a','stock.add.picking.add',JSON.stringify(param)));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					// batch add
