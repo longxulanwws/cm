@@ -108,7 +108,7 @@ public class CmDictAction extends BaseAction {
 			if (ex > 0) {
 				r = -1;
 			} else {
-				r = baseDAO.add(reqData, SQL_DEF_ADD);
+				r = baseDAO.add(reqData, SQL_DEF_ADD).length();
 			}
 			json.put("result", r);
 			response(json);

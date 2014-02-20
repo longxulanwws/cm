@@ -250,7 +250,7 @@ public class KeyGenerator {
 				values.put("orgid", "");
 			values.put("desc", entity.getDescription());
 			
-			return (baseDAO.add(values, KEYGEN_ADD) > 0);
+			return (baseDAO.add(values, KEYGEN_ADD).length() > 0);
 		} catch (Exception e) {
 			LOG.error("新增主键生成器配置发生错误", e);
 		}

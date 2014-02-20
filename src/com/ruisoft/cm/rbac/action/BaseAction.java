@@ -62,6 +62,7 @@ public abstract class BaseAction {
 			}
 			return json;
 		}
-		return new JSONObject(info.replaceAll("\"(?=\\[)|(?<=\\])\"", ""));
+
+		return new JSONObject(info);
 	}
 }

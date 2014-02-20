@@ -125,10 +125,13 @@ public class CommonAction extends BaseAction {
 				returnJson.put("status", "-1");
 				returnJson.put("msg", "没有指定插入实体名称");
 			} else {
-				int r = baseDAO.add(reqData.getString("data"), entityName);
-				if (r < 1) {
+				JSONObject added = baseDAO.add(reqData.getString("data"), entityName);
+				int r = 1;
+				if (added.length() < 1) {
 					r = -3;
 					returnJson.put("msg", "未能成功添加数据");
+				} else {
+					returnJson.put("added", added);
 				}
 				returnJson.put("status", r);
 			}
@@ -159,10 +162,13 @@ public class CommonAction extends BaseAction {
 				returnJson.put("status", "-1");
 				returnJson.put("msg", "没有指定插入实体名称");
 			} else {
-				int r = baseDAO.batchAdd(reqData.getJSONArray("data"), entityName);
-				if (r < reqData.getJSONArray("data").length()) {
+				int r = 1;
+				JSONObject[] added = baseDAO.batchAdd(reqData.getJSONArray("data"), entityName);
+				if (added.length < reqData.getJSONArray("data").length()) {
 					r = -3;
 					returnJson.put("msg", "未能成功添加数据");
+				} else {
+					returnJson.put("added", new JSONArray(added));
 				}
 				returnJson.put("status", r);
 			}

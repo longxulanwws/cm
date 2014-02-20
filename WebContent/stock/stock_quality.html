@@ -51,6 +51,8 @@
 				appendAddBtn(openDictDef, "添加入库单");
 				appendModifyBtn(function(){}, "修改入库单");
 				$("#pageloading").hide();
+				//默认查询全部数据 
+				toQuery();
 			});
 			function sw_opt(item) {
 				var swd = paramRender(item, defGrid.options.param_movein, item.move_in_user);

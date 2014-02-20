@@ -5,6 +5,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -178,48 +179,54 @@ public class BaseDAO {
 		return tpl.queryForInt("SELECT COUNT(1) NUM FROM (".concat(sql).concat(") TC"), args);
 	}
 	
-	public int add(JSONObject values, AddEntity add) throws Exception {
+	public JSONObject add(JSONObject values, AddEntity add) throws Exception {
 		String sql = add.getPreparedSQL();
 		LOG.debug("执行新增：" + sql);
-		Object[] params = getPreparedParam(values, add);
+		Map<String, Object> kv = getPreparedParamMap(values, add);
 
 		if (tpl == null)
 			tpl = new JdbcTemplate(getDataSource());
 
-		return tpl.update(sql, params);
+		int r = tpl.update(sql, kv.values().toArray());
+		if (r > 0) {
+			return new JSONObject(kv);
+		} else {
+			return new JSONObject();
+		}
 	}
 	
-	public int add(JSONObject values, String id) throws Exception {
+	public JSONObject add(JSONObject values, String id) throws Exception {
 		return add(values, SysCache.get(id, aEntity));
 	}
-	
-	public int add(String values, AddEntity add) throws Exception {
+
+	public JSONObject add(String values, AddEntity add) throws Exception {
 		return add(new JSONObject(values), add);
 	}
-	
-	public int add(String values, String id) throws Exception {
+
+	public JSONObject add(String values, String id) throws Exception {
 		return add(new JSONObject(values), SysCache.get(id, aEntity));
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
-	public int batchAdd(JSONArray values, AddEntity add) throws Exception {
+	public JSONObject[] batchAdd(JSONArray values, AddEntity add) throws Exception {
 		String sql = add.getPreparedSQL();
 		LOG.debug("执行批量新增：" + sql);
 
 		if (tpl == null)
 			tpl = new JdbcTemplate(getDataSource());
 		
-		int counter = 0;
-		Object[] params = null;
+		JSONObject[] retJSON = new JSONObject[values.length()];
+		Map<String, Object> kv = null;
 		for (int i = 0; i < values.length(); i++) {
-			params = getPreparedParam(values.getJSONObject(i), add);
-			counter += tpl.update(sql, params);
+			kv = getPreparedParamMap(values.getJSONObject(i), add);
+			retJSON[i] = new JSONObject(kv);
+			tpl.update(sql, kv.values().toArray());
 		}
 		
-		return counter;
+		return retJSON;
 	}
 	
-	public int batchAdd(JSONArray values, String id) throws Exception {
+	public JSONObject[] batchAdd(JSONArray values, String id) throws Exception {
 		return batchAdd(values, SysCache.get(id, aEntity));
 	}
 	
@@ -304,18 +311,26 @@ public class BaseDAO {
 	
 	protected Object[] getPreparedParam(JSONObject json, DMLEntity entity)
 			throws Exception {
-		Map<String, String> cond = entity.getConditions();
-		if (cond == null)
+		if (entity.getConditions() == null)
 			return new Object[0];
 		
-		Object[] params = new Object[cond.size()];
-		int i = 0;
-		String datatype = null;
+		return getPreparedParamMap(json, entity).values().toArray();
+	}
+	
+	protected Map<String, Object> getPreparedParamMap(JSONObject json,
+			DMLEntity entity) throws Exception {
+		Map<String, String> cond = entity.getConditions();
+		if (cond == null)
+			return null;
+		
+		Map<String, Object> retMap = new LinkedHashMap<String, Object>();
 		Object val = null;
-		for (String k : cond.keySet()) {
-			datatype = cond.get(k);
+		String datatype = null;
+		String k = null;
+		for (String kt : cond.keySet()) {
+			datatype = cond.get(kt);
 			
-			k = k.replaceFirst("~\\d+$", "");
+			k = kt.replaceFirst("~\\d+$", "");
 			
 			if (k.startsWith("#"))
 				val = parseSharp(k.substring(1), json);
@@ -332,10 +347,10 @@ public class BaseDAO {
 			else if ("bool".equals(datatype))
 				val = json.getBoolean(k);
 			
-			params[i++] = val;
+			retMap.put(kt, val);
 		}
-
-		return params;
+		
+		return retMap;
 	}
 	
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");

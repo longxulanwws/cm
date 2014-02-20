@@ -17,7 +17,7 @@
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
  						{display:'操作',isSort:false,width:90,render:function(rowdata,rowindex,value) {
- 							var h = "";
+                        	var h = "";
  							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
  							 var row = defGrid.getRow(rowindex);
  							 if(row.state == '00' || row.state == 'null')
@@ -48,8 +48,10 @@
                     param_movein:'user'
 				});
 				appendAddBtn(openDictDef, "添加入库单");
-				appendModifyBtn(function(){}, "修改入库单");
+				appendModifyBtn(openModify, "修改入库单");
 				$("#pageloading").hide();
+				//默认查询全部数据 
+				toQuery();
 			});
 			function sw_opt(item) {
 				var swd = paramRender(item, defGrid.options.param_movein, item.move_in_user);
@@ -100,7 +102,26 @@
 						}
 					});
 	        }
-		
+			function openModify() {
+				var row = defGrid.getSelectedRow();
+				if (!row) {
+					$.ligerDialog.error('请先选择入库单记录。','错误');
+					return;
+				}
+				parent.f_addTab('modify_stockp','入库单维护','./stock/new_stock_picking.html?o=m&code='.concat(row.code));
+			}
+			function toModify(row) {
+				var url = "/cm/rbac/cmDict.do?m=u";
+				ajaxSubmit(url, row, function(data) {
+					if (data) {
+						if (parseInt(data['result']) > 0) {
+							$.ligerDialog.success('保存成功');
+						} else {
+							$.ligerDialog.error('保存失败');
+						}
+					}
+				});
+			}
 			var printWin;
 			function toPrint(rowid) {
 				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});

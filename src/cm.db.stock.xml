@@ -95,6 +95,7 @@
 						</property>
 					</bean>
 				</entry>
+
 				<entry key="move.query">
 					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
 						<property name="dmlType" value="cond" />
@@ -110,31 +111,7 @@
 						</property>
 						<property name="conditions">
 							<map>
-							
-								<entry key="name" value="str:like(lr):and" />
-								<entry key="origin" value=":like(lr)" />
-								<entry key="state" value="" />
-								<entry key="ware_hose_id" value="" />
-							</map>
-						</property>
-					</bean>
-				</entry>
-				<entry key="move.query">
-					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
-						<property name="dmlType" value="cond" />
-						<property name="sql">
-							<value>
-<![CDATA[SELECT ID,Company_ID,Dept_ID,BusiOrg_ID,Picking_ID,Origin,Purchase_ID,
- Purchase_Line_ID,Sale_ID,Sale_Line_ID,Type,Product_ID,Code,Name,Partner_ID,
- Ware_Hose_ID,Location_ID, Product_Uom, Price_Currency, Source_Price_Unit,
- Price_Unit, Tar_Product_Qty, Product_Qty, Pred_Date, Real_Date,
- Move_End_Date, QC_Type, QC_Flag, State, Inventory_State, Valuation_State, Busi_Batch, Auto_Picking,
- Note, CreateUser, CreateDate, WriteDate, WriteUser  FROM Stock_Move]]>
-							</value>
-						</property>
-						<property name="conditions">
-							<map>
-							
+								<entry key="picking_id" value="" />
 								<entry key="name" value="str:like(lr):and" />
 								<entry key="origin" value=":like(lr)" />
 								<entry key="state" value="" />
@@ -157,16 +134,7 @@ VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{m
 						</property>
 					</bean>
 				</entry>
-				<entry key="picking_move.add">
-					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
-						<property name="sql">
-							<value>
-<![CDATA[INSERT INTO stock_move (ID, Company_ID, Dept_ID, BusiOrg_ID,)
-VALUES ({#uuid},{company},{dept},{busiorg})]]>
-							</value>
-						</property>
-					</bean>
-				</entry>				
+				
 					<entry key="picking_product.add">
 					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
 						<property name="sql">
@@ -223,6 +191,16 @@ VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{m
 							<value>
 <![CDATA[INSERT INTO Stock_Picking(ID,Company_ID,Dept_ID,BusiOrg_ID,Code,Name,Type,Move_Type,Send_Type,Origin,Purchase_ID,Sale_ID,Project_ID,Warehose_ID,Pred_Date,Recpt_IN_Date,QC_Date,Recpt_Out_Date,Deal_End_Date,State,Invoice_State,Auto_Picking,Back_Order_ID,Account_Date,Stock_Journal_ID,Move_IN_User,Move_Out_User,Move_Destined,Note,CreateUser,CreateDate,WriteDate,WriteUser)
 VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.code},{name},{type},{movetype},{sendtype},{origin},{purchase},{sale},{project},{warehose},{preddate},{recptindate},{qcdate},{recptoutdate},{dealenddate},{state},{invoicestate},{autopicking},{backorder},{accountdate},{stockjournal},{moveinuser},{moveoutuser},{movedestined},{note},{createuser},{createdate},{writedate},{writeuser})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="stock_move">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+<![CDATA[INSERT INTO STOCK_MOVE(ID,COMPANY_ID,DEPT_ID,BUSIORG_ID,PICKING_ID,ORIGIN,PURCHASE_ID,PURCHASE_LINE_ID,SALE_ID,SALE_LINE_ID,TYPE,PRODUCT_ID,CODE,NAME,PARTNER_ID,WARE_HOSE_ID,LOCATION_ID,PRODUCT_UOM,PRICE_CURRENCY,SOURCE_PRICE_UNIT,PRICE_UNIT,TAR_PRODUCT_QTY,PRODUCT_QTY,PRED_DATE,REAL_DATE,MOVE_END_DATE,QC_TYPE,QC_FLAG,STATE,INVENTORY_STATE,VALUATION_STATE,BUSI_BATCH,AUTO_PICKING,NOTE,CREATEUSER,CREATEDATE,WRITEDATE,WRITEUSER)
+VALUES({#stock.picking_move.id},{company_id},{dept_id},{busiorg_id},{picking_id},{origin},{purchase_id},{purchase_line_id},{sale_id},{sale_line_id},{type},{product_id},{code},{name},{partner_id},{ware_hose_id},{location_id},{product_uom},{price_currency},{source_price_unit},{price_unit},{tar_product_qty},{product_qty},{pred_date},{real_date},{move_end_date},{qc_type},{qc_flag},{state},{inventory_state},{valuation_state},{busi_batch},{auto_picking},{note},{createuser},{createdate},{writedate},{writeuser})]]>
 							</value>
 						</property>
 					</bean>
