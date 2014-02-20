@@ -8,6 +8,9 @@
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
 		<script src="../js/jquery.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
+		<script src="../js/validate/messages_zh.js" type="text/javascript"></script>
 		<script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
 		<script src="../js/common.js" type="text/javascript"></script>
 		<script src="../js/json2.js" type="text/javascript"></script>
@@ -184,8 +187,8 @@
 				addDialog = $.ligerDialog.open({
 					target:$("#new_dict_def"),
 					title:"新增机构",
-					width:380,
-					height:600
+					width:500,
+					height:400
 				});
 			}
 			function toAdd() {
@@ -278,56 +281,51 @@
 			<div class="lineD" style="margin-bottom:10px;">
 				<span class="title l-icon-add">添加机构</span>
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>编号</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newCode" /></div>
-			</div>			
-			<div class="lineD">
-				<div class="labelD"><label>名称</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newName" /></div>
+			<div class="line-div">
+				<div class="label-div"><label>编号</label></div>
+				<div class="in-div"><input type="text" class="diff required" id="newCode" /></div>
+
+				<div class="label-div"><label>名称</label></div>
+				<div class="in-div"><input type="text" class="diff  required" id="newName" /></div>
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>简称</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newShortfor" /></div>
-			</div>
-			<div class="lineD">
-				<div class="labelD"><label>机构类型</label></div>
-				<!--  <div class="dplD"><select class="txt-def" id="newOrgType" param="rbac.org_type" default="0" style="margin-right: 30px;"></select></div>
+			<div class="line-div">
+				<div class="label-div"><label>简称</label></div>
+				<div class="in-div"><input type="text" class="diff required" id="newShortfor" /></div>
+
+				<div class="label-div"><label>机构类型</label></div>
+				<!--  <div class="in-div"><select class="txt-def" id="newOrgType" param="rbac.org_type" default="0" style="margin-right: 30px;"></select></div>
 				-->
-				<div class="dplD"><input type="text" id="orgType_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+				<div class="in-div"><input type="text" id="orgType_combobox" ltype="combobox" class="required diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
 				<input type="hidden" id="newOrgType" />			
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>所属机构</label></div>
-				<div class="dplD"><input type="text" id="org_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+			<div class="line-div">
+				<div class="label-div"><label>所属机构</label></div>
+				<div class="in-div"><input type="text" id="org_combobox" ltype="combobox" class="required diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
 				<input type="hidden" id="Higher_ID" />
 			 
-			</div>			
-			<div class="lineD">
-				<div class="labelD"><label>地址</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newAddress" /></div>
+
+				<div class="label-div"><label>地址</label></div>
+				<div class="in-div"><input type="text" class="diff required" id="newAddress" /></div>
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>电话</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newTel" /></div>
+			<div class="line-div">
+				<div class="label-div"><label>电话</label></div>
+				<div class="in-div"><input type="text" class="diff" id="newTel" /></div>
+
+				<div class="label-div"><label>传真</label></div>
+				<div class="in-div"><input type="text" class="diff" id="newFax" /></div>
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>传真</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newFax" /></div>
+			<div class="line-div">
+				<div class="label-div"><label>邮编</label></div>
+				<div class="in-div"><input type="text" class="diff" id="newZipcdoe" /></div>
+	
+				<div class="label-div"><label>状态</label></div>
+				<div class="in-div"><select class="txt-def" id="newStatus" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>邮编</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newZipcdoe" /></div>
+			<div class="line-div">
+				<div class="label-div"><label>说明</label></div>
+				<div class="in-div"><textarea cols="30" rows="3" id="newDesc"></textarea></div>
 			</div>
-			<div class="lineD">
-				<div class="labelD"><label>状态</label></div>
-				<div class="dplD"><select class="txt-def" id="newStatus" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
-			</div>
-			<div class="lineD">
-				<div class="labelD"><label>说明</label></div>
-				<div class="dplD"><textarea cols="24" rows="5" id="newDesc"></textarea></div>
-			</div>
-			<div class="lineD" style="margin-top:15px;padding-left:30%;">
+			<div class="line-div" style="margin-top:45px;padding-left:40%;">
 				<input type="button" value="保存" onclick="toAdd();" />
 				<input type="button" value="清空" onclick="toReset('#new_dict_def input,select,textarea')" />
 			</div>
