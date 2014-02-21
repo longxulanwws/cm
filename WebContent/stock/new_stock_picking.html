@@ -72,7 +72,7 @@
 					}
 					opt = query['o'];
 					c_code = query['code'];
-
+    
 					if (opt === 'm') {
 						var param = {code:c_code};
 						var data = JSON.stringify(reqObj('q','stock.select.picking.query',JSON.stringify(param)));
@@ -85,6 +85,11 @@
 						ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 							pGrid.set({data: data['data']});
 						}, null, false);
+
+						ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
+							$('#WriteUserCodeS').val(data['uid']);
+							$("#WriteDateS").val(data['date']);
+						}, null, false);
 					}
 				} else {
 					ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
@@ -93,6 +98,7 @@
 						$('#createUserS').val(data['uname']);
 						$('#createUserCodeS').val(data['uid']);
 						$("#createDateS").val(data['date']);
+					
 					}, null, false);
 				}
 				$("#moveInS").ligerComboBox({
@@ -138,9 +144,42 @@
 					$.ligerDialog.error('请添加入库商品。','错误');
 					return;
 				}
-				pGrid.endEdit(c_row.rowindex);
+				alert(123123213);
+				//pGrid.endEdit(c_row.rowindex);
 				if (opt === 'm') {
-					//TODO:修改操作
+					var param = new Object();
+					//入库编号
+					param.code=$('#codeS').val();
+					//采购编号
+					param.origin=$('#originS').val();
+					//供应商
+					param.partner_id=$('#partnerS').val();
+					//预计到货日期
+					param.pred_date=$('#predDateS').val();
+					//入库仓库
+					param.warehose_id=$('#warehouseS').val();
+					//moveInS
+					//$('#moveInS').val();
+					param.move_in_user=$('#moveInIdS').val();
+					//备注
+					param.note=$('#noteS').val();
+					//修改人
+					param.writeusercode=$('#WriteUserCodeS').val();
+					//修改日期
+					param.writedate=$('#WriteDateS').val();
+
+					 var param = JSON.stringify(reqObj('u','stock.update.stockpicking.update',JSON.stringify(param)));
+						//alert(param);
+						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+							if (data) {
+								if (parseInt(data['status']) > 0) {
+									$.ligerDialog.success('保存成功');
+								} else {
+									$.ligerDialog.error('保存失败');
+								}
+							}
+						});
+					
 				} else {
 					var param = new Object();
 					param.company = "";
@@ -156,6 +195,7 @@
 					param.note = $("#noteS").val();
 					param.createuser = $("#createUserCodeS").val();
 					param.createdate = $("#createDateS").val();
+					param.state="00";
 					var data = JSON.stringify(reqObj('a','stock.add.picking.add',JSON.stringify(param)));
 					ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 						var picking = data['added'];
@@ -245,6 +285,8 @@
 						<div class="label-div"><label>制单人</label></div>
 						<div class="in-div"><input type="text" id="createUserS" ltype="text" class="readonly diff" readonly="readonly" /></div>
 						<input type="hidden" id="createUserCodeS" />
+							<input type="hidden" id="WriteUserCodeS" />
+								<input type="hidden" id="WriteDateS" />
 					</div>
 					<div class="line-div">
 						<div class="label-div"><label>制单日期</label></div>
