@@ -34,44 +34,17 @@
                     ],
                     pageSize:20,
                     usePager: true,
-                    dataAction:'server',
-                    url: '/cm/q.jsp',
                     width:'100%',
                     height:'99%',
+                    dataAction:'server',
                     checkbox:false,
                     rownumbers:false,
                     fixedCellHeight:false,
                     colDraggable:true,
-                    enabledEdit:false,
+                    enabledEdit:true,
                     clickToEdit:false,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: toQuery,
-                    onToFirst: function(item) {
-                        toQuery(item, 1);
-                    },
-                    onToLast: function(item) {
-        				var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
-        				if (defGrid.options.total % defGrid.options.pageSize > 0)
-        					p += 1;
-        				toQuery(item, p);
-                    },
-                    onToPrev: function(item) {
-        				var p = parseInt(defGrid.options.page);
-        				if (p > 1)
-        					p -= 1;
-        				else
-            				return;
-        				toQuery(item, p);
-                    },
-                    onToNext: function(item) {
-                    	var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
-        				if (defGrid.options.total % defGrid.options.pageSize > 0)
-        					p += 1;
-    					var cp = parseInt(defGrid.options.page); 
-    					if (cp < p)
-        					cp += 1;
-        				toQuery(item, cp);
-                    },
                     param_movein:'user'
 				});
 				appendAddBtn(openDictDef, "添加入库单");
@@ -96,16 +69,10 @@
 				param.code = $("#codeQ").val();
 				param.origin = $("#originQ").val();
 				param.partner_id = $("#partnerQ").val();
-
+				param.state=$("#stateS").val();
 				var data = JSON.stringify(reqObj('q','stock.select.picking.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
-// 					defGrid.loadData(data['data']);
-					var d = data['data'].Rows;
-					for (var i = 0; i < (defGrid.options.page - 1) * defGrid.options.pageSize; i++) {
-						d.unshift(null);
-					}
-					defGrid.set({data:data['data']});
-					defGrid.data = data['data'];
+					defGrid.set({data: data['data']});
 				});
 			}
 			function openDictDef() {
@@ -155,9 +122,6 @@
 					}
 				});
 			}
-			function toFirst() {
-				
-			}
 			var printWin;
 			function toPrint(rowid) {
 				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
@@ -185,6 +149,7 @@
 					<label>入库单号</label><input type="text" class="s-text txt-def" id="codeQ" />
 					<label>采购订单号</label><input type="text" class="s-text txt-def" id="originQ" />
 					<label>供应商</label><input type="text" class="s-text txt-def" id="partnerQ" />
+					<label>状态</label><select id="stateS" param="stockBillSate" first="" ></select>
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
 					<input type="button" value="清空" onclick="toReset('#codeQ,#originQ,#partnerQ');" />
 				</div>

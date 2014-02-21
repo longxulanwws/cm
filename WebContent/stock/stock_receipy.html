@@ -47,13 +47,15 @@
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: toQuery,
                     param_movein:'user'
+                   
 				});
 				appendAddBtn(openDictDef, "添加入库单");
-				appendModifyBtn(function(){}, "修改入库单");
+				appendModifyBtn(openModify, "修改入库单");
 				$("#pageloading").hide();
 				//默认查询全部数据 
 				toQuery();
 			});
+			
 			function sw_opt(item) {
 				var swd = paramRender(item, defGrid.options.param_movein, item.move_in_user);
 				if (!swd)
@@ -70,7 +72,8 @@
 				param.code = $("#codeQ").val();
 				param.origin = $("#originQ").val();
 				param.partner_id = $("#partnerQ").val();
-
+				param.state=$("#stateS").val();
+                     
 				var data = JSON.stringify(reqObj('q','stock.select.picking.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					defGrid.set({data: data['data']});
@@ -103,7 +106,14 @@
 						}
 					});
 	        }
-		
+			function openModify() {
+				var row = defGrid.getSelectedRow();
+				if (!row) {
+					$.ligerDialog.error('请先选择入库单记录。','错误');
+					return;
+				}
+				parent.f_addTab('receipy_stockp','收货维护','./stock/new_stock_receipy.html?o=m&code='.concat(row.code));
+			}
 			var printWin;
 			function toPrint(rowid) {
 				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
@@ -131,6 +141,7 @@
 					<label>入库单号</label><input type="text" class="s-text txt-def" id="codeQ" />
 					<label>采购订单号</label><input type="text" class="s-text txt-def" id="originQ" />
 					<label>供应商</label><input type="text" class="s-text txt-def" id="partnerQ" />
+					<label>状态</label><select id="stateS" param="stockreceipy"  ></select>
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
 					<input type="button" value="清空" onclick="toReset('#codeQ,#originQ,#partnerQ');" />
 				</div>

@@ -23,6 +23,7 @@
 								<entry key="code" value=":like(lr)" />
 								<entry key="origin" value=":like(lr)" />
 								<entry key="partner_id" value=":like(lr)" />
+								<entry key="state" value="" />
 							</map>
 						</property>
 					</bean>
