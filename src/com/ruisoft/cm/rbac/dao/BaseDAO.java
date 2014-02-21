@@ -132,8 +132,8 @@ public class BaseDAO {
 		
 		LOG.debug(sql);
 
-		final int rStart = (page - 1) * pageSize;
-		final int rEnd = rStart + pageSize;
+		final int rStart = (page - 1) * pageSize + 1;
+		final int rEnd = rStart + pageSize - 1;
 		if (tpl == null)
 			tpl = new JdbcTemplate(getDataSource());
 		
@@ -449,7 +449,7 @@ public class BaseDAO {
 		@Override
 		public JSONObject mapRow(ResultSet rs, int rowNum)
 				throws SQLException {
-			if (rStart > 1 && rowNum == 1) {
+			if (rStart > 1 && rowNum == 0) {
 				rs.absolute(rStart);
 			}
 
