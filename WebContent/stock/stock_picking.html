@@ -20,11 +20,12 @@
                         	var h = "";
  							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
  							 var row = defGrid.getRow(rowindex);
- 							 if(row.state == '01' || row.state == 'null')
+ 							 if(row.state == '00' || row.state == 'null')
                                h += "<a href='javascript:void(0);' id='quality' class='opt-link' onclick='Quality(" + rowindex + ")'>提交质检</a> "; 
                         	return h; 
                         },frozen:true},
-                        {display:'入库单状态',name:'move_type',width:100,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
+                        {display:'单据类型',name:'move_type',width:100,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
+                        {display:'单据状态',name:'state',width:100,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
 	                    {display:'入库单号',name:'code',width:130,minWidth:60},
 	                    {display:'采购单号',name:'origin',width:130},
 			            {display:'供应商',name:'partner_id',render:sw_partner,width:190,align:'left'},
