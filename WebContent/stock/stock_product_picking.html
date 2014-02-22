@@ -22,7 +22,7 @@
 	                    {display:'入库单号',name:'code',width:130,minWidth:60},
 	                    {display:'产品单号',name:'origin',width:130},
 			            {display:'入库日期',name:'pred_date',width:80},
-			            {display:'入库仓库',name:'warehose_id',width:290,align:'left'},
+			            {display:'入库仓库',name:'warehose_id',render:sw_warehose,width:290,align:'left'},
 			            {display:'收货人',name:'move_in_user',render:sw_opt,align:'left'}
                     ],
                     pageSize:20,
@@ -38,16 +38,25 @@
                     clickToEdit:false,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: toQuery,
-                    param_movein:'user'
+                    param_movein:'user',
+                    param_warehose:'base_point'
 				});
 				appendAddBtn(openDictDef, "添加入库单");
-				appendModifyBtn(function(){}, "修改入库单");
+				appendModifyBtn(openModify, "修改产品入库单");
 				$("#pageloading").hide();
+				//默认查询全部数据 
+				toQuery();
 			});
 			function sw_opt(item) {
 				var swd = paramRender(item, defGrid.options.param_movein, item.move_in_user);
 				if (!swd)
 					swd = item.move_in_user;
+				return swd;
+			}
+			function sw_warehose(item) {
+				var swd = paramRender(item, defGrid.options.param_warehose, item.warehose_id);
+				if (!swd)
+					swd = item.warehose_id;
 				return swd;
 			}
 			function toQuery(item, page, pageSize) {
@@ -64,6 +73,14 @@
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					defGrid.set({data: data['data']});
 				});
+			}
+			function openModify() {
+				var row = defGrid.getSelectedRow();
+				if (!row) {
+					$.ligerDialog.error('请先选择入库单记录。','错误');
+					return;
+				}
+				parent.f_addTab('new_product1','成品入库单维护','./stock/new_stock_product_picking.html?o=m&code='.concat(row.code));
 			}
 			function openDictDef() {
 				parent.f_addTab('new_product','新增成品入库单','./stock/new_stock_product_picking.html');
