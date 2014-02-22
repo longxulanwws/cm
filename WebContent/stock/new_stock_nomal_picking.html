@@ -229,7 +229,7 @@
 					param.createuser = $("#createUserCodeS").val();
 					param.createdate = $("#createDateS").val();
 					param.state="00";
-					param.movetype='10';
+					param.movetype='04';
 					var data = JSON.stringify(reqObj('a','stock.add.picking.add',JSON.stringify(param)));
 					ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 						var picking = data['added'];
