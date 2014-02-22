@@ -15,6 +15,7 @@
 			var udata;
 			$(function(){
 				udata = getData('user',{orgid:$("#deptCodeS").val()},false)
+				
 				$("#layout_main").ligerLayout({
 					bottomHeight: "46%",
 					allowBottomResize:false
@@ -53,7 +54,8 @@
                     enabledEdit:true,
                     clickToEdit:false,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
-                    onReload: queryProd
+                    onReload: queryProd,
+                    param_partner:'partner_list'
 				});
 				appendAddBtn(function(){
 					pGrid.addEditRow();
@@ -110,8 +112,35 @@
                         $("#moveInIdS").val(v);
                     }
 				});
+
+				$("#warehouseInS").ligerComboBox({
+					autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:get_warehose_list,
+                    onSelected:function(v,t) {
+                        $("#warehouseS").val(v);
+                    }
+				});
+
+				$("#partnerInS").ligerComboBox({
+					autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:get_partner_list,
+                    onSelected:function(v,t) {
+                        $("#partnerS").val(v);
+                    }
+				});
 				$("#pageloading").hide();
 			});
+			
+			var get_warehose_list=new function () {
+				return getData('base_point');
+			}
+			var get_partner_list=new function () {
+				return getData('partner_list');
+			}
 			function resetArea() {
 				toReset('#a_center input:not(.readonly),select,textarea');
 			}
@@ -125,8 +154,10 @@
 					data = data.Rows[0];
 					$('#codeS').val(data.code);
 					$('#originS').val(data.origin);
+					$('#partnerInS').val(paramRender(null,'partner_list',data.partner_id));
 					$('#partnerS').val(data.partner_id);
 					$('#predDateS').val(data.pred_date);
+					$('#warehouseInS').val(paramRender(null,'base_point',data.warehose_id));
 					$('#warehouseS').val(data.warehose_id);
 					$('#moveInS').val(paramRender(null,'user',data.move_in_user));
 					$('#moveInIdS').val(data.move_in_user);
@@ -144,8 +175,6 @@
 					$.ligerDialog.error('请添加入库商品。','错误');
 					return;
 				}
-				alert(123123213);
-				//pGrid.endEdit(c_row.rowindex);
 				if (opt === 'm') {
 					var param = new Object();
 					//入库编号
@@ -181,6 +210,7 @@
 						});
 					
 				} else {
+					pGrid.endEdit(c_row.rowindex);
 					var param = new Object();
 					param.company = "";
 					param.dept = $("#deptCodeS").val();
@@ -219,6 +249,7 @@
 					});
 				}
 			}
+			
 	        function beginEdit(rowid) { 
 	        	pGrid.beginEdit(rowid);
 	        }
@@ -261,13 +292,23 @@
 					</div>
                 	<div class="line-div">
 						<div class="label-div"><label>供应商</label></div>
-						<div class="in-div"><input type="text" id="partnerS" ltype="text" class="diff" /></div>
+						<div class="in-div">
+						 <!-- <input type="text" id="partnerS" ltype="text" class="diff" />
+						-->
+						<input type="text" id="partnerInS" ltype="combobox" class="diff" />
+						<input type="hidden" id="partnerS" />
+						</div>
 						<div class="label-div"> <label>预计到货日期</label></div>
 						<div class="in-div"><input type="text" id="predDateS" ltype="date" class="diff" /></div>
 					</div>
                 	<div class="line-div">
 						<div class="label-div"><label>入库仓库</label></div>
-						<div class="in-div"><input type="text" id="warehouseS" ltype="text" class="diff" /></div>
+						<div class="in-div">
+						<!--  <input type="text" id="warehouseS" ltype="text" class="diff" />
+						-->
+						<input type="text" id="warehouseInS" ltype="combobox" class="diff" />
+						<input type="hidden" id="warehouseS" />
+						</div>
 						<div class="label-div"><label>收货人</label></div>
 						<div class="in-div"><input type="text" id="moveInS" ltype="combobox" class="diff" /></div>
 						<input type="hidden" id="moveInIdS" />
