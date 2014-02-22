@@ -71,6 +71,8 @@
 				defGrid.options.dataAction = 'server';
 				appendAddBtn(openUserDef, "添加用户");
 				$("#pageloading").hide();
+				//默认查询数据设置
+				toQuery();
 			});
 	        function beginEdit(rowid) { 
 	        	defGrid.beginEdit(rowid);
