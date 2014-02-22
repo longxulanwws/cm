@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>产品入库单</title>
+		<title>产成品入库单</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -80,10 +80,10 @@
 					$.ligerDialog.error('请先选择入库单记录。','错误');
 					return;
 				}
-				parent.f_addTab('new_product1','成品入库单维护','./stock/new_stock_product_picking.html?o=m&code='.concat(row.code));
+				parent.f_addTab('modify_product','产成品入库单维护','./stock/new_stock_product_picking.html?o=m&code='.concat(row.code));
 			}
 			function openDictDef() {
-				parent.f_addTab('new_product','新增成品入库单','./stock/new_stock_product_picking.html');
+				parent.f_addTab('new_product','新增产成品入库单','./stock/new_stock_product_picking.html');
 			}
 			function toModify(row) {
 				var url = "/cm/rbac/cmDict.do?m=u";

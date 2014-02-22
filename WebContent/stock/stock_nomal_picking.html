@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>正常出库</title>
+		<title>销售发货</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -22,7 +22,7 @@
 	                    {display:'出库单号',name:'code',width:130,minWidth:60},
 	                    {display:'产品单号',name:'origin',width:130},
 			            {display:'出库日期',name:'pred_date',width:80},
-			            {display:'出库仓库',name:'warehose_id',width:290,align:'left'},
+			            {display:'出库仓库',name:'warehose_id',render:sw_warehose,width:290,align:'left'},
 			            {display:'出货人',name:'move_in_user',render:sw_opt,align:'left'}
                     ],
                     pageSize:20,
@@ -38,11 +38,14 @@
                     clickToEdit:false,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: toQuery,
-                    param_movein:'user'
+                    param_movein:'user',
+                    param_warehose:'base_point'
 				});
 				appendAddBtn(openDictDef, "添加出库单");
-				appendModifyBtn(function(){}, "修改出库单");
+				appendModifyBtn(openModify, "修改出库单");
 				$("#pageloading").hide();
+				//默认查询全部数据 
+				toQuery();
 			});
 			function sw_opt(item) {
 				var swd = paramRender(item, defGrid.options.param_movein, item.move_in_user);
@@ -65,8 +68,22 @@
 					defGrid.set({data: data['data']});
 				});
 			}
+			function sw_warehose(item) {
+				var swd = paramRender(item, defGrid.options.param_warehose, item.warehose_id);
+				if (!swd)
+					swd = item.warehose_id;
+				return swd;
+			}
+			function openModify() {
+				var row = defGrid.getSelectedRow();
+				if (!row) {
+					$.ligerDialog.error('请先选择入库单记录。','错误');
+					return;
+				}
+				parent.f_addTab('modify_nomal','销售发货维护','./stock/new_stock_nomal_picking.html?o=m&code='.concat(row.code));
+			}
 			function openDictDef() {
-				parent.f_addTab('new_nomal','新增正常出库出库单','./stock/new_stock_nomal_picking.html');
+				parent.f_addTab('new_nomal','新增销售发货单','./stock/new_stock_nomal_picking.html');
 			}
 			function toModify(row) {
 				var url = "/cm/rbac/cmDict.do?m=u";
