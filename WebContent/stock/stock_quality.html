@@ -151,7 +151,8 @@
 				<div id="query_cond" class="fields">
 					<label>入库单号</label><input type="text" class="s-text txt-def" id="codeQ" />
 					<label>采购订单号</label><input type="text" class="s-text txt-def" id="originQ" />
-					<label>供应商</label><input type="text" class="s-text txt-def" id="partnerQ" />
+					<label>供应商</label>
+					<select id="partnerQ" param="partner_list" first="" ></select>
 					<label>状态</label><select id="stateS" param="stockquality"  ></select>
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
 					<input type="button" value="清空" onclick="toReset('#codeQ,#originQ,#partnerQ');" />
