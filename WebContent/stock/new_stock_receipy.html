@@ -124,8 +124,10 @@
 					data = data.Rows[0];
 					$('#codeS').val(data.code);
 					$('#originS').val(data.origin);
+					$('#partnerInS').val(paramRender(null,'partner_list',data.partner_id));
 					$('#partnerS').val(data.partner_id);
 					$('#predDateS').val(data.pred_date);
+					$('#warehouseInS').val(paramRender(null,'base_point',data.warehose_id));
 					$('#warehouseS').val(data.warehose_id);
 					$('#moveInS').val(paramRender(null,'user',data.move_in_user));
 					$('#moveInIdS').val(data.move_in_user);
@@ -192,13 +194,19 @@
 					</div>
                 	<div class="line-div">
 						<div class="label-div"><label>供应商</label></div>
-						<div class="in-div"><input type="text" id="partnerS" ltype="text" class="diff"  readonly="readonly"/></div>
+						<div class="in-div">
+						<input type="text" id="partnerInS" ltype="text" class="diff" readonly="readonly" />
+						<input type="hidden" id="partnerS" />
+						</div>
 						<div class="label-div"> <label>预计到货日期</label></div>
 						<div class="in-div"><input type="text" id="predDateS" ltype="text" class="diff" readonly="readonly" /></div>
 					</div>
                 	<div class="line-div">
 						<div class="label-div"><label>入库仓库</label></div>
-						<div class="in-div"><input type="text" id="warehouseS" ltype="text" class="diff" readonly="readonly" /></div>
+						<div class="in-div">
+							<input type="text" id="warehouseInS" ltype="text" class="diff" readonly="readonly"  />
+						<input type="hidden" id="warehouseS" />
+						</div>
 						<div class="label-div"><label>收货人</label></div>
 						<div class="in-div"><input type="text" id="moveInS" ltype="text" class="diff" readonly="readonly"/></div>
 						<input type="hidden" id="moveInIdS" />
