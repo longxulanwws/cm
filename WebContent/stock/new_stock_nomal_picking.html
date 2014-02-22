@@ -228,7 +228,7 @@
 					param.note = $("#noteS").val();
 					param.createuser = $("#createUserCodeS").val();
 					param.createdate = $("#createDateS").val();
-					param.state="00";
+					param.state="31";
 					param.movetype='04';
 					var data = JSON.stringify(reqObj('a','stock.add.picking.add',JSON.stringify(param)));
 					ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
@@ -295,11 +295,11 @@
 						<div class="in-div"><input type="text" id="originS" ltype="text" class="diff" /></div>
 					</div>
                 	<div class="line-div">
-						<!--<div class="label-div"><label>供应商</label></div>
+						<div class="label-div"><label>客户</label></div>
 						<div class="in-div">
 						<input type="text" id="partnerInS" ltype="combobox" class="diff" />
 						<input type="hidden" id="partnerS" />
-						</div>-->
+						</div>
 						<div class="label-div"> <label>出库日期</label></div>
 						<div class="in-div"><input type="text" id="predDateS" ltype="date" class="diff" /></div>
 					</div>
