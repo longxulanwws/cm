@@ -192,7 +192,7 @@ WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID AND m.RESOURCE_ID=c
 						<property name="dmlType" value="cond" />
 						<property name="sql">
 							<value>
-<![CDATA[SELECT ID, CODE, NAME, HIGHER_ID, SEQ, RESOURCE_ID, ICON_URI, HINT, Path, Layer, Detail, STATUS, DESCRIPTIOIN FROM cm_menu order by code]]>
+<![CDATA[SELECT ID, CODE, NAME, HIGHER_ID, SEQ, RESOURCE_ID, ICON_URI, HINT, Path, Layer, Detail, STATUS, DESCRIPTIOIN FROM cm_menu ]]>
 							</value>
 						</property>
 						<property name="conditions">

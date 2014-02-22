@@ -34,7 +34,7 @@
                             return h;
                         },frozen:true},
                         {display:'账号',name:'account',width:80,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'名称',name:'name',width:100,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'用户名',name:'name',width:100,minWidth:60,align:'left',editor:{type:'text'}},
 	                   // {display:'所属机构',name:'orgid',width:100,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'所属机构',name:'orgid',width:80,minWidth:60,data:get_org_list,render:switcher_org,editor:{type:'select',data:get_org_list,textField:'name',valueField:'value',selectBoxHeight:50}},
 		                {display:'状态',name:'status',width:70,data:status,render:switcher,editor:{type:'select',data:getStatus,textField:'name',valueField:'value',selectBoxHeight:50}},
