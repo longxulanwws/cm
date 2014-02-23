@@ -121,12 +121,12 @@
 			   if(window.confirm('您确定要提交该项数据吗？')==true)
 		         
 				var row = defGrid.getRow(rowid);
-				$('#id').val(row.id);
+				//$('#id').val(row.id);
 				// 待发货状态--- 31---
-				$('#state').val(31);
+				//$('#state').val(31);
 				var param1=new Object();
-				param1.id=$('#id').val();
-				param1.state=$('#state').val();
+				param1.id=row.id;
+				param1.state='31';
 				
 				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 				
