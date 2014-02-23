@@ -238,7 +238,7 @@ public class CommonAction extends BaseAction {
 				int r = baseDAO.delete(reqData.getString("data"), entityName);
 				if (r < 1) {
 					r = -3;
-					returnJson.put("msg", "未能成功添加数据");
+					returnJson.put("msg", "未能成功删除数据");
 				}
 				returnJson.put("status", r);
 			}
