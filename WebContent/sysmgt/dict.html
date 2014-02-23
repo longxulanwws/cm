@@ -42,6 +42,7 @@
                     sortName:'id',
                     width:'100%',
                     height:'100%',
+                    url: '/common/q.jsp',    
                     dataAction:'server',
                     checkbox:false,
                     rownumbers:false,
@@ -56,11 +57,39 @@
 //                     onToLast: toLast,
 //                     onToNext: toNext,
 //                     onToPrev: toPrev,
+                    onToFirst: function(item) {
+                        toQuery(item, 1);
+                    },
+                    onToLast: function(item) {
+        				var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+        				if (defGrid.options.total % defGrid.options.pageSize > 0)
+        					p += 1;
+        				toQuery(item, p);
+                    },
+                    onToPrev: function(item) {
+        				var p = parseInt(defGrid.options.page);
+        				if (p > 1)
+        					p -= 1;
+        				else
+            				return;
+        				toQuery(item, p);
+                    },
+                    onToNext: function(item) {
+                    	var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+        				if (defGrid.options.total % defGrid.options.pageSize > 0)
+        					p += 1;
+    					var cp = parseInt(defGrid.options.page); 
+    					if (cp < p)
+        					cp += 1;
+        				toQuery(item, cp);
+                    },
                     param_status:'rbac.status'
 				});
 				defGrid.options.dataAction = 'server';
 				appendAddBtn(openDictDef, "添加字典字义");
 				$("#pageloading").hide();
+				//默认查询全部数据 
+				toQuery();
 			});
 	        function beginEdit(rowid) { 
 	        	defGrid.beginEdit(rowid);
@@ -102,6 +131,16 @@
 
 				var data = JSON.stringify(reqObj('q','rbac.select.dict.def.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+					 //wws 2014-2-23 增加分页信息 start 
+					var d = data['data'].Rows;
+					var ps = defGrid.options.pageSize, p = defGrid.options.page, t = parseInt(data['data'].Total);
+					if (t > ps) {
+						for (var i = 0; i < (p - 1) * ps; i++) {
+							d.unshift(null);
+						}
+					}
+					defGrid.data = data['data'];
+					 //wws 2014-2-23 增加分页信息  end 
 					defGrid.set({data: data['data']});
 				});
 			}
