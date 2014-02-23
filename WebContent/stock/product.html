@@ -122,7 +122,7 @@
 				var param = new Object();
 				if (!pNode)
 					pNode = pTree.getSelected().data.code;
-				param.categ_id = pNode;
+				param.code = pNode;
 
 				var data = JSON.stringify(reqObj('q','stock.select.product.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
