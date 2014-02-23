@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>回退</title>
+		<title>确认收货</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -20,8 +20,8 @@
  							var h = "";
 							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
 							 var row = defGrid.getRow(rowindex);
-							 if(row.state == '41' )
-                             h += "<a href='javascript:void(0);' id='quality' class='opt-link' onclick='Quality(" + rowindex + ")'>提交退回</a> "; 
+							 if(row.state == '42' )
+                             h += "<a href='javascript:void(0);' id='quality' class='opt-link' onclick='Quality(" + rowindex + ")'>确认收货</a> "; 
                       	return h; 
                         },frozen:true},
                         {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
@@ -48,10 +48,9 @@
                     param_movein:'user',
                     param_warehose:'base_point'
 				});
-				appendAddBtn(openDictDef, "添加退回单");
-				appendModifyBtn(openModify, "修改退回单");
+				//appendAddBtn(openDictDef, "添加退回单");
+				appendModifyBtn(openModify, "查看退回单");
 				$("#pageloading").hide();
-
 				ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
 					$('#createUserCodeS').val(data['uid']);
 				
@@ -75,7 +74,8 @@
 				param.code = $("#codeQ").val();
 				param.origin = $("#originQ").val();
                 param.move_type='05';
-                param.createuser=$("#createUserCodeS").val()
+                param.state=$("#stateS").val();
+                param.move_in_user=$("#createUserCodeS").val()
 				var data = JSON.stringify(reqObj('q','stock.select.picking.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					defGrid.set({data: data['data']});
@@ -93,7 +93,7 @@
 					$.ligerDialog.error('请先选择退回记录。','错误');
 					return;
 				}
-				parent.f_addTab('modify_pocket','退回单维护','./stock/new_stock_rollback_picking.html?o=m&code='.concat(row.code));
+				parent.f_addTab('modify_pocket','退回单维护','./stock/new_stock_cfmrollback_picking.html?o=m&code='.concat(row.code));
 			}
 			function openDictDef() {
 				parent.f_addTab('new_pocket','新增退回单','./stock/new_stock_rollback_picking.html');
@@ -104,7 +104,7 @@
 					var row = defGrid.getRow(rowid);
 					var param1=new Object();
 					param1.id=row.id;
-					param1.state='42';
+					param1.state='43';
 					
 					 var param = JSON.stringify(reqObj('u','stock.update.pickingQuality.update',JSON.stringify(param1)));
 					
@@ -159,6 +159,7 @@
 					<label>产品单号</label><input type="text" class="s-text txt-def" id="originQ" />
 					<!-- <label>供应商</label><input type="text" class="s-text txt-def" id="partnerQ" />
 					 -->
+					 <label>状态</label><select id="stateS" param="rollback" first=""  ></select>
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
 					<input type="button" value="清空" onclick="toReset('#codeQ,#originQ,#partnerQ');" />
 				</div>

@@ -25,6 +25,8 @@
 								<entry key="partner_id" value=":like(lr)" />
 								<entry key="state" value="" />
 								<entry key="move_type" value="" />
+								<entry key="createuser" value="" />
+								<entry key="move_in_user" value="" />
 							</map>
 						</property>
 					</bean>
