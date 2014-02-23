@@ -20,10 +20,12 @@
 							{display:'商品编号',name:'code',width:130,minWidth:60},
 		                    {display:'品	名',name:'name',width:130,minWidth:60},
 		                    {display:'规格型号',name:'specs',width:130},
-				            {display:'单	位',name:'product_uom',width:80,align:'left'},
+				            {display:'单	位',name:'uom_id',width:80,align:'left'},
 				            {display:'仓	库',name:'ware_hose_id',width:80},
-				            {display:'库存数量',name:'product_qty',width:80,align:'left'},
-				            {display:'状	态',name:'state',width:80,align:'left'}
+				            {display:'库存数量',name:'product_qty',width:80,align:'left'}
+				           // {display:'状	态',name:'state',width:80,align:'left'}
+					           // {display:'待收货数量',name:'state',width:80,align:'left'}
+					           // {display:'待发货数量',name:'state',width:80,align:'left'}
                     ],
                     pageSize:10,
                     usePager: true,
@@ -49,6 +51,8 @@
 				defGrid.options.dataAction = 'server';
 				appendAddBtn(openDictDef, "添加字典字义");
 				$("#pageloading").hide();
+
+				toQuery();
 			});
 	        function beginEdit(rowid) { 
 	        	defGrid.beginEdit(rowid);
@@ -89,7 +93,7 @@
 				param.ware_hose_id=$("#moveware_hose").val();
 				param.name = $("#movename").val();
 				param.origin = $("#moveorigin").val();
-				param.state = $("#moveState").val();
+				//param.state = $("#moveState").val();
 
 				var data = JSON.stringify(reqObj('q','stock.select.move.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
@@ -157,9 +161,9 @@
 					<select id="moveware_hose" param="base_point" first=""></select>
 					<label>商品名称</label><input type="text" class="s-text txt-def" id="movename" />
 					<label>商品规格</label><input type="text" class="s-text txt-def" id="moveorigin" />
-					<label>状态</label><select id="moveState" param="rbac.status" first=""></select>
+					<!--  <label>状态</label><select id="moveState" param="rbac.status" first=""></select>-->
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
-					<input type="button" value="清空" onclick="toReset('#dictName,#dictCode,#dictStatus');" />
+					<input type="button" value="清空" onclick="toReset('#query_cond input,select,textarea');" />
 				</div>
 				<div id="query_list"></div>
 			</div>
