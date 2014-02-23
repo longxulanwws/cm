@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>生产领用出库</title>
+		<title>生产领用单</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -17,13 +17,19 @@
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
  						{display:'操作',isSort:false,width:60,render:function(rowdata,rowindex,value) {
-                        	return "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> "; 
-                        },frozen:true},
-                        {display:'单据类型',name:'move_type',width:100,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
+ 							var h = "";
+							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> "; 
+							 var row = defGrid.getRow(rowindex);
+ 							 if(row.state == '00' || row.state == 'null')
+                               h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交发货</a> "; 
+                        	return h; 
+ 						},frozen:true},
+                        {display:'单据状态',name:'state',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
+                        {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
 	                    {display:'出库单号',name:'code',width:130,minWidth:60},
 	                    {display:'产品单号',name:'origin',width:130},
 			            {display:'出库日期',name:'pred_date',width:80},
-			            {display:'出库仓库',name:'warehose_id',render:sw_warehose,width:290,align:'left'},
+			            {display:'出库仓库',name:'warehose_id',render:sw_warehose,width:90,align:'left'},
 			            {display:'出货人',name:'move_in_user',render:sw_opt,align:'left'}
                     ],
                     pageSize:20,
@@ -102,6 +108,32 @@
 			function toPrint(rowid) {
 				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
 			}
+			//提交仓库发货
+			function submitToPick(rowid) {
+			   if(window.confirm('您确定要提交该项数据吗？')==true)
+		         
+				var row = defGrid.getRow(rowid);
+				$('#id').val(row.id);
+				// 待发货状态--- 31---
+				$('#state').val(31);
+				var param1=new Object();
+				param1.id=$('#id').val();
+				param1.state=$('#state').val();
+				
+				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
+				
+					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+						if (data) {
+							if (parseInt(data['status']) > 0) {
+								//$.ligerDialog.success('提交成功');
+								$("#submitToPick").hide();
+								toQuery();
+							} else {
+								$.ligerDialog.error('提交失败');
+							}
+						}
+					});
+	        }
 	    </script>
 		<style type="text/css">
 			label{margin: 5px 20px 5px 15px;}

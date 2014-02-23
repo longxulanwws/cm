@@ -21,12 +21,12 @@
  							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
  							 var row = defGrid.getRow(rowindex);
  							 if(row.state == '10' )
-                               h += "<a href='javascript:void(0);' id='quality' class='opt-link' onclick='Quality(" + rowindex + ")'>提交入库</a> "; 
+                               h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交入库</a> "; 
                         	return h; 
                         },frozen:true},
+                        {display:'单据状态',name:'state',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
                         {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
-                        {display:'单据状态',name:'state',width:100,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
-	                    {display:'入库单号',name:'code',width:130,minWidth:60},
+                        {display:'入库单号',name:'code',width:130,minWidth:60},
 	                    {display:'采购单号',name:'origin',width:130},
 			            {display:'供应商',name:'partner_id',render:sw_partner,width:190,align:'left'},
 			            {display:'预计到货日期',name:'pred_date',width:80},
@@ -93,7 +93,7 @@
 			function openDictDef() {
 				parent.f_addTab('new_stockp','新增入库单','./stock/new_stock_picking.html');
 			}
-			function Quality(rowid) {
+			function submitToPick(rowid) {
 			   if(window.confirm('您确定要提交该项数据吗？')==true)
 		         
 				var row = defGrid.getRow(rowid);
@@ -103,13 +103,13 @@
 				param1.id=$('#id').val();
 				param1.state=$('#state').val();
 				
-				 var param = JSON.stringify(reqObj('u','stock.update.pickingQuality.update',JSON.stringify(param1)));
+				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 				
 					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 						if (data) {
 							if (parseInt(data['status']) > 0) {
 								//$.ligerDialog.success('提交成功');
-								$("#quality").hide();
+								$("#submitToPick").hide();
 								toQuery();
 							} else {
 								$.ligerDialog.error('提交失败');
