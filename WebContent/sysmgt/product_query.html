@@ -50,35 +50,7 @@
                     clickToEdit:false,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: toQuery,
-                    url: '/common/q.jsp',                   
-                    //wws 2014-2-23 增加分页信息 start
-                    onToFirst: function(item) {
-                        toQuery(item, 1);
-                    },
-                    onToLast: function(item) {
-        				var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
-        				if (defGrid.options.total % defGrid.options.pageSize > 0)
-        					p += 1;
-        				toQuery(item, p);
-                    },
-                    onToPrev: function(item) {
-        				var p = parseInt(defGrid.options.page);
-        				if (p > 1)
-        					p -= 1;
-        				else
-            				return;
-        				toQuery(item, p);
-                    },
-                    onToNext: function(item) {
-                    	var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
-        				if (defGrid.options.total % defGrid.options.pageSize > 0)
-        					p += 1;
-    					var cp = parseInt(defGrid.options.page); 
-    					if (cp < p)
-        					cp += 1;
-        				toQuery(item, cp);
-                    }
-        		    //wws 2014-2-23 增加分页信息 end 
+                    
    	   			});
    	   			 
 				 
@@ -101,15 +73,7 @@
 
 				var data = JSON.stringify(reqObj('q','stock.select.product.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
-                    //wws 2014-2-23 增加分页信息 start 
-					var d = data['data'].Rows;
-					var ps = defGrid.options.pageSize, p = defGrid.options.page, t = parseInt(data['data'].Total);
-					if (t > ps) {
-						for (var i = 0; i < (p - 1) * ps; i++) {
-							d.unshift(null);
-						}
-					}
-					defGrid.data = data['data'];
+                   
 					 //wws 2014-2-23 增加分页信息  end 
 					pGrid.set({data: data['data']});
 				});
