@@ -98,6 +98,7 @@ WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID AND m.RESOURCE_ID=c
 								<entry key="account" value="str:like(lr):and" />
 								<entry key="name" value=":like(lr)" />
 								<entry key="status" value="int" />
+								<entry key="id" value="" />
 							</map>
 						</property>
 					</bean>
