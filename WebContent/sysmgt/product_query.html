@@ -70,7 +70,6 @@
 				param.code=$("#codeQ").val();
 				param.name = $("#nameQ").val();
 				param.specs = $("#specsQ").val(); 
-
 				var data = JSON.stringify(reqObj('q','stock.select.product.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
                    
@@ -96,6 +95,7 @@
 				parent.c_row.code = rowdata.code;
 				parent.c_row.name = rowdata.name;
 				parent.c_row.specs = rowdata.specs;
+				parent.c_row.product_uom = rowdata.uom_id;
 				parent.c_row.categ_id = rowdata.categ_id;
 				
 				var retRow = parent.curRow.element;
@@ -106,6 +106,8 @@
 				$(td.firstChild).text(rowdata.name);
 				td = td.nextSibling;
 				$(td.firstChild).text(rowdata.specs);
+				td = td.nextSibling;
+				$(td.firstChild).text(rowdata.uom_id);
 
 				parent.selDialog.hide();
 			}
