@@ -13,3 +13,4 @@ input.diff {height:20px;line-height:20px;}
 .label-div {width:14%;height:30px;position:relative;float:left;padding:5px 0 0 0;}
 .in-div {width:36%;height:30px;position:relative;float:left;padding: 2px 0 0 0;}
 .toolbar{position:fixed;width:100%;z-index:100;}
+.s-text-sort {background:none repeat scroll 0 0 #FFFFFF;border:1px solid #AECAF0;position:relative;width:80px;}

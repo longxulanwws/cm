@@ -17,17 +17,17 @@
 				var opt = window.location.toString().replace(/^[^?]+\?o=/, ''); 
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
- 						{display:'操作',isSort:false,width:100,render:function(rowdata,rowindex,value) {
+ 						{display:'操作',isSort:false,width:60,render:function(rowdata,rowindex,value) {
  							 if (opt === 's') 
  								return "<a href='javascript:void(0);' class='opt-link' onclick='toSelect(".concat(rowindex).concat(")'>选择</a>");
  						},frozen:true},
  						 {display:'编号',name:'code',width:160,minWidth:60},
  	                    {display:'名称',name:'name',width:160,minWidth:60,align:'left'},
  	                    {display:'规格/型号',name:'specs',width:120,minWidth:60,align:'left'},
- 	                    {display:'品牌',name:'brand',width:140,minWidth:60,align:'left'},
- 	                    {display:'类型',name:'categ_id',width:120,minWidth:60,align:'left',render:function(item){return paramRender(item,'product.type2',item.categ_id);}},
- 	                    {display:'商品性质',name:'type',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'product_category',item.type);}},
- 	                    {display:'计量单位',name:'uom_id',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'uom',item.uom_id);}}
+ 	                    //{display:'品牌',name:'brand',width:140,minWidth:60,align:'left'},
+ 	                    //{display:'类型',name:'categ_id',width:120,minWidth:60,align:'left',render:function(item){return paramRender(item,'product.type2',item.categ_id);}},
+ 	                    //{display:'商品性质',name:'type',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'product_category',item.type);}},
+ 	                    {display:'单位',name:'uom_id',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'uom',item.uom_id);}}
                     ],
                     pageSize:20,
                     usePager: true,
@@ -156,9 +156,9 @@
 		<div id="layout_main">
 			<div position="center" id="a_center" title="入库单列表">
 				<div id="query_cond" class="fields">
-						<label>编号</label><input type="text" class="s-text txt-def" id="codeQ" />
-					<label>名称</label><input type="text" class="s-text txt-def" id="nameQ" />
-					<label>规格/型号</label><input type="text" class="s-text txt-def" id="specsQ" />
+				    <label>编号</label><input type="text" class="s-text-sort txt-def" id="codeQ" />
+					<label>名称</label><input type="text" class="s-text-sort txt-def" id="nameQ" />
+					<label>规格/型号</label><input type="text" class="s-text-sort txt-def" id="specsQ" />
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
 					<input type="button" value="清空" onclick="toReset('#codeQ,#originQ,#partnerQ');" />
 				</div>
