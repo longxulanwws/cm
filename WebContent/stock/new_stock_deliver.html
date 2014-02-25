@@ -53,13 +53,12 @@
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: queryProd
 				});
-				appendAddBtn(function(){
-					pGrid.addEditRow();
-					c_row = pGrid.getRow(pGrid.rows.length - 1);
-// 					$(".l-grid2 .l-grid-body-inner").attr("style", "");
-				}, "添加商品明细");
-				appendModifyBtn(function(){}, "修改商品明细");
-				appendDeleteBtn(function(){}, "删除商品明细");
+				//appendAddBtn(function(){
+				//	pGrid.addEditRow();
+				//	c_row = pGrid.getRow(pGrid.rows.length - 1);
+				//}, "添加商品明细");
+				//appendModifyBtn(function(){}, "修改商品明细");
+				//appendDeleteBtn(function(){}, "删除商品明细");
 
 				var str = window.location.toString().replace(/^[^?]+\??/, "");
 				if (str) {

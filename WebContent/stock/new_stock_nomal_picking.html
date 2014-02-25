@@ -178,8 +178,7 @@
 					$.ligerDialog.error('请添加入库商品。','错误');
 					return;
 				}
-				
-				
+				pGrid.endEdit(c_row.rowindex);
 				if (opt === 'm') {
 					var param = new Object();
 					//入库编号
@@ -221,7 +220,7 @@
 					param.dept = $("#deptCodeS").val();
 					param.busiorg = "";
 					param.name = "";
-					param.type = "1";
+					param.type = "0";
 					param.origin = $("#originS").val();
 					param.partner = $("#partnerS").val();
 					param.preddate = $("#predDateS").val();
@@ -255,7 +254,6 @@
 					});
 				}
 			}
-			
 	        function beginEdit(rowid) { 
 	        	pGrid.beginEdit(rowid);
 	        }

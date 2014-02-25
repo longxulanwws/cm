@@ -34,7 +34,9 @@
 						{display:'商品编号',name:'code',width:90,editor:{type:'popup',onButtonClick:selectProduct},textField:'code',valueField:'categ_id'},
 	                    {display:'品名',name:'name',width:150},
 			            {display:'规格/型号',name:'specs',width:150,render:function(item){return paramRender(item,'product_specs',item.code);}},
-			            {display:'单位',name:'product_uom',width:90,render:function(item){return paramRender(item,'uom',item.product_uom);},editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}},
+			            {display:'单位',name:'product_uom',width:90,render:function(item){return paramRender(item,'uom',item.product_uom);}
+			            //,editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}
+			            },
 			            {display:'采购数量',name:'tar_product_qty',width:90,align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.tar_product_qty).toFixed(0);}},
 			            {display:'收货数量',name:'product_qty',width:90,id:'num',align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
 			            {display:'质检方式',name:'qc_type',width:150},
@@ -60,7 +62,7 @@
 // 					$(".l-grid2 .l-grid-body-inner").attr("style", "");
 				}, "添加商品明细");
 				appendModifyBtn(function(){}, "修改商品明细");
-				appendDeleteBtn(function(){}, "删除商品明细");
+				appendDeleteBtn(deleteRow, "删除商品明细");
 
 				var str = window.location.toString().replace(/^[^?]+\??/, "");
 				if (str) {
@@ -158,15 +160,35 @@
 	        function cancelEdit(rowid) { 
 	        	pGrid.cancelEdit(rowid);
 	        }
-	        function deleteRow(rowid) {
+	        function deleteRow() {
+	        	var row = pGrid.getSelectedRow();
+				if (!row) {
+					$.ligerDialog.error('请先选择入库商品记录。','错误');
+					return;
+				}
 	            $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
 		            if (!r)
 			            return;
-	                var row = pGrid.getRow(rowid);
-	                if (row['__status'] !== 'add')
-	                	toDel(JSON.stringify(row));
-	                pGrid.deleteRow(rowid);
-	            })
+		        	if (row.__status === 'add') {
+		        		pGrid.deleteRow(row);
+		        		if (pGrid.row.length === 0)
+			        		pGrid.data = {};
+		        		return;
+			        }
+	                var param = new Object();
+	                param.id = row.id
+	                var data = JSON.stringify(reqObj('d','stock.delete.stock_move',JSON.stringify(param)));
+    				ajaxSubmit("/cm/rbac/cm.do?m=d", data, function(data) {
+    					if (data) {
+    						if (parseInt(data['status']) > 0) {
+    							$.ligerDialog.success('删除成功');
+				                pGrid.deleteRow(row);
+    						} else {
+    							$.ligerDialog.error('删除失败');
+    						}
+    					}
+    				});
+	            });
 	        }
 			function calcTotal(item) {
 				if (item.product_qty && item.price_unit) {

@@ -20,7 +20,7 @@
  							var h = "";
 							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
 							 var row = defGrid.getRow(rowindex);
-							 if(row.state == '00' )
+							 if(row.state == '41' )
                              h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交收货</a> "; 
                       	return h; 
                         },frozen:true},
@@ -106,7 +106,7 @@
 					var param1=new Object();
 					param1.id=row.id;
 					//待收货状态
-					param1.state='21';
+					param1.state='42';
 					
 					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 					

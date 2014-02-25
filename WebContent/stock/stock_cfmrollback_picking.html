@@ -106,7 +106,7 @@
 					param1.id=row.id;
 					param1.state='43';
 					
-					 var param = JSON.stringify(reqObj('u','stock.update.pickingQuality.update',JSON.stringify(param1)));
+					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 					
 						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 							if (data) {
