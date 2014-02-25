@@ -26,8 +26,8 @@
 				$("#d-menu").ligerToolBar({items:[
 				    {text:'退回',click:toAdd,icon:'save'},
 				    {line:true},
-				   // {text:'清空',click:resetArea,icon:'clear'},
-					//{line:true}
+				    {text:'确认收货',id:'quality',click:Quality,icon:'clear'},
+					{line:true}
 				]});
                	pGrid = $("#p-div").ligerGrid({
                     columns:[
@@ -121,6 +121,8 @@
 			function bindVal(data) {
 				if (data.Rows && data.Rows.length === 1) {
 					data = data.Rows[0];
+					$('#idS').val(data.id);
+					$('#stateS').val(data.state);
 					$('#codeS').val(data.code);
 					$('#originS').val(data.origin);
 					$('#partnerInS').val(paramRender(null,'partner_list',data.partner_id));
@@ -138,6 +140,34 @@
 					$('#createDateS').val(data.createdate);
 				}
 			}
+			function Quality(rowid) {
+				if($('#stateS').val()=='20')
+					$.ligerDialog.error('已提交收货，不能重复收货，请确认！');
+				else
+				   if(window.confirm('您确定要提交该项数据吗？')==true)
+			         
+					//var row = defGrid.getRow(rowid);
+					//$('#id').val(row.id);
+					//$('#state').val(20);
+					var param1=new Object();
+					param1.id=$('#idS').val();
+					param1.state='20';
+					
+					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
+					
+						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+							if (data) {
+								if (parseInt(data['status']) > 0) {
+									$('#stateS').val(20);
+									$.ligerDialog.success('提交成功');
+									//$("#quality").hide();
+									//toQuery();
+								} else {
+									$.ligerDialog.error('提交失败');
+								}
+							}
+						});
+		        }
 			function queryProd() {}
 			function toAdd() {
 				if (pGrid.rows.length === 0) {
@@ -179,6 +209,8 @@
 		</style>
 	</head>
 	<body style="padding:0;">
+	<input  type="hidden" id="idS"/>
+	<input  type="hidden" id="stateS"/>
 		<div id="pageloading"></div>  
 		<div id="layout_main">
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">
