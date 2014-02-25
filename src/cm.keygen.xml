@@ -12,7 +12,7 @@
 			<map>
 				<entry key="stock.picking.code">
 					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
-						<property name="rule" value="'RK'{org}{year}{seq(4)}" />
+						<property name="rule" value="'RK'{org}{date}{seq(4)}" />
 						<property name="circle" value="year" />
 						<property name="group" value="true" />
 					</bean>
@@ -24,7 +24,7 @@
 				</entry>
 				<entry key="stock.product.code">
 					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
-						<property name="rule" value="{$type}{$categ_id}{seq(4)}" />
+						<property name="rule" value="{$categ_id}{seq(4)}" />
 					</bean>
 				</entry>
 				<entry key="stock.picking_move.id">
