@@ -384,7 +384,7 @@ Layer={layer:int},Detail={detail},STATUS={status},DESCRIPTION={description} WHER
 					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
 						<property name="sql">
 							<value>
-<![CDATA[UPDATE CM_USER SET Account={account},NAME={name},STATUS={status},DESCRIPTION={description} WHERE ID={id}]]>
+<![CDATA[UPDATE CM_USER SET Account={account},NAME={name},Orgid={orgid},STATUS={status},DESCRIPTION={description} WHERE ID={id}]]>
 							</value>
 						</property>
 					</bean>
