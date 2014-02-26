@@ -34,9 +34,10 @@
                         },frozen:true},
                         {display:'单位类型',name:'type',width:80,minWidth:60,data:get_type_list,render:switcher_type,editor:{type:'select',data:get_type_list,textField:'name',valueField:'value',selectBoxHeight:50}},
                         {display:'编号',name:'code',width:40,minWidth:60,align:'left',editor:{type:'text'}},
-	                    {display:'名称',name:'name',width:50,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'名称',name:'name',width:200,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'所属机构',name:'dept_id',width:80,minWidth:60,data:get_org_list,render:switcher_org,editor:{type:'select',data:get_org_list,textField:'name',valueField:'value',selectBoxHeight:50}},
-		                {display:'组织机构代码证号',name:'uuid_code',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+	                    {display:'所属行政区划',name:'Of_Region',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'Of_Region',item.Of_Region);}},
+	                    {display:'组织机构代码证号',name:'uuid_code',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'税号',name:'tax_code',width:80,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'所属行业',name:'of_trade',width:80,minWidth:60,data:get_trade_list,render:switcher_trade,editor:{type:'select',data:get_trade_list,textField:'name',valueField:'value',selectBoxHeight:50}},
 	                    {display:'法人代表',name:'legal_body',width:80,minWidth:60,align:'left',editor:{type:'text'}},
@@ -102,7 +103,8 @@
                     param_type:'unit_type',
                     param_trade:'Industry',
                     param_level:'credit_rating',
-                    param_bank:'bank_account'
+                    param_bank:'bank_account',
+                    param_region:'region'
 				});
 				defGrid.options.dataAction = 'server';
 				appendAddBtn(openUserDef, "添加用户");
@@ -110,6 +112,15 @@
 			
 			
 				//var org_data = getData('org_list');
+				$("#region_combobox").ligerComboBox({
+					autocomplete: true,
+                	valueField:'value',
+                	textField:'name',
+                	data:get_region_list,
+                	onSelected:function(v,t) {
+                    	$("#Of_Region").val(v);
+                }
+			   });
 				$("#org_combobox").ligerComboBox({
 					autocomplete: true,
                 	valueField:'value',
@@ -118,8 +129,7 @@
                 	onSelected:function(v,t) {
                     	$("#Dept_ID").val(v);
                 }
-			   });
-				   
+			   });  
 				$("#type_combobox").ligerComboBox({
 					autocomplete: true,
                 	valueField:'value',
@@ -194,7 +204,9 @@
 			var get_org_list=new function () {
 				return getData('org_list');
 			}
-
+			var get_region_list=new function () {
+				return getData('region');
+			}
 			function switcher_type(item) {
 				return paramRender(item, defGrid.options.param_type, item.type);
 			}
@@ -306,6 +318,7 @@
 				param.code=$("#code").val();
 				param.name = $("#newName").val();
 				param.type = $("#newType").val();
+				param.Of_Region= $("#Of_Region").val();
 				param.uuid_code=$("#newuuid_code").val();
 				param.tax_code = $("#newTax_code").val();
 				param.of_trade=$("#newOf_trade").val();
@@ -410,9 +423,10 @@
 				<div class="in-div"><input type="text" id="org_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
 				<input type="hidden" id="Dept_ID" />
 				
-				<div class="label-div"><label>单位类型</label></div>
-				<div class="in-div"><input type="text" id="type_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
-				<input type="hidden" id="newType" />
+				<div class="label-div"><label>所属行政区划</label></div>
+				 
+				<div class="in-div"><input type="text" id="region_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+				<input type="hidden" id="Of_Region" />
 			</div>	
 			<div class="line-div">
 				<div class="label-div"><label>组织机构代码证号</label></div>
@@ -462,9 +476,9 @@
 			</div>
 			<div class="line-div">
 				<div class="label-div"><label>说明</label></div>
-				<div class="in-div"><textarea cols="24" rows="5" id="newDesc"></textarea></div>
+				<div class="in-div"><textarea cols="40" rows="2" id="newDesc"></textarea></div>
 			</div>
-			<div class="line-div" style="margin-top:80px;padding-left:40%;">
+			<div class="line-div" style="margin-top:40px;padding-left:40%;">
 				<input type="button" value="保存" onclick="toAdd();" />
 				<input type="button" value="清空" onclick="toReset('#new_user_def input,select,textarea')" />
 			</div>

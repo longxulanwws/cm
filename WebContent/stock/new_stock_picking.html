@@ -58,7 +58,7 @@
                     fixedCellHeight:false,
                     colDraggable:false,
                     enabledEdit:true,
-                    clickToEdit:false,
+                    clickToEdit:true,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: queryProd,
                     param_partner:'partner_list'
@@ -175,13 +175,27 @@
 					$('#createDateS').val(data.createdate);
 				}
 			}
-			function queryProd() {}
+			function queryProd() {
+				var data = JSON.stringify(reqObj('q','stock.select.move.query',JSON.stringify({picking_id:c_code})));
+				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+					pGrid.set({data: data['data']});
+				}, null, false);
+			}
 			function toAdd() {
 				if (pGrid.rows.length === 0) {
 					$.ligerDialog.error('请添加入库商品。','错误');
 					return;
 				}
 				pGrid.endEdit(c_row.rowindex);
+				var param = new Object();
+				param.origin = $("#originS").val();
+				param.partner = $("#partnerS").val();
+				param.preddate = $("#predDateS").val();
+				param.warehose = $("#warehouseS").val();
+				param.moveinuser = $("#moveInIdS").val();
+				param.note = $("#noteS").val();
+
+				var en = 'stock.add.picking.add', optType = 'a';
 				if (opt === 'm') {
 					var param = new Object();
 					//入库编号
@@ -203,18 +217,19 @@
 					param.writeusercode=$('#WriteUserCodeS').val();
 					//修改日期
 					param.writedate=$('#WriteDateS').val();
-
-					 var param = JSON.stringify(reqObj('u','stock.update.stockpicking.update',JSON.stringify(param)));
-						//alert(param);
-						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
-							if (data) {
-								if (parseInt(data['status']) > 0) {
-									$.ligerDialog.success('保存成功');
-								} else {
-									$.ligerDialog.error('保存失败');
-								}
-							}
-						});
+					en = 'stock.update.picking';
+					optType = 'u';
+					// var param = JSON.stringify(reqObj('u','stock.update.stockpicking.update',JSON.stringify(param)));
+					//	//alert(param);
+					//	ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+					//		if (data) {
+					//			if (parseInt(data['status']) > 0) {
+					//				$.ligerDialog.success('保存成功');
+					//			} else {
+					//				$.ligerDialog.error('保存失败');
+					//			}
+					//		}
+					//	});
 					
 				} else {
 					pGrid.endEdit(c_row.rowindex);
@@ -234,10 +249,38 @@
 					param.createdate = $("#createDateS").val();
 					param.movetype="01";
 					param.state="00";
-					var data = JSON.stringify(reqObj('a','stock.add.picking.add',JSON.stringify(param)));
-					ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+					}
+					var data = JSON.stringify(reqObj(optType,en,JSON.stringify(param)));
+				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+					var rows = pGrid.rows;
+					if (opt === 'm') {
+						var addRows = [], updateRows = [];
+						for (var i = 0; i < rows.length; i++) {
+							if (rows[i].__status === 'add') {
+								rows[i].picking_id = $('#codeS').val();
+								rows[i].origin = $('#originS').val();
+								rows[i].type = '0';
+								rows[i].createuser = $('#createUserCodeS').val();
+								rows[i].createdate = $('#createDateS').val();
+								rows[i].dept_id = $('#deptCodeS').val();
+								rows[i].company_id = '';
+								rows[i].busiorg_id = '';
+								addRows.push(rows[i]);
+							} else if (rows[i].__status === 'update') {
+								updateRows.push(rows[i]);
+							}
+						}
+						var data = JSON.stringify(reqObj('ba','stock.add.stock_move',addRows));
+						ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(result) {
+							data = JSON.stringify(reqObj('bu','stock.update.stock_move', updateRows));
+							ajaxSubmit("/cm/rbac/cm.do?m=bu", data, function(data) {
+								$.ligerDialog.success('保存成功', '操作完成', function() {
+									parent.tabManager.removeTabItem("new_stockp");
+								});
+							});
+						});
+					} else {
 						var picking = data['added'];
-						var rows = pGrid.rows;
 						for (var i = 0; i < rows.length; i++) {
 							rows[i].picking_id = picking['#stock.picking.code'];
 							rows[i].origin = $('#originS').val();
@@ -247,7 +290,6 @@
 							rows[i].dept_id = $('#deptCodeS').val();
 							rows[i].company_id = '';
 							rows[i].busiorg_id = '';
-							
 						}
 						var data = JSON.stringify(reqObj('ba','stock.add.stock_move',rows));
 						ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
@@ -255,11 +297,11 @@
 								parent.tabManager.removeTabItem("new_stockp");
 							});
 						});
-					});
-				}
+					}
+				});
 			}
-			
-	        function beginEdit(rowid) { 
+	        function toEdit(rowid) {
+		        alert(rowid);
 	        	pGrid.beginEdit(rowid);
 	        }
 	        function cancelEdit(rowid) { 
@@ -342,10 +384,10 @@
 						<div class="in-div"><input type="text" id="moveInS" ltype="combobox" class="diff" /></div>
 						<input type="hidden" id="moveInIdS" />
 					</div>
-					<div class="line-div" style="height:76px;">
+					<div class="line-div" style="height:50px;">
 						<div class="label-div"><label>备注</label></div>
 						<div class="in-div" style="width:72%;">
-							<textarea cols="73" rows="3" id="noteS"></textarea>
+							<textarea cols="73" rows="2" id="noteS"></textarea>
 						</div>
 					</div>
 					<div class="line-div">
