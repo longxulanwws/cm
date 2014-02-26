@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>销售发货</title>
+		<title>商品物料查询</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -113,7 +113,7 @@
 				
 				var rowdata =defGrid.getRow(rowindex);
 
-				//alert(c_row);
+				
 				if (!parent.c_row) {
 					parent.c_row = parent.pGrid.getSelectedRow();
 					if (!parent.c_row) {
@@ -125,9 +125,10 @@
 				parent.c_row.code = rowdata.code;
 				parent.c_row.name = rowdata.name;
 				parent.c_row.specs = rowdata.specs;
+				parent.c_row.product_uom = rowdata.uom_id;
 				parent.c_row.categ_id = rowdata.categ_id;
 				
-				var retRow = parent.curRow.element;
+				 var retRow = parent.curRow.element;
 				retRow.value = rowdata.code;
 				var td = retRow.parentNode.parentNode
 				var id = td.id.replace(/\|/g, '\\|').replace(/.$/, '');
@@ -135,7 +136,9 @@
 				$(td.firstChild).text(rowdata.name);
 				td = td.nextSibling;
 				$(td.firstChild).text(rowdata.specs);
-
+				td = td.nextSibling;
+				$(td.firstChild).text(rowdata.uom_id);
+                 
 				parent.selDialog.hide();
 			}
 	    </script>
