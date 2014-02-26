@@ -20,8 +20,11 @@
  							var h = "";
 							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
 							 var row = defGrid.getRow(rowindex);
-							 if(row.state == '41' )
-                             h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交收货</a> "; 
+							 if(row.state == '41' || row.state == 'null')
+								 {
+                             h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交收货</a> ";
+                             h += "<a href='javascript:void(0);'  class='opt-link' onclick='deleteRow(" + rowindex + ")'>删除</a> ";
+								 } 
                       	return h; 
                         },frozen:true},
                         {display:'单据状态',name:'state',width:90,minWidth:60,render:function(item){return paramRender(item,'rollback',item.state);}},
@@ -93,10 +96,10 @@
 					$.ligerDialog.error('请先选择退回记录。','错误');
 					return;
 				}
-				parent.f_addTab('modify_pocket','退回单维护','./stock/new_stock_rollback_picking.html?o=m&code='.concat(row.code));
+				parent.f_addTab('modify_rollback','退回单维护','./stock/new_stock_rollback_picking.html?o=m&code='.concat(row.code));
 			}
 			function openDictDef() {
-				parent.f_addTab('new_pocket','新增退回单','./stock/new_stock_rollback_picking.html');
+				parent.f_addTab('new_rollback','新增退回单','./stock/new_stock_rollback_picking.html');
 			}
 			// 提交仓库收货
 			function submitToPick(rowid) {
@@ -137,6 +140,38 @@
 			var printWin;
 			function toPrint(rowid) {
 				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+			}
+			 function deleteRow(rowid) {
+		            $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
+			            if (!r)
+				            return;
+		                var row = defGrid.getRow(rowid);
+		                if (row['__status'] !== 'add')
+		                	toDel(JSON.stringify(row));
+		                defGrid.deleteRow(rowid);
+		            })
+		        }
+			 function toDel(row) {
+				
+				 var param = JSON.stringify(reqObj('d','stock.delete.stock_move.prckingid',row));
+					ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
+						if (data) {
+							if (parseInt(data['status']) > 0) {
+								
+						     var param = JSON.stringify(reqObj('d','stock.delete.stock_picking.code',row));
+						      ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
+								if (parseInt(data['status']) > 0) {
+								  $.ligerDialog.success('删除成功');
+								}
+								else{
+										$.ligerDialog.error('删除失败');
+									}
+									});
+							} else {
+								$.ligerDialog.error('删除失败');
+							}
+						}
+					});
 			}
 	    </script>
 		<style type="text/css">

@@ -290,6 +290,24 @@ Warehose_ID={warehose_id},Move_IN_User={move_in_user},Note={note},WriteUser={wri
 						</property>
 					</bean>
 				</entry>
+				<entry key="stock_move.prckingid">
+					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+						<property name="sql">
+							<value>
+<![CDATA[DELETE FROM stock_move WHERE Picking_id={code}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="stock_picking.code">
+					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+						<property name="sql">
+							<value>
+<![CDATA[DELETE FROM stock_picking WHERE code={code}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
 			</map>
 		</property>
 	</bean>

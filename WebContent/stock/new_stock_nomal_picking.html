@@ -39,6 +39,9 @@
 			           {display:'单位',name:'product_uom',width:100,render:function(item){return paramRender(item,'uom',item.product_uom);}
 			           //,editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}
 			           },
+			           {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}
+			            ,editor:{type:'select',data:getData('Brand'),valueField:'value',textField:'name'}
+			            },
 			            {display:'发货数量',name:'product_qty',width:100,id:'num',align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
 			           
 			            //{display:'单价',name:'source_price_unit',align:'right',editor:{type:'float'},render:function(item){return parseFloat(item.source_price_unit).toFixed(2);}},

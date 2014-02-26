@@ -25,8 +25,8 @@
 					$(this).removeClass("l-textarea");
 				});
 				$("#d-menu").ligerToolBar({items:[
-				   // {text:'保存',click:toAdd,icon:'save'},
-					//{line:true},
+				    {text:'确认收货',id:'quality',click:Quality,icon:'clear'},
+					{line:true}
 				   // {text:'清空',click:resetArea,icon:'clear'},
 					//{line:true}
 				]});
@@ -37,6 +37,9 @@
 			            {display:'规格/型号',name:'specs',width:160,render:function(item){return paramRender(item,'product_specs',item.code);}},
 			          //  {display:'待入库数量',name:'tar_product_qty',align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.tar_product_qty).toFixed(0);}},
 			            {display:'单位',name:'product_uom',width:100,render:function(item){return paramRender(item,'uom',item.product_uom);},editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}},
+			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}
+			            ,editor:{type:'select',data:getData('Brand'),valueField:'value',textField:'name'}
+			            },
 			            {display:'退回数量',name:'product_qty',width:100,id:'num',align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
 			            //{display:'单价',name:'source_price_unit',align:'right',editor:{type:'float'},render:function(item){return parseFloat(item.source_price_unit).toFixed(2);}},
 			            //{display:'产成品单价',name:'price_unit',width:100,id:'price',align:'right',editor:{type:'float'},render:function(item){return parseFloat(item.price_unit).toFixed(2);}},
@@ -151,6 +154,8 @@
 			function bindVal(data) {
 				if (data.Rows && data.Rows.length === 1) {
 					data = data.Rows[0];
+					$('#idS').val(data.id);
+					$('#stateS').val(data.state);
 					$('#codeS').val(data.code);
 					$('#originS').val(data.origin);
 					$('#partnerInS').val(paramRender(null,'partner_list',data.partner_id));
@@ -168,6 +173,35 @@
 					$('#createDateS').val(data.createdate);
 				}
 			}
+			function Quality() {
+				if($('#stateS').val()=='43')
+					$.ligerDialog.error('已提交退回，不能重复提交，请确认！');
+				else
+					
+				   if(window.confirm('您确定要确认该项数据吗？')==true)
+			         
+				//	var row = defGrid.getRow(rowid);
+					//$('#id').val(row.id);
+					//$('#state').val(32);
+					var param1=new Object();
+					param1.id=$('#idS').val();
+					param1.state='43';
+					
+					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
+					
+						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+							if (data) {
+								if (parseInt(data['status']) > 0) {
+									$('#stateS').val(43);
+									$.ligerDialog.success('提交成功');
+									//$("#quality").hide();
+									//toQuery();
+								} else {
+									$.ligerDialog.error('提交失败');
+								}
+							}
+						});
+		        }
 			function queryProd() {}
 			function toAdd() {
 				if (pGrid.rows.length === 0) {
@@ -280,6 +314,8 @@
 		</style>
 	</head>
 	<body style="padding:0;">
+	<input  type="hidden" id="idS"/>
+	<input  type="hidden" id="stateS"/>
 		<div id="pageloading"></div>  
 		<div id="layout_main">
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">

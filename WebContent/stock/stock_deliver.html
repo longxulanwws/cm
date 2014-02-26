@@ -16,7 +16,7 @@
 			$(function(){
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
- 						{display:'操作',isSort:false,width:90,render:function(rowdata,rowindex,value) {
+ 						{display:'操作',isSort:false,width:150,render:function(rowdata,rowindex,value) {
  							var h = "";
  							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
  							 var row = defGrid.getRow(rowindex);
