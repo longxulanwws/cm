@@ -87,6 +87,7 @@
 				param.origin = $("#originQ").val();
 				//param.partner_id = $("#partnerQ").val();
 				param.state=$("#stateS").val();
+				
                 param.move_type='04';
 				var data = JSON.stringify(reqObj('q','stock.select.picking.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
@@ -104,7 +105,7 @@
 				//$('#state').val(32);
 				var param1=new Object();
 				param1.id=row.id;
-				param1.state='32';
+				param1.state='30';
 				
 				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 				

@@ -156,7 +156,7 @@
 				
 			}
 			function Quality() {
-				if($('#stateS').val()=='32')
+				if($('#stateS').val()=='30')
 					$.ligerDialog.error('已提交发货，不能重复发货，请确认！');
 				else
 					
@@ -167,14 +167,14 @@
 					//$('#state').val(32);
 					var param1=new Object();
 					param1.id=$('#idS').val();
-					param1.state='32';
+					param1.state='30';
 					
 					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 					
 						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 							if (data) {
 								if (parseInt(data['status']) > 0) {
-									$('#stateS').val(32);
+									$('#stateS').val(30);
 									$.ligerDialog.success('提交成功');
 									//$("#quality").hide();
 									//toQuery();
