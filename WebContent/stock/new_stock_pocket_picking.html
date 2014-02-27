@@ -27,6 +27,8 @@
 				$("#d-menu").ligerToolBar({items:[
 				    {text:'保存',click:toAdd,icon:'save'},
 					{line:true},
+					 {text:'保存并返回',click:toAddCl,icon:'save'},
+				     {line:true},
 				    {text:'清空',click:resetArea,icon:'clear'},
 					{line:true}
 				]});
@@ -105,6 +107,7 @@
 						$('#createUserS').val(data['uname']);
 						$('#createUserCodeS').val(data['uid']);
 						$("#createDateS").val(data['date']);
+						$("#WriteDateS").val(data['date']);
 					
 					}, null, false);
 				}
@@ -175,13 +178,22 @@
 				}
 			}
 			function queryProd() {}
-			function toAdd() {
+		    function toAddCl()
+		    {
+			    toAdd('q');
+			 }
+			function toAdd(q) {
+				
 				if (pGrid.rows.length === 0) {
 					$.ligerDialog.error('请添加入库商品。','错误');
 					return;
 				}
-				pGrid.endEdit(c_row.rowindex);
+				//pGrid.endEdit(c_row.rowindex);
 				if (opt === 'm') {
+
+					
+					
+					
 					var param = new Object();
 					//入库编号
 					param.code=$('#codeS').val();
@@ -208,14 +220,28 @@
 						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 							if (data) {
 								if (parseInt(data['status']) > 0) {
-									$.ligerDialog.success('保存成功');
+									if(q=='q')
+										{
+									     parent.tabManager.removeTabItem("modify_pocket");
+										}
 								} else {
 									$.ligerDialog.error('保存失败');
 								}
 							}
 						});
+						
 					
 				} else {
+					if($("#saveQ").val()=='1')
+					{
+						$.ligerDialog.error('该单据已保存，不可重复保存，请确认！');
+						return ;
+				    }
+					if(q=='q' && $("#saveQ").val()=='1')
+					{
+				     parent.tabManager.removeTabItem("new_pocket");
+					}
+				
 					pGrid.endEdit(c_row.rowindex);
 					var param = new Object();
 					param.company = "";
@@ -233,12 +259,15 @@
 					param.createdate = $("#createDateS").val();
 					param.movetype="03";
 					param.state="00";
+					//修改日期
+					param.writedate=$("#WriteDateS").val();
+					
 					var data = JSON.stringify(reqObj('a','stock.add.picking.add',JSON.stringify(param)));
 					ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 						var picking = data['added'];
 						var rows = pGrid.rows;
 						for (var i = 0; i < rows.length; i++) {
-							rows[i].picking_id = picking['#stock.picking.code'];
+							rows[i].picking_id = picking['#stock.picking.out.code'];
 							rows[i].origin = $('#originS').val();
 							rows[i].type = '0';
 							rows[i].createuser = $('#createUserCodeS').val();
@@ -250,7 +279,13 @@
 						var data = JSON.stringify(reqObj('ba','stock.add.stock_move',rows));
 						ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
 							$.ligerDialog.success('保存成功', '操作完成', function() {
-								parent.tabManager.removeTabItem("new_stockp");
+								if (data) {
+									//alert(parseInt(data['status']));
+									if (parseInt(data['status']) > 0) {
+										$("#saveQ").val(1);
+									}
+								}
+								
 							});
 						});
 					});
@@ -306,6 +341,7 @@
 	</head>
 	<body style="padding:0;">
 		<div id="pageloading"></div>  
+		<input type="hidden" id="saveQ" />
 		<div id="layout_main">
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">
 				<div id="d-menu" class="toolbar"></div>

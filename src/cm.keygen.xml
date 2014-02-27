@@ -26,7 +26,7 @@
 				</entry>
 				<entry key="stock.picking.out.code">
 					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
-						<property name="rule" value="'CK'{date}{seq(4)}" />
+						<property name="rule" value="'LY_CK'{date}{seq(4)}" />
 						<property name="circle" value="year" />
 						<property name="group" value="true" />
 					</bean>
