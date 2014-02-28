@@ -69,7 +69,7 @@
 					c_row = pGrid.getRow(pGrid.rows.length - 1);
 // 					$(".l-grid2 .l-grid-body-inner").attr("style", "");
 				}, "添加商品明细");
-				appendModifyBtn(function(){}, "修改商品明细");
+				appendModifyBtn(function(){}, "编辑商品明细");
 				appendDeleteBtn(deleteRow, "删除商品明细");
 
 				var str = window.location.toString().replace(/^[^?]+\??/, "");
@@ -216,7 +216,7 @@
 					param.writedate=$('#WriteDateS').val();
 
 					 var param = JSON.stringify(reqObj('u','stock.update.stockpicking.update',JSON.stringify(param)));
-						//alert(param);
+						 
 						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 							if (data) {
 								if (parseInt(data['status']) > 0) {
@@ -350,7 +350,7 @@
 					<div class="line-div">
 						<div class="label-div"><label>出库单号</label></div>
 						<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
-						<div class="label-div"><label>生产订单号</label></div>
+						<div class="label-div"><label>生产单号</label></div>
 						<div class="in-div"><input type="text" id="originS" ltype="text" class="diff" /></div>
 					</div>
                 	<div class="line-div">
@@ -387,11 +387,11 @@
 						<div class="label-div"><label>制单人</label></div>
 						<div class="in-div"><input type="text" id="createUserS" ltype="text" class="readonly diff" readonly="readonly" /></div>
 						<input type="hidden" id="createUserCodeS" />
-							<input type="hidden" id="WriteUserCodeS" />
-								<input type="hidden" id="WriteDateS" />
+						<input type="hidden" id="WriteUserCodeS" />
+						<input type="hidden" id="WriteDateS" />
 					</div>
 					<div class="line-div">
-						<div class="label-div"><label>制单日期</label></div>
+						<div class="label-div"><label>制单时间</label></div>
 						<div class="in-div"><input type="text" id="createDateS" ltype="text" class="readonly diff" readonly="readonly" /></div>
 					</div>
 			    </form>

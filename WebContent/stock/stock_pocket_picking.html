@@ -40,17 +40,18 @@
 	 								  h += "已提交发货  ";
 		 							 }
                            	return h; 
- 						},frozen:true},
+ 						},frozen:true
+ 						},
                         {display:'单据状态',name:'state',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
-                        {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
-                        {display:'修改日期',name:'writedate',width:120},
+                        //{display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
+                        {display:'修改时间',name:'writedate',width:130},
   	                    {display:'出库单号',name:'code',width:150,minWidth:60},
-	                    {display:'产品单号',name:'origin',width:130},
+	                    {display:'生产单号',name:'origin',width:130},
 			            {display:'出库日期',name:'pred_date',width:80},
 			            {display:'出库仓库',name:'warehose_id',render:sw_warehose,width:90,align:'left'},
 			            {display:'出货人',name:'move_in_user',width:90,render:sw_opt,align:'left'},
-			            
-			            {display:'备注',name:'note'}
+			            {display:'制单时间',name:'createdate',width:130},
+			            {display:'备注',width:190,name:'note'}
                     ],
                     pageSize:20,
                     usePager: true,
@@ -69,7 +70,7 @@
                     param_warehose:'base_point'
 				});
 				appendAddBtn(openDictDef, "添加出库单");
-				appendModifyBtn(openModify, "修改出库单");
+				appendModifyBtn(openModify, "编辑出库单");
 				$("#pageloading").hide();
 				//默认查询全部数据 
 				toQuery();
@@ -104,7 +105,12 @@
 			function openModify() {
 				
 				var row = defGrid.getSelectedRow();
-				if(row.state!='31' || row.state!='32' || row.state!='30')
+				if (!row) {
+					$.ligerDialog.error('请先选择要编辑的生产领用单记录。','错误');
+					return;
+				}
+				alert(row.state);
+				if(row.state!='00' || row.state!='31' || row.state!='32' || row.state!='30')
 				{
 					$.ligerDialog.error('该单据已提交，不允许编辑！');
 					return;
@@ -235,7 +241,7 @@
 			<div position="center" id="a_center" title="入库单列表">
 				<div id="query_cond" class="fields">
 					<label>出库单号</label><input type="text" class="s-text txt-def" id="codeQ" />
-					<label>产品单号</label><input type="text" class="s-text txt-def" id="originQ" />
+					<label>生产单号</label><input type="text" class="s-text txt-def" id="originQ" />
 					<!-- <label>供应商</label><input type="text" class="s-text txt-def" id="partnerQ" />
 					 -->
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />

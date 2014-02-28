@@ -41,8 +41,8 @@
 						</property>
 						<property name="conditions">
 							<map>
-								<entry key="code" value="" />
-								<entry key="origin" value="" />
+								<entry key="code" value=":like(lr)" />
+								<entry key="origin" value=":like(lr)" />
 								<entry key="move_type" value="" />
 							</map>
 						</property>
@@ -58,11 +58,15 @@
 						</property>
 						<property name="conditions">
 							<map>
-								<entry key="code" value="" />
-								<entry key="origin" value="" />
+								<entry key="code" value=":like(lr)" />
+								<entry key="origin" value=":like(lr)" />
 								<entry key="move_type" value="" />
 							</map>
 						</property>
+						<property name="order" value="WriteDate"/>
+							 
+						<property name="desc" value="true"/>
+							 
 					</bean>
 				</entry>
 				<entry key="picking_nomal.query">
@@ -75,8 +79,8 @@
 						</property>
 						<property name="conditions">
 							<map>
-								<entry key="code" value="" />
-								<entry key="origin" value="" />
+								<entry key="code" value=":like(lr)" />
+								<entry key="origin" value=":like(lr)" />
 								<entry key="move_type" value="" />
 							</map>
 						</property>
