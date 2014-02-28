@@ -72,7 +72,9 @@ public class CmUserAction extends BaseAction {
 			} else {
 				user.put("status", "1");
 				user.put("date",
-						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ").format(new Date()));
+						new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+				user.put("sDate",
+						new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 			}
 		
 			response(user.toString());
