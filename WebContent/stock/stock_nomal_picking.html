@@ -16,25 +16,47 @@
 			$(function(){
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
- 						{display:'操作',isSort:false,width:160,render:function(rowdata,rowindex,value) {
+ 						{display:'操作',isSort:false,width:130,render:function(rowdata,rowindex,value) {
  							var h = "";
-							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> "; 
+							 // h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> "; 
 							 var row = defGrid.getRow(rowindex);
- 							 if(row.state == '00' || row.state == 'null')
- 	 							 {
-                               h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交发货</a> ";
-                               h += "<a href='javascript:void(0);'  class='opt-link' onclick='deleteRow(" + rowindex + ")'>删除</a> ";
- 	 							 } 
+ 							// if(row.state == '00' || row.state == 'null')
+ 	 							// {
+                             //  h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交发货</a> ";
+                             //  h += "<a href='javascript:void(0);'  class='opt-link' onclick='deleteRow(" + rowindex + ")'>删除</a> ";
+ 	 							// } 
+ 							 if(row.state == '32'||row.state == '31' ) 
+							  {
+								  h += "已审核  ";
+							  }
+							  else
+							 {
+							  h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitSH(" + rowindex + ")'>审核</a> ";
+							  }
+							
+	 							 if(row.state == '00' || row.state == 'null' ||row.state == '32')
+	 							 {
+                              h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交发货</a> ";
+							 
+                             // h += "<a href='javascript:void(0);'  class='opt-link' onclick='deleteRow(" + rowindex + ")'>删除</a> "; 
+								
+	 							 }
+	 							 else
+		 							 {
+	 								  h += "已提交发货  ";
+		 							 }
                         	return h; 
  						},frozen:true},
-                        {display:'单据状态',name:'state',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
-	                    {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
-	                    {display:'出库单号',name:'code',width:130,minWidth:100},
-	                    {display:'产品单号',name:'origin',width:130},
-	                    {display:'客户',name:'partner_id',render:sw_partner,width:190,align:'left'},
+                        {display:'单据状态',name:'state',width:70,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
+	                   // {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
+	                    {display:'修改时间',name:'writedate',width:130},
+	                    {display:'出库单号',name:'code',width:80,minWidth:150},
+	                    {display:'生产任务单号',name:'origin',width:80},
+	                    {display:'客户',name:'partner_id',render:sw_partner,width:130,align:'left'},
 			            {display:'出库日期',name:'pred_date',width:80},
 			            {display:'出库仓库',name:'warehose_id',render:sw_warehose,width:90,align:'left'},
-			            {display:'出货人',name:'move_in_user',render:sw_opt,align:'left'}
+			            {display:'出货人',name:'move_in_user',width:90,render:sw_opt,align:'left'},
+			            {display:'备注',width:240,name:'note'}
                     ],
                     pageSize:20,
                     usePager: true,
@@ -55,6 +77,7 @@
 				});
 				appendAddBtn(openDictDef, "添加出库单");
 				appendModifyBtn(openModify, "修改出库单");
+				appendDeleteBtn(deleteRow, "删除单据信息");
 				$("#pageloading").hide();
 				//默认查询全部数据 
 				toQuery();
@@ -80,7 +103,9 @@
 				var param = new Object();
 				param.code = $("#codeQ").val();
 				param.origin = $("#originQ").val();
+				param.state=$("#stateS").val();
                 param.move_type='04';
+                
 				var data = JSON.stringify(reqObj('q','stock.select.picking_nomal.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					defGrid.set({data: data['data']});
@@ -95,9 +120,20 @@
 			function openModify() {
 				var row = defGrid.getSelectedRow();
 				if (!row) {
+					$.ligerDialog.error('请先选择要编辑的生产领用单记录。','错误');
+					return;
+				}
+				var con=Contrast(row);
+				if(con =='false' )
+				{
+					$.ligerDialog.error('该单据不允许编辑！');
+					return;
+				}
+				if (!row) {
 					$.ligerDialog.error('请先选择入库单记录。','错误');
 					return;
 				}
+				
 				parent.f_addTab('modify_nomal','销售发货维护','./stock/new_stock_nomal_picking.html?o=m&code='.concat(row.code));
 			}
 			function openDictDef() {
@@ -119,11 +155,40 @@
 			function toPrint(rowid) {
 				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_nomal_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
 			}
+			 function submitSH(rowid)
+			 {
+				 var row = defGrid.getRow(rowid);
+					//$('#id').val(row.id);
+					// 待发货状态--- 31---
+					//$('#state').val(31);
+					var param1=new Object();
+					param1.id=row.id;
+					param1.state='32';
+					
+					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
+					
+						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+							if (data) {
+								if (parseInt(data['status']) > 0) {
+									//$.ligerDialog.success('提交成功');
+									//$("#submitToPick").hide();
+									toQuery();
+								} else {
+									$.ligerDialog.error('提交失败');
+								}
+							}
+						});
+			 }
 			//提交仓库发货
 			function submitToPick(rowid) {
-			   if(window.confirm('您确定要提交该项数据吗？')==true)
-		         
 				var row = defGrid.getRow(rowid);
+				if(row.state=='00')
+				{
+					$.ligerDialog.error('该单据未审核不能提交，请先审核！');
+					return;
+				}
+			   if(window.confirm('您确定要提交该项数据吗？')==true)
+			   {
 				//$('#id').val(row.id);
 				// 待发货状态--- 31---
 				//$('#state').val(31);
@@ -144,12 +209,25 @@
 							}
 						}
 					});
+			   }
 	        }
 			 function deleteRow(rowid) {
+				 var row = defGrid.getRow(rowid);
+				 alert(row.state);
+				 if(row.state=='32')
+					{
+					 $.ligerDialog.error('该单据已审核，不能删除！');
+						return;
+					}
+				 if(row.state=='31'||row.state=='30')
+					{
+					 $.ligerDialog.error('该单据已提交，不能删除！');
+						return;
+					}
 		            $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
 			            if (!r)
 				            return;
-		                var row = defGrid.getRow(rowid);
+		                
 		                if (row['__status'] !== 'add')
 		                	toDel(JSON.stringify(row));
 		                defGrid.deleteRow(rowid);
@@ -199,6 +277,7 @@
 					<label>产品单号</label><input type="text" class="s-text txt-def" id="originQ" />
 					<!-- <label>供应商</label><input type="text" class="s-text txt-def" id="partnerQ" />
 					 -->
+					 <label>单据状态</label><select id="stateS" param="Deliver" first="" ></select>
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
 					<input type="button" value="清空" onclick="toReset('#codeQ,#originQ,#partnerQ');" />
 				</div>

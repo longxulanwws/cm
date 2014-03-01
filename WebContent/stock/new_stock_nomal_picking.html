@@ -27,6 +27,8 @@
 				$("#d-menu").ligerToolBar({items:[
 				    {text:'保存',click:toAdd,icon:'save'},
 					{line:true},
+					 {text:'返回',click:toAddCl,icon:'save'},
+				     {line:true},
 				    {text:'清空',click:resetArea,icon:'clear'},
 					{line:true}
 				]});
@@ -106,6 +108,7 @@
 						$('#createUserS').val(data['uname']);
 						$('#createUserCodeS').val(data['uid']);
 						$("#createDateS").val(data['date']);
+						$("#WriteDateS").val(data['date']);
 					
 					}, null, false);
 				}
@@ -176,6 +179,15 @@
 				}
 			}
 			function queryProd() {}
+			  function toAddCl()
+			    {
+			    	///if (opt === 'm') {
+			    	parent.tabManager.removeTabItem("modify_nomal");
+			    //	}
+			    	//else{
+			    		parent.tabManager.removeTabItem("new_nomal");
+				    //	}
+				 }
 			function toAdd() {
 				if (pGrid.rows.length === 0) {
 					$.ligerDialog.error('请添加入库商品。','错误');
@@ -234,12 +246,16 @@
 					param.createdate = $("#createDateS").val();
 					param.state="00";
 					param.movetype='04';
+					param.flow_state="00";
+					//修改日期
+					param.writedate=$("#WriteDateS").val();
 					var data = JSON.stringify(reqObj('a','stock.add.picking.add',JSON.stringify(param)));
 					ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 						var picking = data['added'];
 						var rows = pGrid.rows;
 						for (var i = 0; i < rows.length; i++) {
-							rows[i].picking_id = picking['#stock.picking.code'];
+							rows[i].picking_id = picking['#stock.picking.out.code'];
+                            
 							rows[i].origin = $('#originS').val();
 							rows[i].type = '0';
 							rows[i].createuser = $('#createUserCodeS').val();
@@ -248,10 +264,19 @@
 							rows[i].company_id = '';
 							rows[i].busiorg_id = '';
 						}
+						$('#codeS').val(picking['#stock.picking.out.code']);
+						opt='m';
+						
 						var data = JSON.stringify(reqObj('ba','stock.add.stock_move',rows));
 						ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
 							$.ligerDialog.success('保存成功', '操作完成', function() {
-								parent.tabManager.removeTabItem("new_stockp");
+								if (data) {
+									//alert(parseInt(data['status']));
+									//if (parseInt(data['status']) > 0) {
+										//$("#saveQ").val(1);
+									//}
+								}
+								
 							});
 						});
 					});
@@ -314,7 +339,7 @@
 					<div class="line-div">
 						<div class="label-div"><label>出库单号</label></div>
 						<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
-						<div class="label-div"><label>销售订单号</label></div>
+						<div class="label-div"><label>销售任务单号</label></div>
 						<div class="in-div"><input type="text" id="originS" ltype="text" class="diff" /></div>
 					</div>
                 	<div class="line-div">

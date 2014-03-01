@@ -16,7 +16,7 @@
 			$(function(){
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
- 						{display:'操作',isSort:false,width:150,render:function(rowdata,rowindex,value) {
+ 						{display:'操作',isSort:false,width:130,render:function(rowdata,rowindex,value) {
  							var h = "";
  							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
  							 var row = defGrid.getRow(rowindex);
@@ -24,16 +24,16 @@
                                h += "待确认发货 "; 
                         	return h; 
                         },frozen:true},
-                        {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
-                        {display:'单据状态',name:'state',width:100,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
-                        {display:'修改时间',name:'writedate',width:150},
-	                    {display:'出库单号',name:'code',width:130,minWidth:60},
-	                    {display:'生产任务单号',name:'origin',width:130},
-			            //{display:'供应商',name:'partner_id',render:sw_partner,width:190,align:'left'},
+                        {display:'单据类型',name:'move_type',width:70,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
+                        {display:'单据状态',name:'state',width:60,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
+                        {display:'修改时间',name:'writedate',width:130},
+	                    {display:'出库单号',name:'code',width:150,minWidth:60},
+	                    {display:'销售任务单号',name:'origin',width:130},
+			            {display:'客户',name:'partner_id',render:sw_partner,width:150,align:'left'},
 			            //{display:'出库日期',name:'pred_date',width:80},
 			            {display:'出库仓库',name:'warehose_id',render:sw_warehose,width:90,align:'left'},
 			            {display:'发货人',name:'move_in_user',width:90,render:sw_opt,align:'left'},
-			            {display:'备注',name:'note'}
+			            {display:'备注',width:210,name:'note'}
                     ],
                     pageSize:20,
                     usePager: true,
@@ -90,7 +90,7 @@
 				//param.partner_id = $("#partnerQ").val();
 				param.state=$("#stateS").val();
 				
-                param.move_type='03';
+                param.move_type='04';
 				var data = JSON.stringify(reqObj('q','stock.select.picking.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					defGrid.set({data: data['data']});
@@ -129,7 +129,7 @@
 					$.ligerDialog.error('请先选择入库单记录。','错误');
 					return;
 				}
-				parent.f_addTab('deliver_stockp','发货维护','./stock/new_stock_deliver.html?o=m&code='.concat(row.code));
+				parent.f_addTab('deliver_stockpsale','销售发货维护','./stock/new_stock_deliver_sale.html?o=m&code='.concat(row.code));
 			}
 			var printWin;
 			function toPrint(rowid) {

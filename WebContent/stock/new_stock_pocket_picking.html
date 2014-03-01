@@ -27,7 +27,7 @@
 				$("#d-menu").ligerToolBar({items:[
 				    {text:'保存',click:toAdd,icon:'save'},
 					{line:true},
-					 {text:'保存并返回',click:toAddCl,icon:'save'},
+					 {text:'返回',click:toAddCl,icon:'save'},
 				     {line:true},
 				    {text:'清空',click:resetArea,icon:'clear'},
 					{line:true}
@@ -44,7 +44,10 @@
 			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}
 			            ,editor:{type:'select',data:getData('Brand'),valueField:'value',textField:'name'}
 			            },
-			            {display:'领用数量',name:'product_qty',width:100,id:'num',align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
+			            {display:'库存数量',name:'',width:100,align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
+			            {display:'已占用数量',name:'',width:100,align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
+			            {display:'可用数量',name:'',width:100,align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
+			            {display:'出库数量',name:'product_qty',width:100,align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}}
 			            //{display:'单价',name:'source_price_unit',align:'right',editor:{type:'float'},render:function(item){return parseFloat(item.source_price_unit).toFixed(2);}},
 			            //{display:'产成品单价',name:'price_unit',width:100,id:'price',align:'right',editor:{type:'float'},render:function(item){return parseFloat(item.price_unit).toFixed(2);}},
 			            //{display:'金额',name:'total',id:'total',width:100,align:'right',render:calcTotal}
@@ -180,9 +183,15 @@
 			function queryProd() {}
 		    function toAddCl()
 		    {
-			    toAdd('q');
+		    	///if (opt === 'm') {
+		    	parent.tabManager.removeTabItem("modify_pocket");
+		    //	}
+		    	//else{
+		    		parent.tabManager.removeTabItem("new_pocket");
+			    //	}
 			 }
 			function toAdd(q) {
+				
 				
 				if (pGrid.rows.length === 0) {
 					$.ligerDialog.error('请添加入库商品。','错误');
@@ -190,9 +199,6 @@
 				}
 				//pGrid.endEdit(c_row.rowindex);
 				if (opt === 'm') {
-
-					
-					
 					
 					var param = new Object();
 					//入库编号
@@ -220,10 +226,11 @@
 						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 							if (data) {
 								if (parseInt(data['status']) > 0) {
-									if(q=='q')
-										{
-									     parent.tabManager.removeTabItem("modify_pocket");
-										}
+									//if(q=='q')
+										//{
+									    // parent.tabManager.removeTabItem("modify_pocket");
+										//}
+									$.ligerDialog.success('保存成功');
 								} else {
 									$.ligerDialog.error('保存失败');
 								}
@@ -232,15 +239,15 @@
 						
 					
 				} else {
-					if($("#saveQ").val()=='1')
-					{
-						$.ligerDialog.error('该单据已保存，不可重复保存，请确认！');
-						return ;
-				    }
-					if(q=='q' && $("#saveQ").val()=='1')
-					{
-				     parent.tabManager.removeTabItem("new_pocket");
-					}
+					//if($("#saveQ").val()=='1')
+					//{
+					//	$.ligerDialog.error('该单据已保存，不可重复保存，请确认！');
+						//return ;
+				   // }//
+					//if(q=='q' && $("#saveQ").val()=='1')
+					//{
+				   //  parent.tabManager.removeTabItem("new_pocket");
+					//}
 				
 					pGrid.endEdit(c_row.rowindex);
 					var param = new Object();
@@ -259,6 +266,7 @@
 					param.createdate = $("#createDateS").val();
 					param.movetype="03";
 					param.state="00";
+					param.flow_state="00";
 					//修改日期
 					param.writedate=$("#WriteDateS").val();
 					
@@ -268,6 +276,7 @@
 						var rows = pGrid.rows;
 						for (var i = 0; i < rows.length; i++) {
 							rows[i].picking_id = picking['#stock.picking.out.code'];
+                            
 							rows[i].origin = $('#originS').val();
 							rows[i].type = '0';
 							rows[i].createuser = $('#createUserCodeS').val();
@@ -276,14 +285,17 @@
 							rows[i].company_id = '';
 							rows[i].busiorg_id = '';
 						}
+						$('#codeS').val(picking['#stock.picking.out.code']);
+						opt='m';
+						
 						var data = JSON.stringify(reqObj('ba','stock.add.stock_move',rows));
 						ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
 							$.ligerDialog.success('保存成功', '操作完成', function() {
 								if (data) {
 									//alert(parseInt(data['status']));
-									if (parseInt(data['status']) > 0) {
-										$("#saveQ").val(1);
-									}
+									//if (parseInt(data['status']) > 0) {
+										//$("#saveQ").val(1);
+									//}
 								}
 								
 							});
@@ -350,7 +362,7 @@
 					<div class="line-div">
 						<div class="label-div"><label>出库单号</label></div>
 						<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
-						<div class="label-div"><label>生产单号</label></div>
+						<div class="label-div"><label>生产任务单号</label></div>
 						<div class="in-div"><input type="text" id="originS" ltype="text" class="diff" /></div>
 					</div>
                 	<div class="line-div">

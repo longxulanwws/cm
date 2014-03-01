@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>新增入库单</title>
+		<title>收货</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -24,7 +24,9 @@
 					$(this).removeClass("l-textarea");
 				});
 				$("#d-menu").ligerToolBar({items:[
-				    {text:'退回',click:toAdd,icon:'save'},
+					{text:'保存',click:toAdd,icon:'save'},
+					{line:true},
+				    {text:'退回',icon:'save'},
 				    {line:true},
 				    {text:'确认收货',id:'quality',click:Quality,icon:'clear'},
 					{line:true}
@@ -101,6 +103,8 @@
 						$('#createUserS').val(data['uname']);
 						$('#createUserCodeS').val(data['uid']);
 						$("#createDateS").val(data['date']);
+						$('#WriteUserCodeS').val(data['uid']);
+						$("#WriteDateS").val(data['date']);
 					
 					}, null, false);
 				}
@@ -183,6 +187,39 @@
 				//pGrid.endEdit(c_row.rowindex);
 				if (opt === 'm') {
 					//编辑方式
+					//编辑方式
+					var param = new Object();
+					//入库编号
+					param.code=$('#codeS').val();
+					//采购编号
+					param.origin=$('#originS').val();
+					//供应商
+					param.partner_id=$('#partnerS').val();
+					//预计到货日期
+					param.pred_date=$('#predDateS').val();
+					//入库仓库
+					param.warehose_id=$('#warehouseS').val();
+					//moveInS
+					//$('#moveInS').val();
+					param.move_in_user=$('#moveInIdS').val();
+					//备注
+					param.note=$('#noteS').val();
+					//修改人
+					param.writeusercode=$('#WriteUserCodeS').val();
+					//修改日期
+					param.writedate=$('#WriteDateS').val();
+
+					 var param = JSON.stringify(reqObj('u','stock.update.stockpicking.update',JSON.stringify(param)));
+						//alert(param);
+						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+							if (data) {
+								if (parseInt(data['status']) > 0) {
+									$.ligerDialog.success('保存成功');
+								} else {
+									$.ligerDialog.error('保存失败');
+								}
+							}
+						});
 				} 
 				
 			}
@@ -244,7 +281,7 @@
 						<input type="hidden" id="warehouseS" />
 						</div>
 						<div class="label-div"><label>收货人</label></div>
-						<div class="in-div"><input type="text" id="moveInS" ltype="text" class="diff" readonly="readonly"/></div>
+						<div class="in-div"><input type="text" id="moveInS" ltype="combobox" class="diff" /></div>
 						<input type="hidden" id="moveInIdS" />
 					</div>
 					<div class="line-div" style="height:76px;">
