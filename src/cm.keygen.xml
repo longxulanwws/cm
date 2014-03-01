@@ -17,20 +17,30 @@
 						<property name="group" value="true" />
 					</bean>
 				</entry>
-				<entry key="stock.picking.rk.code">
-					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
-						<property name="rule" value="'RK'{date}{seq(4)}" />
-						<property name="circle" value="year" />
-						<property name="group" value="true" />
-					</bean>
-				</entry>
 				<entry key="stock.picking.out.code">
 					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
-						<property name="rule" value="'LY_CK'{date}{seq(4)}" />
+						<property name="rule" value="'CK'{date}{seq(4)}" />
+						<property name="circle" value="year" />
+						<property name="group" value="true" />
+					</bean>
+				</entry>	
+				<!-- 原材料入库单编号规则 -->			
+				<entry key="stock.picking.ycl.rk.code">
+					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+						<property name="rule" value="'YCLRK'{date}{seq(4)}" />
 						<property name="circle" value="year" />
 						<property name="group" value="true" />
 					</bean>
 				</entry>
+				<!-- 生产领用出库单编号规则 -->
+				<entry key="stock.picking.ly.ck.code">
+					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+						<property name="rule" value="'LYCK'{date}{seq(4)}" />
+						<property name="circle" value="year" />
+						<property name="group" value="true" />
+					</bean>
+				</entry>
+
 				<entry key="stock.product.id">
 					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
 						<property name="rule" value="{seq(6)}" />

@@ -310,3 +310,16 @@ function appendDeleteBtn(action, title) {
 $(function() {
 	selectInjector();
 });
+function Contrast(rowid)
+{
+	if(rowid.state.substr(0,1)=='0' && rowid.flow_state.substr(0,1)=='0')
+		{
+	return "ok";
+		}
+	else if(rowid.state.substr(0,1)==rowid.flow_state.substr(0,1))
+		{
+		return "false";
+		
+		}
+	
+}

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>生产领用</title>
+		<title>生产领用单办理</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -194,7 +194,7 @@
 				
 				
 				if (pGrid.rows.length === 0) {
-					$.ligerDialog.error('请添加入库商品。','错误');
+					$.ligerDialog.error('请添加商品。','错误');
 					return;
 				}
 				//pGrid.endEdit(c_row.rowindex);
@@ -239,15 +239,7 @@
 						
 					
 				} else {
-					//if($("#saveQ").val()=='1')
-					//{
-					//	$.ligerDialog.error('该单据已保存，不可重复保存，请确认！');
-						//return ;
-				   // }//
-					//if(q=='q' && $("#saveQ").val()=='1')
-					//{
-				   //  parent.tabManager.removeTabItem("new_pocket");
-					//}
+
 				
 					pGrid.endEdit(c_row.rowindex);
 					var param = new Object();
@@ -275,8 +267,7 @@
 						var picking = data['added'];
 						var rows = pGrid.rows;
 						for (var i = 0; i < rows.length; i++) {
-							rows[i].picking_id = picking['#stock.picking.out.code'];
-                            
+							rows[i].picking_id = picking['#stock.picking.ly.ck.code'];                            
 							rows[i].origin = $('#originS').val();
 							rows[i].type = '0';
 							rows[i].createuser = $('#createUserCodeS').val();
@@ -292,10 +283,7 @@
 						ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
 							$.ligerDialog.success('保存成功', '操作完成', function() {
 								if (data) {
-									//alert(parseInt(data['status']));
-									//if (parseInt(data['status']) > 0) {
-										//$("#saveQ").val(1);
-									//}
+
 								}
 								
 							});
@@ -313,7 +301,7 @@
 	        function deleteRow() {
 	        	var row = pGrid.getSelectedRow();
 				if (!row) {
-					$.ligerDialog.error('请先选择入库商品记录。','错误');
+					$.ligerDialog.error('请先选择商品记录。','错误');
 					return;
 				}
 	            $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
@@ -366,19 +354,13 @@
 						<div class="in-div"><input type="text" id="originS" ltype="text" class="diff" /></div>
 					</div>
                 	<div class="line-div">
-						<!--<div class="label-div"><label>供应商</label></div>
-						<div class="in-div">
-						<input type="text" id="partnerInS" ltype="combobox" class="diff" />
-						<input type="hidden" id="partnerS" />
-						</div>-->
+
 						<div class="label-div"> <label>出库日期</label></div>
 						<div class="in-div"><input type="text" id="predDateS" ltype="date" class="diff" /></div>
 					</div>
                 	<div class="line-div">
 						<div class="label-div"><label>出库仓库</label></div>
 						<div class="in-div">
-						<!--  <input type="text" id="warehouseS" ltype="text" class="diff" />
-						-->
 						<input type="text" id="warehouseInS" ltype="combobox" class="diff" />
 						<input type="hidden" id="warehouseS" />
 						</div>
@@ -408,7 +390,7 @@
 					</div>
 			    </form>
 			</div>
-			<div position="bottom" id="a_right" title="选择入库商品">
+			<div position="bottom" id="a_right" title="商品选择列表">
 				<div id="p-div"></div>
 			</div>
 		</div>

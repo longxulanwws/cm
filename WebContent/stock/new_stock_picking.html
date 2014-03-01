@@ -283,7 +283,7 @@
 					} else {
 						var picking = data['added'];
 						for (var i = 0; i < rows.length; i++) {
-							rows[i].picking_id = picking['#stock.picking.code'];
+							rows[i].picking_id = picking['#stock.picking.cg.rk.code'];
 							rows[i].origin = $('#originS').val();
 							rows[i].type = '0';
 							rows[i].createuser = $('#createUserCodeS').val();

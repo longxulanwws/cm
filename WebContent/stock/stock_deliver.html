@@ -16,7 +16,7 @@
 			$(function(){
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
- 						{display:'操作',isSort:false,width:150,render:function(rowdata,rowindex,value) {
+ 						{display:'操作',isSort:false,width:100,render:function(rowdata,rowindex,value) {
  							var h = "";
  							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
  							 var row = defGrid.getRow(rowindex);
@@ -24,16 +24,16 @@
                                h += "待确认发货 "; 
                         	return h; 
                         },frozen:true},
-                        {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
-                        {display:'单据状态',name:'state',width:100,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
-                        {display:'修改时间',name:'writedate',width:150},
-	                    {display:'出库单号',name:'code',width:130,minWidth:60},
+                        //{display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
+                        {display:'单据状态',name:'state',width:80,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
+                        {display:'修改时间',name:'writedate',width:130},
+	                    {display:'出库单号',name:'code',width:130},
 	                    {display:'生产任务单号',name:'origin',width:130},
 			            //{display:'供应商',name:'partner_id',render:sw_partner,width:190,align:'left'},
 			            //{display:'出库日期',name:'pred_date',width:80},
 			            {display:'出库仓库',name:'warehose_id',render:sw_warehose,width:90,align:'left'},
 			            {display:'发货人',name:'move_in_user',width:90,render:sw_opt,align:'left'},
-			            {display:'备注',name:'note'}
+			            {display:'备注',width:150,name:'note',align:'left'}
                     ],
                     pageSize:20,
                     usePager: true,

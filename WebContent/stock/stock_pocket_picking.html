@@ -49,16 +49,18 @@
                         {display:'单据状态',name:'state',width:70,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
                         //{display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
                         {display:'修改时间',name:'writedate',width:130},
-  	                    {display:'出库单号',name:'code',width:150,minWidth:60},
+  	                    {display:'出库单号',name:'code',width:130,minWidth:60},
 	                    {display:'生产任务单号',name:'origin',width:130},
 			            {display:'出库日期',name:'pred_date',width:80},
-			            {display:'出库仓库',name:'warehose_id',render:sw_warehose,width:90,align:'left'},
-			            {display:'出货人',name:'move_in_user',width:90,render:sw_opt,align:'left'},
+			            {display:'出库仓库',name:'warehose_id',render:sw_warehose,width:90},
+			            {display:'出货人',name:'move_in_user',width:90,render:sw_opt},
 			           // {display:'制单时间',name:'createdate',width:100},
-			            {display:'备注',width:210,name:'note'}
+			            {display:'备注',width:210,name:'note',align:'left'}
                     ],
                     pageSize:20,
                     usePager: true,
+                    dataAction:'server', 
+                    url: '../common/q.jsp', 
                     width:'100%',
                     height:'99%',
                     dataAction:'server',
@@ -73,9 +75,9 @@
                     param_movein:'user',
                     param_warehose:'base_point'
 				});
-				appendAddBtn(openDictDef, "添加出库单");
-				appendModifyBtn(openModify, "编辑出库单");
-				appendDeleteBtn(deleteRow, "删除单据信息");
+				appendAddBtn(openDictDef, "添加生产领用单");
+				appendModifyBtn(openModify, "编辑生产领用单");
+				appendDeleteBtn(deleteRow, "删除生产领用单");
 				$("#pageloading").hide();
 				//默认查询全部数据 
 				toQuery();
@@ -112,23 +114,20 @@
 				
 				var row = defGrid.getSelectedRow();
 				if (!row) {
-					$.ligerDialog.error('请先选择要编辑的生产领用单记录。','错误');
+					$.ligerDialog.error('请先选择生产领用单记录。','错误');
 					return;
 				}
 				var con=Contrast(row);
 				if(con =='false' )
 				{
-					$.ligerDialog.error('该单据不允许编辑！');
+					$.ligerDialog.error('已审核或已提交的单据不允许编辑！');
 					return;
 				}
-				if (!row) {
-					$.ligerDialog.error('请先选择入库单记录。','错误');
-					return;
-				}
-				parent.f_addTab('modify_pocket','生产领用出库单维护','./stock/new_stock_pocket_picking.html?o=m&code='.concat(row.code));
+				
+				parent.f_addTab('modify_pocket','生产领用单维护','./stock/new_stock_pocket_picking.html?o=m&code='.concat(row.code));
 			}
 			function openDictDef() {
-				parent.f_addTab('new_pocket','新增生产领用出库单','./stock/new_stock_pocket_picking.html');
+				parent.f_addTab('new_pocket','新增生产领用单','./stock/new_stock_pocket_picking.html');
 			}
 			function toModify(row) {
 				var url = "/cm/rbac/cmDict.do?m=u";
@@ -265,7 +264,7 @@
 	<body style="padding:0;">
 		<div id="pageloading"></div>  
 		<div id="layout_main">
-			<div position="center" id="a_center" title="入库单列表">
+			<div position="center" id="a_center" title="生产领用单列表">
 				<div id="query_cond" class="fields">
 					<label>出库单号</label><input type="text" class="s-text txt-def" id="codeQ" />
 					<label>生产任务单号</label><input type="text" class="s-text txt-def" id="originQ" />
