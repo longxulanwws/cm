@@ -184,8 +184,6 @@ public class CommonAction extends BaseAction {
 			}
 			reqData = null;
 		}
-	
-		
 	}
 	
 	@RequestMapping(params = "m=u")
@@ -217,6 +215,42 @@ public class CommonAction extends BaseAction {
 				response(returnJson);
 			} catch (IOException e) {
 				LOG.error("更新返回信息时发生错误", e);
+			}
+			reqData = null;
+		}
+	}
+	
+	@RequestMapping(params = "m=bu")
+	public void batchUpdate() {
+		JSONMap<String, Object> returnJson = new JSONMap<String, Object>(JSONMap.TYPE.OBJECT);
+		
+		try {
+			if (reqData == null)
+				reqData = getReqData();
+			// 查询实体名称
+			String entityName = reqData.getString("en");
+			if (entityName == null || SysCache.get(entityName) == null) {
+				returnJson.put("status", "-1");
+				returnJson.put("msg", "没有指定更新实体名称");
+			} else {
+				int r = baseDAO.batchUpdate(reqData.getJSONArray("data"), entityName);
+				if (r < reqData.getJSONArray("data").length()) {
+					r = -3;
+					returnJson.put("msg", "未能成功添加数据");
+				} else {
+					r = 1;
+				}
+				returnJson.put("status", r);
+			}
+		} catch (Exception e) {
+			LOG.error("执行插入操作发生错误", e);
+			returnJson.put("status", "-2");
+			returnJson.put("msg", "执行插入操作发生错误");
+		} finally {
+			try {
+				response(returnJson);
+			} catch (IOException e) {
+				LOG.error("插入返回信息时发生错误", e);
 			}
 			reqData = null;
 		}

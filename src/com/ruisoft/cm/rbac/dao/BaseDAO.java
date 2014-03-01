@@ -91,7 +91,7 @@ public class BaseDAO {
 	public List<JSONObject> query(JSONObject json, QueryEntity query)
 			throws Exception {
 		String sql = query.getSql(json);
-		LOG.debug("执行查询:" + sql);
+		LOG.info("执行查询:" + sql);
 		
 		if (tpl == null)
 			tpl = new JdbcTemplate(getDataSource());
@@ -181,7 +181,7 @@ public class BaseDAO {
 	
 	public JSONObject add(JSONObject values, AddEntity add) throws Exception {
 		String sql = add.getPreparedSQL();
-		LOG.debug("执行新增：" + sql);
+		LOG.info("执行新增：" + sql);
 		Map<String, Object> kv = getPreparedParamMap(values, add);
 
 		if (tpl == null)
@@ -253,6 +253,29 @@ public class BaseDAO {
 		return update(new JSONObject(values), SysCache.get(id, uEntity));
 	}
 	
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
+	public int batchUpdate(JSONArray values, UpdateEntity update) throws Exception {
+		String sql = update.getPreparedSQL();
+		LOG.debug("执行批量更新：" + sql);
+
+		if (tpl == null)
+			tpl = new JdbcTemplate(getDataSource());
+		
+		int counter = 0;
+		Object[] params = null;
+		for (int i = 0; i < values.length(); i++) {
+			params = getPreparedParam(values.getJSONObject(i), update);
+			LOG.info("执行批量更新：".concat(sql));
+			counter += tpl.update(sql, params);
+		}
+		
+		return counter;
+	}
+	
+	public int batchUpdate(JSONArray values, String id) throws Exception {
+		return batchUpdate(values, SysCache.get(id, uEntity));
+	}
+	
 	public int delete(JSONObject values, DeleteEntity delete) throws Exception {
 		String sql = null;
 		if (tpl == null)
@@ -260,11 +283,11 @@ public class BaseDAO {
 		
 		if (DMLEntity.COND.equals(delete.getDmlType())) {
 			sql = delete.getSql(values);
-			LOG.debug("执行删除：" + sql);
+			LOG.info("执行删除：" + sql);
 			return tpl.update(sql);
 		} else {
 			sql = delete.getPreparedSQL();
-			LOG.debug("执行删除：" + sql);
+			LOG.info("执行删除：" + sql);
 			Object[] params = getPreparedParam(values, delete);
 			return tpl.update(sql, params);
 		}
@@ -292,13 +315,13 @@ public class BaseDAO {
 		Object[] params = null;
 		for (int i = 0; i < values.length(); i++) {
 			if (DMLEntity.COND.equals(delete.getDmlType())) {
-				LOG.debug("执行批量删除：" + sql);
+				LOG.info("执行批量删除：" + sql);
 				sql = delete.getSql(values.getJSONObject(i));
 				counter += tpl.update(sql);
 			} else {
 				params = getPreparedParam(values.getJSONObject(i), delete);
 				sql = delete.getPreparedSQL();
-				LOG.debug("执行批量删除：" + sql);
+				LOG.info("执行批量删除：" + sql);
 				counter += tpl.update(sql, params);
 			}
 		}
