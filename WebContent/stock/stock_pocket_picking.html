@@ -20,23 +20,25 @@
  							 
  							var h = ""; 
 							var row = defGrid.getRow(rowindex);
-							  if(row.state == '32'||row.state == '31' ) 
+							// 单据状态 state      新建  00 ，未审核 10、已审核 20 、未提交30 、已提交 40
+							// 流程状态 flow_state 00 新建（制单） 10  入库质检  20 收货     30 发货  40 入库 50 出库
+							  if(row.state  >= '20' && row.flow_state >='00') 
 							  	{
 								  h += "已审核  ";
 							  	}
-							  if(row.state == '00' || row.state == 'null' )
+							  if( row.state <= '10' && row.flow_state =='00'   )
 							 	{
 							  		h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitSH(" + rowindex + ")'>审核</a> ";
 								}
 							
-	 						if(row.state == '00' || row.state == 'null' ||row.state == '32')
+	 						if(row.state == '20' && row.flow_state =='20')
  	 							 {
                                		h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交发货</a> ";
 								 }
-	 							 else
-		 							 {
-	 								  h += "已提交发货  ";
-		 							 }
+	 						if(row.state  >= '40' && row.flow_state >='30') 
+		 						{
+	 								h += "已提交发货  ";
+		 						}
 								
 							
                            	return h; 
@@ -141,6 +143,9 @@
 			function toPrint(rowid) {
 				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
 			}
+			/* 
+				单据审核处理
+			*/
 			 function submitSH(rowid)
 			 {
 				 var row = defGrid.getRow(rowid);
@@ -149,7 +154,16 @@
 					//$('#state').val(31);
 					var param1=new Object();
 					param1.id=row.id;
-					param1.state='32';
+					//param1.state='32';
+					
+					// 单据状态 是指 单据处于 新建  00 ，未审核 10、已审核 20 、未提交30 、已提交 40
+					param1.state="20";
+					// 单据流程状态 是指， 单据的流转去向，及业务流程中的各处理环节 如：生产领用单据   生产管理中制单、库存管理中的出库
+					// 00 新建（制单） 10  入库质检  20 收货     30 发货  40 入库 50 出库
+					/* 
+						单据审核,流程状态不变，业务部发生流转
+					*/ 
+					//param1.flow_state="03";
 					
 					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 					
@@ -165,11 +179,14 @@
 							}
 						});
 			 }
-			//提交仓库发货
+			
+			/* 
+				提交仓库发货,业务单据流转 
+			*/
 			function submitToPick(rowid) {
 				var row = defGrid.getRow(rowid);
 
-				if(row.state=='00')
+				if(row.state=='00'||row.state=='10')
 				{
 					$.ligerDialog.error('该单据未审核不能提交，请先审核！');
 					return;
@@ -182,6 +199,12 @@
 				var param1=new Object();
 				param1.id=row.id;
 				param1.state='31';
+				// 单据状态 是指 单据处于 新建  00 ，未审核 10、已审核 20 、未提交30 、已提交 40
+				param1.state="40";
+				// 单据流程状态 是指， 单据的流转去向，及业务流程中的各处理环节 如：生产领用单据   生产管理中制单、库存管理中的出库
+				// 00 新建（制单） 10  入库质检  20 收货     30 发货  40 入库  50 出库
+				// 生产领用出库，直接进入 出库环节
+				param1.flow_state="50";
 				
 				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 				
@@ -197,20 +220,18 @@
 						}
 					});
 	        }
+			/*	删除处理 
+			*/
 			 function deleteRow(rowid) {
 				 
 				 var row = defGrid.getSelectedRow();
-				// alert(row.state)
-				 if(row.state=='32')
+				 
+				 if(row.state >= '20')
 					{
-					 $.ligerDialog.error('该单据已审核，不能删除！');
+					 $.ligerDialog.error('该单据已审核或已提交，不能删除！');
 						return;
 					}
-				 if(row.state=='31'||row.state=='30')
-					{
-					 $.ligerDialog.error('该单据已提交，不能删除！');
-						return;
-					}
+				  
 		            $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
 			            if (!r)
 				            return;
@@ -220,6 +241,7 @@
 		                defGrid.deleteRow(rowid);
 		            })
 		        }
+			// 删除处理业务处理
 			 function toDel(row) {
 				
 				 var param = JSON.stringify(reqObj('d','stock.delete.stock_move.prckingid',row));
@@ -243,6 +265,7 @@
 						}
 					});
 			}
+			
 	    </script>
 		<style type="text/css">
 			label{margin: 5px 20px 5px 15px;}

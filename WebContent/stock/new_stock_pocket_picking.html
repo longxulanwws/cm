@@ -163,7 +163,7 @@
 			var curRow, selDialog;
 			function selectProduct() {
 				curRow = this;
-				selDialog = $.ligerDialog.open({height:600,width:800,isResize: true,url:'../sysmgt/product_query.html?o=s',title:'选择商品'});
+				selDialog = $.ligerDialog.open({height:500,width:800,isResize: true,url:'../sysmgt/product_query.html?o=s',title:'选择商品'});
 			}
 			
 			// 查询时数据值绑定  应该可以抽象为公共的功能
@@ -265,9 +265,7 @@
 					param.company = "";
 					param.dept = $("#deptCodeS").val();
 					param.busiorg = "";
-					param.name = "";
-					//单据性质 0 收货 1 发货
-					param.type = "1";
+					param.name = "";					
 					param.origin = $("#originS").val();
 					param.partner = $("#partnerS").val();
 					param.preddate = $("#predDateS").val();
@@ -276,16 +274,23 @@
 					param.note = $("#note").val();
 					param.createuser = $("#createUserCodeS").val();
 					param.createdate = $("#createDateS").val();
+					//修改日期
+					param.writedate=$("#WriteDateS").val();
 					
 					// 单据的状态处理
+					
+					//单据性质 0 收货 1 发货
+					param.type = "1";
 					// 指单据类型 ，03  生产领用单
 					param.movetype="03";
-					// 单据状态 是指 单据处于 新建，未审核、已审核、未提交、已提交
+					// 单据状态 state      新建  00 ，未审核 10、已审核 20 、未提交30 、已提交 40
+					// 流程状态 flow_state 00 新建（制单） 10  入库质检  20 收货     30 发货  40 入库 50 出库
+					 
 					param.state="00";
 					// 单据流程状态 是指， 单据的流转去向，及业务流程中的各处理环节 如：生产领用单据   生产管理中制单、库存管理中的出库
 					param.flow_state="00";
-					//修改日期
-					param.writedate=$("#WriteDateS").val();
+					
+ 
 					
 					// 新插入一条记录 出库单记录处理
 					var data = JSON.stringify(reqObj('a','stock.add.picking.add',JSON.stringify(param)));

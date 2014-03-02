@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>发货</title>
+		<title>生产领用出库</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -17,8 +17,19 @@
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
  						{display:'操作',isSort:false,width:100,render:function(rowdata,rowindex,value) {
- 							var h = "";
- 							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
+							
+							// 单据状态 state      新建  00 ，未审核 10、已审核 20 、未提交30 、已提交 40
+							// 流程状态 flow_state 00 新建（制单） 10  入库质检  20 收货     30 发货  40 入库 50 出库
+							
+							var h = "";
+							var row = defGrid.getRow(rowindex);
+							//先接收待办任务
+							if( row.state == '40' && row.flow_state =='50'   )
+							  {
+ 							    h += "<a href='javascript:void(0);' class='opt-link' onclick='toReceive(" + rowindex + ")'>待办接收</a> ";
+							  }
+							//再进行出库审核
+ 							h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
  							 var row = defGrid.getRow(rowindex);
  							 if(row.state == '31' )
                                h += "待确认发货 "; 
@@ -53,7 +64,7 @@
                     param_partner:'partner_list'
                    
 				});
-				appendModifyBtn(openModify, "修改入库单");
+				appendModifyBtn(openModify, "审核入库单");
 				$("#pageloading").hide();
 				//默认查询全部数据 
 				toQuery();
@@ -95,9 +106,10 @@
 					defGrid.set({data: data['data']});
 				});
 			}
-			function openDictDef() {
-				parent.f_addTab('new_stockp','新增入库单','./stock/new_stock_picking.html');
-			}
+// 			function openDictDef() {
+// 				parent.f_addTab('new_stockp','新增入库单','./stock/new_stock_picking.html');
+// 			}
+
 			function Quality(rowid) {
 			   if(window.confirm('您确定要提交该项数据吗？')==true)
 		         
