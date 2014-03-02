@@ -69,10 +69,10 @@
 			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}
 			            ,editor:{type:'select',data:getData('Brand'),valueField:'value',textField:'name'}
 			            },
-			            {display:'采购数量',name:'tar_product_qty',align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.tar_product_qty ? item.tar_product_qty : 0).toFixed(0);}},
-			            {display:'入库数量',name:'product_qty',id:'num',align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty ? item.product_qty : 0).toFixed(0);}},
-			            {display:'采购单价',name:'source_price_unit',align:'right',editor:{type:'float'},render:function(item){return parseFloat(item.source_price_unit ? item.source_price_unit : 0).toFixed(2);}},
-			            {display:'入库单价',name:'price_unit',id:'price',align:'right',editor:{type:'float'},render:function(item){return parseFloat(item.price_unit ? item.price_unit : 0).toFixed(2);}},
+			            {display:'采购数量',name:'tar_product_qty',align:'right',editor:{type:'string'},render:function(item){return item.tar_product_qty ? parseFloat(item.tar_product_qty).toFixed(0) : 0;}},
+			            {display:'入库数量',name:'product_qty',id:'num',align:'right',editor:{type:'string'},render:function(item){return item.product_qty ? parseFloat(item.product_qty).toFixed(0) : 0;}},
+			            {display:'采购单价',name:'source_price_unit',align:'right',editor:{type:'string'},render:function(item){return item.source_price_unit ? parseFloat(item.source_price_unit).toFixed(2) : 0;}},
+			            {display:'入库单价',name:'price_unit',id:'price',align:'right',editor:{type:'string'},render:function(item){return item.price_unit ? parseFloat(item.price_unit).toFixed(2) : 0;}},
 			            {display:'金额',name:'total',id:'total',align:'right',render:calcTotal}
                     ],
                     pageSize:20,

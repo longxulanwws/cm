@@ -225,8 +225,10 @@ function selectInjector() {
 						continue;
 				
 					opt += "<option value='" + param[i].value + "'";
-					if (param[i].value == selected)
+					if (param[i].value == selected) {
 						opt += " selected";
+						
+					}
 					opt += ">" + param[i].name + "</option>";
 				}
 			}

@@ -72,7 +72,7 @@
                     clickToEdit:false,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: toQuery,
-                    url: '/common/q.jsp',                   
+                    url: '../common/q.jsp',                   
                     //wws 2014-2-23 增加分页信息 start
                     onToFirst: function(item) {
                         toQuery(item, 1);
@@ -123,7 +123,7 @@
 					return;
 				}
 				resetArea();
-				
+
 				detailDialog = $.ligerDialog.open({
 					target:$("#detail"),
 					title:"新增商品",
@@ -194,7 +194,7 @@
 			}
 			function toSave() {
 				var valid = true;
-				$('*[id$="S"]').each(function(index, element) {
+				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
 					if (!$(this).rules()) return;
 					if (!$(element).valid()) {
 						valid = false;
@@ -309,15 +309,16 @@
                	<div class="line-div">					
 					<div class="label-div"> <label>规格型号</label></div>
 					<div class="in-div"><input type="text" id="specsS" ltype="text" class="required diff" /></div>
-					<div class="label-div"><label>计量单位</label></div>
-					<div class="in-div"><select id="uomIdS" param="uom" first="" ></select></div>
 				</div>
-               	<div class="line-div">					
+               	<div class="line-div">
+					<div class="label-div"><label>计量单位</label></div>
+					<div class="in-div"><select id="uomIdS" param="uom" first="" default="m"></select></div>
 					<div class="label-div"><label>单位精度</label></div>
-					<div class="in-div"><select id="uomPresS" param="uom_pres" first="" ></select></div>
-					<!--  <div class="label-div"><label>物料性质</label></div>
-					<div class="in-div" ><select id="typeS" param="product_category" default="1"></select></div>
-				-->
+					<div class="in-div"><select id="uomPresS" param="uom_pres" first=""></select></div>
+				</div>
+               	<div class="line-div">
+					<div class="label-div"><label>物料性质</label></div>
+					<div class="in-div" style="width:72%;"><select id="typeS" param="product_category" first=""></select></div>
 				</div>
 				<div class="line-div" style="height:76px;">
 					<div class="label-div"><label>备注</label></div>
