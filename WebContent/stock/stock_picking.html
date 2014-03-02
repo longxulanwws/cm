@@ -17,9 +17,17 @@
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
  						{display:'操作',isSort:false,width:90,render:function(rowdata,rowindex,value) {
-                        	var h = "";
- 							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
- 							 var row = defGrid.getRow(rowindex);
+ 							
+ 							var h = ""; 
+							var row = defGrid.getRow(rowindex);
+							  if(row.state == '32'||row.state == '31' ) 
+							  	{
+								  h += "已审核  ";
+							  	}
+							  if(row.state == '00' || row.state == 'null' )
+							 	{
+							  		h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitSH(" + rowindex + ")'>审核</a> ";
+								}
  							 if(row.state == '00' || row.state == 'null')
                                h += "<a href='javascript:void(0);' id='to_quality' class='opt-link' onclick='to_quality(" + rowindex + ")'>提交质检</a> "; 
                         	return h; 
@@ -34,7 +42,7 @@
 			            {display:'入库仓库',name:'warehose_id',render:sw_warehose,width:80},
 			            {display:'收货人',name:'move_in_user',render:sw_opt,width:80},
 			            {display:'入库异常',name:'move_in_user',width:80},
-			            {display:'备注',width:210,name:'note',align:'left'}
+			            {display:'备注',width:200,name:'note',align:'left'}
                     ],
                     pageSize:20,
                     usePager: true,

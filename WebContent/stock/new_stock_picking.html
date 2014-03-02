@@ -31,6 +31,8 @@
 				$("#d-menu").ligerToolBar({items:[
 				    {text:'保存',click:toAdd,icon:'save'},
 					{line:true},
+					{text:'返回',click:toBack,icon:'back'},
+				    {line:true},
 				    {text:'清空',click:resetArea,icon:'clear'},
 					{line:true}
 				]});
@@ -209,21 +211,30 @@
 					pGrid.set({data: data['data']});
 				}, null, false);
 			}
+			//界面的返回处理，实际是关闭标签处理。
+		    function toBack()
+		    {
+		    	//关闭修改界面
+		    	parent.tabManager.removeTabItem("modify_stockp");
+		       	//关闭新增界面
+		    	parent.tabManager.removeTabItem("new_stockp");
+			 }			
 			function toAdd() {
 				if (pGrid.rows.length === 0) {
 					$.ligerDialog.error('请添加入库商品。','错误');
 					return;
 				}
-				// 必输数据项校验控制
-				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
-					if (!$(this).rules()) return;
-					if (!$(element).valid()) {
-						valid = false;
-						return;
-					}
-				});
+// 				// 必输数据项校验控制
+// 				var valid = true;
+// 				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+// 					if (!$(this).rules()) return;
+// 					if (!$(element).valid()) {
+// 						valid = false;
+// 						return;
+// 					}
+// 				});
 				
-				if (!valid) return;
+// 				if (!valid) return;
 				
 				var param = {
 					origin:$("#originS").val(),
@@ -233,17 +244,20 @@
 					moveinuser:$("#moveInIdS").val(),
 					note:$("#note").val()
 				};
-
-				var en = 'stock.picking.ycl.rk.code', optType = 'a';
+				// 
+				var en = 'stock.add.yclrk.picking.add', optType = 'a';
 				if (opt === 'm') {
 					param.code = $('#codeS').val();
 					//修改人
 					param.writeusercode=$('#WriteUserCodeS').val();
 					//修改日期
 					param.writedate=$('#WriteDateS').val();
+					// 进行修改数据库处理
 					en = 'stock.update.picking';
+					// 操作类型为 update
 					optType = 'u';
 				} else {
+					// 新增时 数据处理
 					param.company = "";
 					param.dept = $("#deptCodeS").val();
 					param.busiorg = "";
@@ -287,15 +301,18 @@
 							var data_u = JSON.stringify(reqObj('bu','stock.update.stock_move', updateRows));
 							ajaxSubmit("/cm/rbac/cm.do?m=bu", data_u, function(result) {
 								$.ligerDialog.success('保存成功', '操作完成');
+								//保存后 将 opt 标记为 编辑状态， 再次点击保存时，进行单据修改的 update处理
+								opt='m';
 								br = result['status'];
 							});
 						} else {
 							br = 1;
 						}
-						//
+						//需要处理为 窗口不关闭
 						if (ar > 0 && br > 0)
 							parent.tabManager.removeTabItem("new_stockp");
 					} else {
+						// 新增处理
 						var picking = data['added'];
 						for (var i = 0; i < rows.length; i++) {
 							rows[i].picking_id = picking['#stock.picking.ycl.rk.code'];
@@ -310,9 +327,13 @@
 						var data = JSON.stringify(reqObj('ba','stock.add.stock_move',rows));
 						ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
 							$.ligerDialog.success('保存成功', '操作完成', function() {
+								//保存后 将 opt 标记为 编辑状态， 再次点击保存时，进行单据修改的 update处理
+								opt='m';
+								
 								parent.tabManager.removeTabItem("new_stockp");
 							});
 						});
+						
 					}
 				});
 			}
@@ -353,6 +374,7 @@
     				});
 	            });
 	        }
+	        
 			function calcTotal(item) {
 				if (item.product_qty && item.price_unit) {
 					return (parseFloat(item.product_qty) * parseFloat(item.price_unit)).toFixed(2);
@@ -386,8 +408,6 @@
                 	<div class="line-div">
 						<div class="label-div"><label>供应商</label></div>
 						<div class="in-div">
-						 <!-- <input type="text" id="partnerS" ltype="text" class="diff" />
-						-->
 						<input type="text" id="partnerInS" ltype="combobox" class="diff" />
 						<input type="hidden" id="partnerS" />
 						</div>
@@ -396,9 +416,7 @@
 					</div>
                 	<div class="line-div">
 						<div class="label-div"><label>入库仓库</label></div>
-						<div class="in-div">
-						<!--  <input type="text" id="warehouseS" ltype="text" class="diff" />
-						-->
+						<div class="in-div"> 
 						<input type="text" id="warehouseInS" ltype="combobox" class="diff" />
 						<input type="hidden" id="warehouseS" />
 						</div>
@@ -420,7 +438,7 @@
 						<div class="in-div"><input type="text" id="createUserS" ltype="text" class="readonly diff" readonly="readonly" /></div>
 						<input type="hidden" id="createUserCodeS" />
 							<input type="hidden" id="WriteUserCodeS" />
-								<input type="hidden" id="WriteDateS" />
+							<input type="hidden" id="WriteDateS" />
 					</div>
 					<div class="line-div">
 						<div class="label-div"><label>制单时间</label></div>

@@ -278,8 +278,11 @@
 					param.createdate = $("#createDateS").val();
 					
 					// 单据的状态处理
+					// 指单据类型 ，03  生产领用单
 					param.movetype="03";
+					// 单据状态 是指 单据处于 新建，未审核、已审核、未提交、已提交
 					param.state="00";
+					// 单据流程状态 是指， 单据的流转去向，及业务流程中的各处理环节 如：生产领用单据   生产管理中制单、库存管理中的出库
 					param.flow_state="00";
 					//修改日期
 					param.writedate=$("#WriteDateS").val();

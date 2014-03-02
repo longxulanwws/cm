@@ -17,9 +17,9 @@
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
  						{display:'操作',isSort:false,width:130,render:function(rowdata,rowindex,value) {
- 							var h = "";
-									
-							 var row = defGrid.getRow(rowindex);
+ 							 
+ 							var h = ""; 
+							var row = defGrid.getRow(rowindex);
 							  if(row.state == '32'||row.state == '31' ) 
 							  	{
 								  h += "已审核  ";
