@@ -28,9 +28,9 @@
 					$(this).removeClass("l-textarea");
 				});
 				$("#d-menu").ligerToolBar({items:[
-				    {text:'保存',click:toAdd,icon:'save'},
+				    {text:'保存',click:toSave,icon:'save'},
 					{line:true},
-					 {text:'返回',click:toAddCl,icon:'save'},
+					 {text:'返回',click:toBack,icon:'back'},
 				     {line:true},
 				    {text:'清空',click:resetArea,icon:'clear'},
 					{line:true}
@@ -40,26 +40,20 @@
 						{display:'商品编号',name:'code',width:160,editor:{type:'popup',onButtonClick:selectProduct},textField:'code',valueField:'categ_id'},
 	                    {display:'品名',name:'name',width:160},
 			            {display:'规格/型号',name:'specs',width:160,render:function(item){return paramRender(item,'product_specs',item.code);}},
-			          //  {display:'待入库数量',name:'tar_product_qty',align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.tar_product_qty).toFixed(0);}},
-			            {display:'单位',name:'product_uom',width:100,render:function(item){return paramRender(item,'uom',item.product_uom);}
-			            //,editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}
-			            },
+			        	{display:'单位',name:'product_uom',width:100,render:function(item){return paramRender(item,'uom',item.product_uom);}},
 			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}
-			            ,editor:{type:'select',data:getData('Brand'),valueField:'value',textField:'name'}
-			            },
+			            ,editor:{type:'select',data:getData('Brand'),valueField:'value',textField:'name'}},
 			            {display:'库存数量',name:'',width:100,align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
 			            {display:'已占用数量',name:'',width:100,align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
 			            {display:'可用数量',name:'',width:100,align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
 			            {display:'出库数量',name:'product_qty',width:100,align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}}
-			            //{display:'单价',name:'source_price_unit',align:'right',editor:{type:'float'},render:function(item){return parseFloat(item.source_price_unit).toFixed(2);}},
-			            //{display:'产成品单价',name:'price_unit',width:100,id:'price',align:'right',editor:{type:'float'},render:function(item){return parseFloat(item.price_unit).toFixed(2);}},
-			            //{display:'金额',name:'total',id:'total',width:100,align:'right',render:calcTotal}
-                    ],
+			        ],
                     pageSize:20,
                     usePager: true,
                     width:'100%',
                     height:'100%',
                     dataAction:'server',
+                    url: '../common/q.jsp', 
                     checkbox:false,
                     rownumbers:false,
                     fixedCellHeight:false,
@@ -67,17 +61,20 @@
                     enabledEdit:true,
                     clickToEdit:false,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
-                    onReload: queryProd,
+                    onReload: queryProd,                   
                     param_partner:'partner_list'
 				});
+               	//
 				appendAddBtn(function(){
 					pGrid.addEditRow();
-					c_row = pGrid.getRow(pGrid.rows.length - 1);
-// 					$(".l-grid2 .l-grid-body-inner").attr("style", "");
+					c_row = pGrid.getRow(pGrid.rows.length - 1); 
 				}, "添加商品明细");
+               	//  此功能还未实现
 				appendModifyBtn(function(){}, "编辑商品明细");
+               	//
 				appendDeleteBtn(deleteRow, "删除商品明细");
-
+				// 此段代码需增加 注释说明
+				
 				var str = window.location.toString().replace(/^[^?]+\??/, "");
 				if (str) {
 					var ss = str.split('&');
@@ -117,6 +114,8 @@
 					
 					}, null, false);
 				}
+				// 下拉框 数据 处理
+				
 				$("#moveInS").ligerComboBox({
 					autocomplete: true,
                     valueField:'value',
@@ -146,6 +145,7 @@
                         $("#partnerS").val(v);
                     }
 				});
+				
 				$("#pageloading").hide();
 			});
 			
@@ -155,14 +155,18 @@
 			var get_partner_list=new function () {
 				return getData('partner_list');
 			}
+			
 			function resetArea() {
 				toReset('#a_center input:not(.readonly),select,textarea');
 			}
+			// 选择商品 处理
 			var curRow, selDialog;
 			function selectProduct() {
 				curRow = this;
 				selDialog = $.ligerDialog.open({height:600,width:800,isResize: true,url:'../sysmgt/product_query.html?o=s',title:'选择商品'});
 			}
+			
+			// 查询时数据值绑定  应该可以抽象为公共的功能
 			function bindVal(data) {
 				if (data.Rows && data.Rows.length === 1) {
 					data = data.Rows[0];
@@ -175,7 +179,7 @@
 					$('#warehouseS').val(data.warehose_id);
 					$('#moveInS').val(paramRender(null,'user',data.move_in_user));
 					$('#moveInIdS').val(data.move_in_user);
-					$('#noteS').val(data.note);
+					$('#note').val(data.note);
 					$('#deptS').val(paramRender(null,'org_list',data.dept_id));
 					$('#deptCodeS').val(data.dept_id);
 					$('#createUserS').val(paramRender(null,'user',data.createuser));
@@ -183,24 +187,37 @@
 					$('#createDateS').val(data.createdate);
 				}
 			}
+			// 此功能是否需要实现？？？
 			function queryProd() {}
-		    function toAddCl()
+			
+			//界面的返回处理，实际是关闭标签处理。
+		    function toBack()
 		    {
-		    	///if (opt === 'm') {
+		    	//关闭修改界面
 		    	parent.tabManager.removeTabItem("modify_pocket");
-		    //	}
-		    	//else{
-		    		parent.tabManager.removeTabItem("new_pocket");
-			    //	}
+		       	//关闭新增界面
+		    	parent.tabManager.removeTabItem("new_pocket");
 			 }
-			function toAdd(q) {
+			// 保存业务处理
+			function toSave() {
 				
+// 				// 数据项校验控制
+// 				var valid = true;
+// 				// 数据项校验控制
+// 				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+// 					if (!$(this).rules()) return;
+// 					if (!$(element).valid()) {
+// 						valid = false;
+// 						return;
+// 					}
+// 				});
+// 				if (!valid) return;
 				
 				if (pGrid.rows.length === 0) {
 					$.ligerDialog.error('请添加商品。','错误');
 					return;
 				}
-				//pGrid.endEdit(c_row.rowindex);
+				//编辑时处理
 				if (opt === 'm') {
 					
 					var param = new Object();
@@ -214,25 +231,19 @@
 					param.pred_date=$('#predDateS').val();
 					//入库仓库
 					param.warehose_id=$('#warehouseS').val();
-					//moveInS
-					//$('#moveInS').val();
+				
 					param.move_in_user=$('#moveInIdS').val();
 					//备注
-					param.note=$('#noteS').val();
+					param.note=$('#note').val();
 					//修改人
 					param.writeusercode=$('#WriteUserCodeS').val();
 					//修改日期
 					param.writedate=$('#WriteDateS').val();
 
-					 var param = JSON.stringify(reqObj('u','stock.update.stockpicking.update',JSON.stringify(param)));
-						 
-						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+					var param = JSON.stringify(reqObj('u','stock.update.stockpicking.update',JSON.stringify(param)));
+					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 							if (data) {
 								if (parseInt(data['status']) > 0) {
-									//if(q=='q')
-										//{
-									    // parent.tabManager.removeTabItem("modify_pocket");
-										//}
 									$.ligerDialog.success('保存成功');
 								} else {
 									$.ligerDialog.error('保存失败');
@@ -242,29 +253,36 @@
 						
 					
 				} else {
-
-				
+					// 新增时处理
+					
 					pGrid.endEdit(c_row.rowindex);
+					
+					//处理 stock_picking 表
+					//生产领用  发货处理
 					var param = new Object();
 					param.company = "";
 					param.dept = $("#deptCodeS").val();
 					param.busiorg = "";
 					param.name = "";
-					param.type = "0";
+					//单据性质 0 收货 1 发货
+					param.type = "1";
 					param.origin = $("#originS").val();
 					param.partner = $("#partnerS").val();
 					param.preddate = $("#predDateS").val();
 					param.warehose = $("#warehouseS").val();
 					param.moveinuser = $("#moveInIdS").val();
-					param.note = $("#noteS").val();
+					param.note = $("#note").val();
 					param.createuser = $("#createUserCodeS").val();
 					param.createdate = $("#createDateS").val();
+					
+					// 单据的状态处理
 					param.movetype="03";
 					param.state="00";
 					param.flow_state="00";
 					//修改日期
 					param.writedate=$("#WriteDateS").val();
 					
+					// 新插入一条记录 出库单记录处理
 					var data = JSON.stringify(reqObj('a','stock.add.picking.add',JSON.stringify(param)));
 					ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 						var picking = data['added'];
@@ -282,9 +300,11 @@
 						}
 						//保存后显示单据编号处理
 						$('#codeS').val(picking_Code);
-						//
+						
+						//保存后 将 opt 标记为 编辑状态， 再次点击保存时，进行单据修改的 update处理
 						opt='m';
 						
+						// 商品明细列表的 新增处理
 						var data = JSON.stringify(reqObj('ba','stock.add.stock_move',rows));
 						ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
 							$.ligerDialog.success('保存成功', '操作完成', function() {
@@ -304,6 +324,7 @@
 	        function cancelEdit(rowid) { 
 	        	pGrid.cancelEdit(rowid);
 	        }
+	        //删除商品列数据处理
 	        function deleteRow() {
 	        	var row = pGrid.getSelectedRow();
 				if (!row) {
@@ -334,6 +355,7 @@
     				});
 	            });
 	        }
+	        // 此项代码的含义？？？ 是否还需要？？
 			function calcTotal(item) {
 				if (item.product_qty && item.price_unit) {
 					return (parseFloat(item.product_qty) * parseFloat(item.price_unit)).toFixed(2);
@@ -377,7 +399,7 @@
 					<div class="line-div" style="height:76px;">
 						<div class="label-div"><label>备注</label></div>
 						<div class="in-div" style="width:72%;">
-							<textarea cols="73" rows="3" id="noteS"></textarea>
+							<textarea cols="80" rows="2" id="note"></textarea>
 						</div>
 					</div>
 					<div class="line-div">

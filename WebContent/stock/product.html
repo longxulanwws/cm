@@ -193,6 +193,7 @@
 				isU = true;
 			}
 			function toSave() {
+				// 比数据项校验控制
 				var valid = true;
 				// 比数据项校验控制
 				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
@@ -205,6 +206,7 @@
 				if (!valid) return;
 				
 				var param = new Object();
+				
 				param.type = $("#typeS").val();
 				param.categ_id = pNode;
 				param.name = $("#nameS").val();

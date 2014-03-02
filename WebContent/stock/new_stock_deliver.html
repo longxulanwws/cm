@@ -30,7 +30,7 @@
 				    {line:true},
 				    {text:'确认发货',id:'quality',click:Quality,icon:'ok'},
 					{line:true},
-				    {text:'返回',icon:'back'},
+				    {text:'返回',click:toBack,icon:'back'},
 				    {line:true}
 				]});
                	pGrid = $("#p-div").ligerGrid({
@@ -149,6 +149,13 @@
 				}
 			}
 			function queryProd() {}
+			
+		    function toBack()
+		    {
+		        //关闭 出库单维护界面
+		    	parent.tabManager.removeTabItem("deliver_stockp"); 
+			   
+			 }
 			function toAdd() {
 				if (pGrid.rows.length === 0) {
 					$.ligerDialog.error('请添加入库商品。','错误');
@@ -301,7 +308,7 @@
 					</div>
 			    </form>
 			</div>
-			<div position="bottom" id="a_right" title="商品列表">
+			<div position="bottom" id="a_right" title="出库商品列表">
 				<div id="p-div"></div>
 			</div>
 		</div>
