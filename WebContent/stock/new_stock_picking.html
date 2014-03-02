@@ -8,6 +8,9 @@
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
 		<script src="../js/jquery.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
+		<script src="../js/validate/messages_zh.js" type="text/javascript"></script>
 		<script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
 		<script src="../js/common.js" type="text/javascript"></script>
 		<script type="text/javascript">
@@ -192,7 +195,7 @@
 					$('#warehouseS').val(data.warehose_id);
 					$('#moveInS').val(paramRender(null,'user',data.move_in_user));
 					$('#moveInIdS').val(data.move_in_user);
-					$('#noteS').val(data.note);
+					$('#note').val(data.note);
 					$('#deptS').val(paramRender(null,'org_list',data.dept_id));
 					$('#deptCodeS').val(data.dept_id);
 					$('#createUserS').val(paramRender(null,'user',data.createuser));
@@ -211,16 +214,27 @@
 					$.ligerDialog.error('请添加入库商品。','错误');
 					return;
 				}
+				// 必输数据项校验控制
+				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+					if (!$(this).rules()) return;
+					if (!$(element).valid()) {
+						valid = false;
+						return;
+					}
+				});
+				
+				if (!valid) return;
+				
 				var param = {
 					origin:$("#originS").val(),
 					partner:$("#partnerS").val(),
 					preddate:$("#predDateS").val(),
 					warehose:$("#warehouseS").val(),
 					moveinuser:$("#moveInIdS").val(),
-					note:$("#noteS").val()
+					note:$("#note").val()
 				};
 
-				var en = 'stock.add.picking.add', optType = 'a';
+				var en = 'stock.picking.ycl.rk.code', optType = 'a';
 				if (opt === 'm') {
 					param.code = $('#codeS').val();
 					//修改人
@@ -278,12 +292,13 @@
 						} else {
 							br = 1;
 						}
+						//
 						if (ar > 0 && br > 0)
 							parent.tabManager.removeTabItem("new_stockp");
 					} else {
 						var picking = data['added'];
 						for (var i = 0; i < rows.length; i++) {
-							rows[i].picking_id = picking['#stock.picking.cg.rk.code'];
+							rows[i].picking_id = picking['#stock.picking.ycl.rk.code'];
 							rows[i].origin = $('#originS').val();
 							rows[i].type = '0';
 							rows[i].createuser = $('#createUserCodeS').val();
@@ -394,7 +409,7 @@
 					<div class="line-div" style="height:50px;">
 						<div class="label-div"><label>备注</label></div>
 						<div class="in-div" style="width:72%;">
-							<textarea cols="73" rows="2" id="noteS"></textarea>
+							<textarea cols="73" rows="2" id="note"></textarea>
 						</div>
 					</div>
 					<div class="line-div">
@@ -408,7 +423,7 @@
 								<input type="hidden" id="WriteDateS" />
 					</div>
 					<div class="line-div">
-						<div class="label-div"><label>制单日期</label></div>
+						<div class="label-div"><label>制单时间</label></div>
 						<div class="in-div"><input type="text" id="createDateS" ltype="text" class="readonly diff" readonly="readonly" /></div>
 					</div>
 			    </form>

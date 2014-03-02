@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>采购入库单</title>
+		<title>原材料入库</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -25,18 +25,21 @@
                         	return h; 
                         },frozen:true},
                         {display:'单据状态',name:'state',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
-                        {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
+                        //{display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
+                        {display:'修改时间',name:'writedate',width:130},
                         {display:'入库单号',name:'code',width:130,minWidth:60},
 	                    {display:'采购申请单号',name:'origin',width:130},
 			            {display:'供应商',name:'partner_id',render:sw_partner,width:190,align:'left'},
 			            {display:'预计到货日期',name:'pred_date',width:80},
-			            {display:'入库仓库',name:'warehose_id',render:sw_warehose,width:90,align:'left'},
-			            {display:'收货人',name:'move_in_user',render:sw_opt,width:90,align:'left'}
+			            {display:'入库仓库',name:'warehose_id',render:sw_warehose,width:80},
+			            {display:'收货人',name:'move_in_user',render:sw_opt,width:80},
+			            {display:'入库异常',name:'move_in_user',width:80},
+			            {display:'备注',width:210,name:'note',align:'left'}
                     ],
                     pageSize:20,
                     usePager: true,
                     dataAction:'server',
-                    url: '/common/q.jsp',
+                    url: '../common/q.jsp',
                     width:'100%',
                     height:'99%',
                     checkbox:false,
@@ -77,8 +80,8 @@
                     param_warehose:'base_point',
                     param_partner:'partner_list'
 				});
-				appendAddBtn(openDictDef, "添加入库单");
-				appendModifyBtn(openModify, "修改入库单");
+				appendAddBtn(openDictDef, "添加原材料入库单");
+				appendModifyBtn(openModify, "编辑原材料入库单");
 				$("#pageloading").hide();
 				//默认查询全部数据 
 				toQuery();
@@ -127,7 +130,7 @@
 				});
 			}
 			function openDictDef() {
-				parent.f_addTab('new_stockp','新增采购入库单','./stock/new_stock_picking.html');
+				parent.f_addTab('new_stockp','新增原材料入库单','./stock/new_stock_picking.html');
 			}
 			function to_quality(rowid) {
 			   if(window.confirm('您确定要提交该项数据吗？')==true)
@@ -157,10 +160,10 @@
 			function openModify() {
 				var row = defGrid.getSelectedRow();
 				if (!row) {
-					$.ligerDialog.error('请先选择入库单记录。','错误');
+					$.ligerDialog.error('请先选择原材料入库单记录。','错误');
 					return;
 				}
-				parent.f_addTab('modify_stockp','入库单维护','./stock/new_stock_picking.html?o=m&code='.concat(row.code));
+				parent.f_addTab('modify_stockp','原材料入库单维护','./stock/new_stock_picking.html?o=m&code='.concat(row.code));
 			}
 			function toModify(row) {
 				var url = "/cm/rbac/cmDict.do?m=u";
@@ -196,7 +199,7 @@
 	<input type="hidden" id="state" />
 		<div id="pageloading"></div>  
 		<div id="layout_main">
-			<div position="center" id="a_center" title="入库单列表">
+			<div position="center" id="a_center" title="原材料入库单列表">
 				<div id="query_cond" class="fields">
 					<label>入库单</label><input type="text" class="s-text-qCond txt-def" id="codeQ" />
 					<label>采购申请单</label><input type="text" class="s-text-qCond txt-def" id="originQ" />

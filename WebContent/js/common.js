@@ -325,3 +325,17 @@ function Contrast(rowid)
 		}
 	
 }
+//必输数据项校验控制
+function validateCon()
+{
+	// 必输数据项校验控制
+	$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+		if (!$(this).rules()) return;
+		if (!$(element).valid()) {
+			valid = false;
+			return;
+		}
+	});
+	
+	if (!valid) return;
+}
