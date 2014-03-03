@@ -106,7 +106,7 @@
 						$("#createDateS").val(data['date']);
 					}, null, false);
 				}
-				$("#moveInS").ligerComboBox({
+				var moveInBox = $("#moveInS").ligerComboBox({
 					autocomplete: true,
                     valueField:'value',
                     textField:'name',
@@ -116,7 +116,7 @@
                     }
 				});
 				$("#warehouseInS").ligerComboBox({
-					autocomplete: true,
+					autocomplete: false,
                     valueField:'value',
                     textField:'name',
                     data:get_warehose_list,
@@ -201,21 +201,20 @@
 		    	parent.tabManager.removeTabItem("new_stockp");
 			}			
 			function toAdd() {
+				// 必输数据项校验控制
+				var valid = true;
+				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+					if (!$(this).rules()) return;
+					if (!$(element).valid()) {
+						valid = false;
+						return;
+					}
+				});
+				if (!valid) return;
 				if (pGrid.rows.length === 0) {
 					$.ligerDialog.error('请添加入库商品。','错误');
 					return;
 				}
-// 				// 必输数据项校验控制
-// 				var valid = true;
-// 				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
-// 					if (!$(this).rules()) return;
-// 					if (!$(element).valid()) {
-// 						valid = false;
-// 						return;
-// 					}
-// 				});
-				
-// 				if (!valid) return;
 				
 				var param = {
 					origin:$("#originS").val(),
@@ -375,30 +374,30 @@
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">
 				<div id="d-menu" class="toolbar"></div>
 				<div style="height:25px;"></div>
-				<form name="basic-form" method="post" id="basic_form">
+				<form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
 					<div class="line-div">
 						<div class="label-div"><label>入库单号</label></div>
 						<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
 						<div class="label-div"><label>采购申请单号</label></div>
-						<div class="in-div"><input type="text" id="originS" ltype="text" class="diff" /></div>
+						<div class="in-div"><input type="text" id="originS" ltype="text" class="required diff" /></div>
 					</div>
                 	<div class="line-div">
 						<div class="label-div"><label>供应商</label></div>
 						<div class="in-div">
-						<input type="text" id="partnerInS" ltype="combobox" class="diff" />
+						<input type="text" id="partnerInS" ltype="combobox" class="required diff" />
 						<input type="hidden" id="partnerS" />
 						</div>
 						<div class="label-div"> <label>预计到货日期</label></div>
-						<div class="in-div"><input type="text" id="predDateS" ltype="date" class="diff" /></div>
+						<div class="in-div"><input type="text" id="predDateS" ltype="date" class="required diff" /></div>
 					</div>
                 	<div class="line-div">
 						<div class="label-div"><label>入库仓库</label></div>
 						<div class="in-div"> 
-						<input type="text" id="warehouseInS" ltype="combobox" class="diff" />
+						<input type="text" id="warehouseInS" ltype="combobox" class="required diff" />
 						<input type="hidden" id="warehouseS" />
 						</div>
 						<div class="label-div"><label>收货人</label></div>
-						<div class="in-div"><input type="text" id="moveInS" ltype="combobox" class="diff" /></div>
+						<div class="in-div"><input type="text" id="moveInS" ltype="combobox" class="required diff" /></div>
 						<input type="hidden" id="moveInIdS" />
 					</div>
 					<div class="line-div" style="height:50px;">
