@@ -18,15 +18,14 @@
                     columns:[
  						{display:'操作',isSort:false,width:100,render:function(rowdata,rowindex,value) {
 							
-							// 单据状态 state      新建  00 ，未审核 10、已审核 20 、未提交30 、已提交 40
-							// 流程状态 flow_state 00 新建（制单） 10  入库质检  20 收货     30 发货  40 入库 50 出库 60 入库完成  70 出库完成
-							
+ 							// 单据状态 state      00 新建  10 未审核 20 已审核 30 未提交 40已提交  50 已驳回
+ 							// 流程状态 flow_state 00 新建（制单） 10 入库质检   20 收货、发货   30 入、出库确认   40 打印出入库单   50 入、出库完成							
 							var h = "";
 							var row = defGrid.getRow(rowindex);
 							//先接收待办任务
 							if( row.state == '40' && row.flow_state =='50'   )
 							  {
- 							    h += "<a href='javascript:void(0);' class='opt-link' onclick='toReceive(" + rowindex + ")'>待办接收</a> ";
+ 							    h += "<a href='javascript:void(0);' class='opt-link' onclick='toReceive(" + rowindex + ")'>接收出库待办</a> ";
 							  }
 							//再进行出库审核
 							

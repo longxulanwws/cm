@@ -24,15 +24,15 @@
 					$(this).removeClass("l-textarea");
 				});
 				$("#d-menu").ligerToolBar({items:[
-				    {text:'保存',click:toAdd,icon:'save'},
+				    {text:'保存',id:'saveB',click:toSave,icon:'save'},
 				    {line:true},
-				    {text:'驳回修改',click:toDismiss,icon:'prev'},
+				    {text:'驳回修改',id:'dismissB',click:toDismiss,icon:'prev'},
 				    {line:true},
-				    {text:'打印出库单',id:'quality',click:toPrint,icon:'print'},
+				    {text:'打印出库单',id:'printB',click:toPrint,icon:'print'},
 					{line:true},
-				    {text:'确认出库',id:'quality',click:toConfirm,icon:'ok'},
+				    {text:'确认出库',id:'confirmB',click:toConfirm,icon:'ok'},
 					{line:true},
-				    {text:'返回',click:toBack,icon:'back'},
+				    {text:'返回',id:'backB',click:toBack,icon:'back'},
 				    {line:true}
 				]});
                	pGrid = $("#p-div").ligerGrid({
@@ -41,10 +41,7 @@
 	                    {display:'品名',name:'name',width:150},
 			            {display:'规格/型号',name:'specs',width:150,render:function(item){return paramRender(item,'product_specs',item.code);}},
 			            {display:'单位',name:'product_uom',width:90,render:function(item){return paramRender(item,'uom',item.product_uom);},editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}},
-			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}
-			            ,editor:{type:'select',data:getData('Brand'),valueField:'value',textField:'name'}
-			            },
-			            //{display:'采购数量',name:'tar_product_qty',width:90,align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.tar_product_qty).toFixed(0);}},
+			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);},editor:{type:'select',data:getData('Brand'),valueField:'value',textField:'name'}},
 			            {display:'数量',name:'product_qty',width:90,id:'num',align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
 			           
                     ],
@@ -126,8 +123,8 @@
 			function bindVal(data) {
 				if (data.Rows && data.Rows.length === 1) {
 					data = data.Rows[0];
-					$('#idS').val(data.id);
-					$('#stateS').val(data.state);
+					$('#idH').val(data.id);
+					$('#stateH').val(data.state);
 					$('#codeS').val(data.code);
 					$('#originS').val(data.origin);
 					$('#partnerInS').val(paramRender(null,'partner_list',data.partner_id));
@@ -145,6 +142,7 @@
 					$('#createDateS').val(data.createdate);
 				}
 			}
+			
 			function queryProd() {}
 			
 		    function toBack()
@@ -153,13 +151,12 @@
 		    	parent.tabManager.removeTabItem("deliver_stockp"); 
 			   
 			 }
-			function toAdd() {
+			function toSave() {
 				if (pGrid.rows.length === 0) {
 					$.ligerDialog.error('请添加入库商品。','错误');
 					return;
 				}
 				
-				//pGrid.endEdit(c_row.rowindex);
 				if (opt === 'm') {
 					//编辑方式
 					var param = new Object();
@@ -183,90 +180,81 @@
 					//修改日期
 					param.writedate=$('#WriteDateS').val();
 
-					 var param = JSON.stringify(reqObj('u','stock.update.stockpicking.update',JSON.stringify(param)));
-						//alert(param);
-						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
-							if (data) {
-								if (parseInt(data['status']) > 0) {
-									$.ligerDialog.success('保存成功');
-								} else {
-									$.ligerDialog.error('保存失败');
-								}
-							}
-						});
+					upPickingDel(param,'stock.update.stockpicking.update','保存成功','保存失败');					 
 				} 
 				
 			}
+			
+			// 单据状态 state      00 新建  10 未审核 20 已审核 30 未提交 40已提交  50 已驳回
+			// 流程状态 flow_state 00 新建（制单） 10 入库质检   20 收货、发货   30 入、出库确认   40 打印出入库单   50 入、出库完成
 			// 驳回修改处理，即 退回到 
 			function toDismiss()
 			{
 				var param=new Object();
-				param.id=$('#idS').val();
-				// 单据状态 state      新建  00 ，未审核 10、已审核 20 、未提交30 、已提交 40     已驳回 60
-				// 流程状态 flow_state 00 新建（制单） 10  入库质检  20 收货     30 发货  40 入库 50 出库 60 入库完成  70 出库完成
+				param.id=$('#idH').val();
 				// 驳回后状态被修改
-				param.state="60";
-				
-				upPickingDel(param,'驳回成功','驳回失败');
-				
-				$('#stateS').val(60);
+				param.state="50";
+				upPickingDel(param,'stock.update.picking_state.update','驳回成功','驳回失败');
+				$('#stateH').val(50);
 			}
+			//确认出库
+			function toConfirm() {
+									
+				if($('#stateH').val()=='40')
+					$.ligerDialog.error('已确认出库，不能重复出库确认，请确认！');
+				else					
+				   if(window.confirm('您确定要提交该项数据吗？')==true)
+			         
+				var param=new Object();
+					param.id=$('#idH').val();
+					//已提交 40
+					param.state='40';
+					// 确认出库后流程为出库完成
+					param.flow_state='50';
+                
+					upPickingDel(param,'stock.update.picking_state.update','确认出库成功','确认出库失败');
+					//已提交 40
+					$('#stateH').val('40');
+					$('#flow_stateH').val('50');
+		        }
+			//打印处理
+			var printWin;
+			function toPrint(rowid) {
+				if(!$('#stateH').val()=='20'){
+					$.ligerDialog.error('该单据未审核，不能打印，请确认！');
+					return;					
+				}
+				
+				var printFlag =false
+				if(!$('#flow_stateH').val() >='40'){
+					if(window.confirm('该单据已打印过，请确认是否需要第二次打印？')==true)
+				    printFlag=true;
+// 					$.ligerDialog.error('已打印请勿重复打印，不能打印，请确认！');
+// 					return;					
+				}else{
+					printFlag=true;
+				}
+				
+				if(printFlag){
+					printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+				}
+			}			
 			
-			function upPickingDel(param,successInfo,errorInfo)
-			{
+			function upPickingDel(param,upSqlConID,successInfo,errorInfo){
 				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param)));
 					
 					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 						if (data) {
-							if (parseInt(data['status']) > 0) {
-								
+							if (parseInt(data['status']) > 0) {								
 								$.ligerDialog.success(successInfo);
-
-							} else {
-								
+							} else {								
 								$.ligerDialog.error(errorInfo);
 							}
 						}
 					});
 			}
-			//确认出库
-			function toConfirm() {
-				if($('#stateS').val()=='60')
-					$.ligerDialog.error('该单据已驳回，不能出库确认，请确认！');
-				
-				if($('#stateS').val()=='30')
-					$.ligerDialog.error('已出库完成，不能重复出库确认，请确认！');
-				else
-					
-				   if(window.confirm('您确定要提交该项数据吗？')==true)
-			         
-				var param1=new Object();
-				param1.id=$('#idS').val();
-					
-					// 单据状态 state      新建  00 ，未审核 10、已审核 20 、未提交30 、已提交 40
-					// 流程状态 flow_state 00 新建（制单） 10  入库质检  20 收货     30 发货  40 入库 50 出库 60 入库完成  70 出库完成
-					// 确认出库后 出库完成
-					param1.flow_state="70";
-					
-					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
-					
-						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
-							if (data) {
-								if (parseInt(data['status']) > 0) {
-									$('#stateS').val(30);
-									$.ligerDialog.success('提交成功');
-									//$("#quality").hide();
-									//toQuery();
-								} else {
-									$.ligerDialog.error('提交失败');
-								}
-							}
-						});
-		        }
-			var printWin;
-			function toPrint(rowid) {
-				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
-			}
+
+
 	        function beginEdit(rowid) { 
 	        	pGrid.beginEdit(rowid);
 	        }
@@ -283,6 +271,7 @@
 	                pGrid.deleteRow(rowid);
 	            })
 	        }
+	        
 			function calcTotal(item) {
 				if (item.product_qty && item.price_unit) {
 					return (parseFloat(item.product_qty) * parseFloat(item.price_unit)).toFixed(2);
@@ -295,8 +284,9 @@
 		</style>
 	</head>
 	<body style="padding:0;">
-	<input  type="hidden" id="idS"/>
-	<input  type="hidden" id="stateS"/>
+	<input  type="hidden" id="idH"/>
+	<input  type="hidden" id="stateH"/>
+	<input  type="hidden" id="flow_stateH"/>
 		<div id="pageloading"></div>  
 		<div id="layout_main">
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">
@@ -337,8 +327,8 @@
 						<div class="label-div"><label>出库人</label></div>
 						<div class="in-div"><input type="text" id="createUserS" ltype="text" class="readonly diff" readonly="readonly" /></div>
 						<input type="hidden" id="createUserCodeS" />
-							<input type="hidden" id="WriteUserCodeS" />
-								<input type="hidden" id="WriteDateS" />
+						<input type="hidden" id="WriteUserCodeS" />
+						<input type="hidden" id="WriteDateS" />
 					</div>
 					<div class="line-div">
 						<div class="label-div"><label>制单时间</label></div>
