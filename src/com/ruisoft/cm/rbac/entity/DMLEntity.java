@@ -144,7 +144,7 @@ public abstract class DMLEntity {
 						if (!"".equals(cfg[0])) // 数据类型
 							condCfg.setColType(cfg[0].trim());
 						if (!"".equals(cfg[1])) // 匹配方式 (=/!=/<>/LIKE/IN/NOT LIKE/NOT IN)
-							condCfg.setMatchType(cfg[1].trim());
+							condCfg.setMatchType(transferSign(cfg[1].trim()));
 						if (!"".equals(cfg[2])) // 条件连接类型(AND/OR)
 							condCfg.setLinkType(cfg[2].trim());
 					} catch (ArrayIndexOutOfBoundsException e) {
@@ -179,6 +179,16 @@ public abstract class DMLEntity {
 		}
 		
 		return preparedSQL.trim();
+	}
+	
+	private static final String SIGN_GT = "&gt;";
+	private static final String SIGN_GT_A = ">";
+	private static final String SIGN_LT = "&lt;";
+	private static final String SIGN_LT_A = "<";
+	
+	private String transferSign(String sign) {
+		return sign.replaceAll(SIGN_GT, SIGN_GT_A)
+				.replaceAll(SIGN_LT, SIGN_LT_A);
 	}
 
 	public String getDmlType() {
