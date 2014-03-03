@@ -24,15 +24,17 @@
 					$(this).removeClass("l-textarea");
 				});
 				$("#d-menu").ligerToolBar({items:[
-				    {text:'保存',id:'saveB',click:toSave,icon:'save'},
+				    {text:'保存',id:'toSave',click:toSave,icon:'save'},
 				    {line:true},
-				    {text:'驳回修改',id:'dismissB',click:toDismiss,icon:'prev'},
+				    {text:'出库单审核',id:'toConfirm',click:toConfirm,icon:'ok'},
 				    {line:true},
-				    {text:'打印出库单',id:'printB',click:toPrint,icon:'print'},
+				    {text:'打印出库单',id:'toPrint',click:toPrint,icon:'print'},
 					{line:true},
-				    {text:'确认出库',id:'confirmB',click:toConfirm,icon:'ok'},
+				    {text:'确认出库',id:'submitConfirm',click:submitConfirm,icon:'ok'},
 					{line:true},
-				    {text:'返回',id:'backB',click:toBack,icon:'back'},
+					{text:'驳回修改',id:'toDismiss',click:toDismiss,icon:'prev'},
+				    {line:true},
+				    {text:'返回',id:'toBack',click:toBack,icon:'back'},
 				    {line:true}
 				]});
                	pGrid = $("#p-div").ligerGrid({
@@ -124,7 +126,7 @@
 				if (data.Rows && data.Rows.length === 1) {
 					data = data.Rows[0];
 					$('#idH').val(data.id);
-					$('#stateH').val(data.state);
+					$('#state').val(data.state);
 					$('#codeS').val(data.code);
 					$('#originS').val(data.origin);
 					$('#partnerInS').val(paramRender(null,'partner_list',data.partner_id));
@@ -186,7 +188,7 @@
 			}
 			
 			// 单据状态 state      00 新建  10 未审核 20 已审核 30 未提交 40已提交  50 已驳回
-			// 流程状态 flow_state 00 新建（制单） 10 入库质检   20 收货、发货   30 入、出库确认   40 打印出入库单   50 入、出库完成
+			// 流程状态 flow_state 00 新建（制单） 10 入库质检     20 入、出库审核   30 打印出入库单   40 入、出库确认    50 入、出库完成
 			// 驳回修改处理，即 退回到 
 			function toDismiss()
 			{
@@ -195,18 +197,27 @@
 				// 驳回后状态被修改
 				param.state="50";
 				upPickingDel(param,'stock.update.picking_state.update','驳回成功','驳回失败');
-				$('#stateH').val(50);
+				$('#state').val(50);
 			}
-			//确认出库
+			// 审核确认
 			function toConfirm() {
+				var param=new Object();
+				param.id=$('#id').val();
+				//已审核 20
+				param.state='20';                
+				upPickingDel(param,'stock.update.picking_state.update','确认出库成功','确认出库失败');		
+					
+		        }
+			//确认出库
+			function submitConfirm() {
 									
-				if($('#stateH').val()=='40')
+				if($('#state').val()=='40')
 					$.ligerDialog.error('已确认出库，不能重复出库确认，请确认！');
 				else					
 				   if(window.confirm('您确定要提交该项数据吗？')==true)
 			         
 				var param=new Object();
-					param.id=$('#idH').val();
+					param.id=$('#id').val();
 					//已提交 40
 					param.state='40';
 					// 确认出库后流程为出库完成
@@ -214,19 +225,19 @@
                 
 					upPickingDel(param,'stock.update.picking_state.update','确认出库成功','确认出库失败');
 					//已提交 40
-					$('#stateH').val('40');
-					$('#flow_stateH').val('50');
+					$('#state').val('40');
+					$('#flow_state').val('50');
 		        }
 			//打印处理
 			var printWin;
 			function toPrint(rowid) {
-				if(!$('#stateH').val()=='20'){
+				if(!$('#state').val()=='20'){
 					$.ligerDialog.error('该单据未审核，不能打印，请确认！');
 					return;					
 				}
 				
 				var printFlag =false
-				if(!$('#flow_stateH').val() >='40'){
+				if(!$('#flow_state').val() >='40'){
 					if(window.confirm('该单据已打印过，请确认是否需要第二次打印？')==true)
 				    printFlag=true;
 // 					$.ligerDialog.error('已打印请勿重复打印，不能打印，请确认！');
@@ -241,7 +252,7 @@
 			}			
 			
 			function upPickingDel(param,upSqlConID,successInfo,errorInfo){
-				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param)));
+				 var param = JSON.stringify(reqObj('u',upSqlConID,JSON.stringify(param)));
 					
 					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 						if (data) {
@@ -284,9 +295,9 @@
 		</style>
 	</head>
 	<body style="padding:0;">
-	<input  type="hidden" id="idH"/>
-	<input  type="hidden" id="stateH"/>
-	<input  type="hidden" id="flow_stateH"/>
+	<input  type="hidden" id="id"/>
+	<input  type="hidden" id="state"/>
+	<input  type="hidden" id="flow_state"/>
 		<div id="pageloading"></div>  
 		<div id="layout_main">
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">

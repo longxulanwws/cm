@@ -19,37 +19,37 @@
  						{display:'操作',isSort:false,width:100,render:function(rowdata,rowindex,value) {
 							
  							// 单据状态 state      00 新建  10 未审核 20 已审核 30 未提交 40已提交  50 已驳回
- 							// 流程状态 flow_state 00 新建（制单） 10 入库质检   20 收货、发货   30 入、出库确认   40 打印出入库单   50 入、出库完成							
+ 							// 流程状态 flow_state 00 新建（制单） 10 入库质检     20 入、出库审核   30 打印出入库单   40 入、出库确认    50 入、出库完成							
 							var h = "";
 							var row = defGrid.getRow(rowindex);
 							//先接收待办任务
-							if( row.state == '40' && row.flow_state =='50'   )
-							  {
- 							    h += "<a href='javascript:void(0);' class='opt-link' onclick='toReceive(" + rowindex + ")'>接收出库待办</a> ";
+							if( row.state == '40' && row.flow_state =='20'   ){
+ 							    h = "<a href='javascript:void(0);' class='opt-link' onclick='toReceive(" + rowindex + ")'>接收出库待办</a> ";
 							  }
 							//再进行出库审核
 							
-							  if( row.state <= '10' && row.flow_state =='40'   )
-							 	{
-							  		h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitSH(" + rowindex + ")'>审核</a> ";
-								}
-							  if(row.state  >= '20' && row.flow_state >='40') 
-							  	{
-								  h += "已审核  ";
+							  if( row.state <= '10' && row.flow_state =='20'   ){
+							  		//h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='toConfirm(" + rowindex + ")'>审核</a> ";
+								  h = "未审核  "
+							  }
+							
+							  if(row.state  >= '20' && row.flow_state =='20'){
+								  h = "已审核  ";
 							  	}
 							  
 							//打印出库单
-							  if(row.state  >= '20' && row.flow_state >='40') 
-							  	{							
+							  if(row.state  >= '20' && row.flow_state =='20'){							
  									h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
 							  	}
+							  if(row.flow_state >='30')
+								 h += "打印完成  ";
 							//待确认出库 ，在里面进行 确认出库 
- 							 if(row.state == '40' )
+ 							 if(row.state == '40' && row.flow_state =='40')
                                h += "待确认出库 ";
 							
- 							 if(row.flow_state >='70') 
-							  	{ 
- 								h += "出库完成 ";
+ 							 if(row.flow_state >='50') 
+							  	{  								
+ 								h += "出库完成  ";
 							  	}
  							 //驳回
  	 						 if(row.state  == '60') 
@@ -129,41 +129,70 @@
 					defGrid.set({data: data['data']});
 				});
 			}
-// 			function openDictDef() {
-// 				parent.f_addTab('new_stockp','新增入库单','./stock/new_stock_picking.html');
-// 			}
 
-			function Quality(rowid) {
-			   if(window.confirm('您确定要提交该项数据吗？')==true)
-		         
+			// 单据状态 state      00 新建  10 未审核 20 已审核 30 未提交 40已提交  50 已驳回
+			// 流程状态 flow_state 00 新建（制单） 10 入库质检     20 入、出库审核   30 打印出入库单   40 入、出库确认    50 入、出库完成
+			
+			// 接收待办
+			function toReceive(rowid)
+			{
 				var row = defGrid.getRow(rowid);
-				//$('#id').val(row.id);
-				//$('#state').val(32);
-				var param1=new Object();
-				param1.id=row.id;
-				param1.state='30';
+				var param=new Object();
+				param.id=row.id;				
+				// 驳回后状态被修改
+				param.state='10';
+				upPickingDel(param,'stock.update.picking_state.update','驳回成功','驳回失败');
+				$('#state').val('10');
+			}
+
+			//打印处理
+			var printWin;
+			function toPrint(rowid) {
+				var row = defGrid.getRow(rowid);
 				
-				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
+					
+				if(row.state=='20'){
+					$.ligerDialog.error('该单据未审核，不能打印，请确认！');
+					return;					
+				}
 				
+				var printFlag =false
+				if(row.flow_state >='40'){
+					if(window.confirm('该单据已打印过，请确认是否需要第二次打印？')==true)
+				    printFlag=true;
+// 					$.ligerDialog.error('已打印请勿重复打印，不能打印，请确认！');
+// 					return;					
+				}else{
+					printFlag=true;
+				}
+				
+				if(printFlag){
+					printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+				}
+			}			
+			
+			function upPickingDel(param,upSqlConID,successInfo,errorInfo){
+				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param)));
+					
 					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 						if (data) {
-							if (parseInt(data['status']) > 0) {
-								//$.ligerDialog.success('提交成功');
-								$("#quality").hide();
-								toQuery();
-							} else {
-								$.ligerDialog.error('提交失败');
+							if (parseInt(data['status']) > 0) {								
+								$.ligerDialog.success(successInfo);
+							} else {								
+								$.ligerDialog.error(errorInfo);
 							}
 						}
 					});
-	        }
+			}
+
+			
 			function openModify() {
 				var row = defGrid.getSelectedRow();
 				if (!row) {
 					$.ligerDialog.error('请先选择出库单记录。','错误');
 					return;
 				}
-				if(row.state=='60'){
+				if(row.state=='50'){
 					$.ligerDialog.error('该单据已驳回，不能被编辑，请确认！');
 					return;
 				}
