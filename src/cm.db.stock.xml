@@ -63,6 +63,7 @@
 								<entry key="origin" value=":like(lr)" />
 								<entry key="move_type" value="" />
 								<entry key="state" value="" />
+								<entry key="move_in_user" value="" />
 							</map>
 						</property>
 						<property name="order" value="WriteDate"/>

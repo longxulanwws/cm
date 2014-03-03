@@ -86,6 +86,10 @@
 				$("#pageloading").hide();
 				//默认查询全部数据 
 				toQuery();
+				
+				ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
+					$('#createUserCodeS').val(data['uid']);
+				}, null, false);
 			});
 			function sw_opt(item) {
 				var swd = paramRender(item, defGrid.options.param_movein, item.move_in_user);
@@ -104,6 +108,7 @@
 				param.origin = $("#originQ").val();
 				param.state=$("#stateQ").val();
                 param.move_type='03';
+                param.move_in_user=$('#createUserCodeS').val();
 				var data = JSON.stringify(reqObj('q','stock.select.picking_pocket.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					defGrid.set({data: data['data']});
@@ -275,6 +280,7 @@
 	</head>
 	<body style="padding:0;">
 		<div id="pageloading"></div>  
+		<input type="hidden" id="createUserCodeS" />
 		<div id="layout_main">
 			<div position="center" id="a_center" title="生产领用单列表">
 				<div id="query_cond" class="fields">
