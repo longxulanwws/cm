@@ -274,7 +274,7 @@ VALUES({#stock.product.id},{#session.USER_INFO.oid},{dept_id},{busiorg_id},{type
 					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
 						<property name="sql">
 							<value>
-<![CDATA[UPDATE Stock_Picking SET State={state},Flow_State={state} WHERE ID={id}]]>
+<![CDATA[UPDATE Stock_Picking SET State={state},Flow_State={flow_state} WHERE ID={id}]]>
 							</value>
 						</property>
 					</bean>

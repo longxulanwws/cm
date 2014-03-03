@@ -26,9 +26,9 @@
 				$("#d-menu").ligerToolBar({items:[
 				    {text:'保存',id:'toSave',click:toSave,icon:'save'},
 				    {line:true},
-				    {text:'出库单审核',id:'toConfirm',click:toConfirm,icon:'ok'},
-				    {line:true},
-				    {text:'打印出库单',id:'toPrint',click:toPrint,icon:'print'},
+// 				    {text:'出库单审核',id:'toConfirm',click:toConfirm,icon:'ok'},
+// 				    {line:true},
+				    {text:'打印出库单',id:'',click:toPrint,icon:'print'},
 					{line:true},
 				    {text:'确认出库',id:'submitConfirm',click:submitConfirm,icon:'ok'},
 					{line:true},
@@ -125,7 +125,8 @@
 			function bindVal(data) {
 				if (data.Rows && data.Rows.length === 1) {
 					data = data.Rows[0];
-					$('#idH').val(data.id);
+					$('#id').val(data.id);
+					$('#flow_state').val(data.flow_state);
 					$('#state').val(data.state);
 					$('#codeS').val(data.code);
 					$('#originS').val(data.origin);
@@ -210,13 +211,21 @@
 		        }
 			//确认出库
 			function submitConfirm() {
-									
+			  			
 				if($('#state').val()=='40')
+					{
 					$.ligerDialog.error('已确认出库，不能重复出库确认，请确认！');
-				else					
+				   return;
+					}
+				else if($('#flow_state').val()=='30')
+					{
+					$.ligerDialog.error('该单据未打印，不能确认出库，请确认！');
+					return;
+					}
+				else
+					{
 				   if(window.confirm('您确定要提交该项数据吗？')==true)
-			         
-				var param=new Object();
+    				var param=new Object();
 					param.id=$('#id').val();
 					//已提交 40
 					param.state='40';
@@ -227,6 +236,7 @@
 					//已提交 40
 					$('#state').val('40');
 					$('#flow_state').val('50');
+					}
 		        }
 			//打印处理
 			var printWin;
@@ -245,14 +255,25 @@
 				}else{
 					printFlag=true;
 				}
-				
+				alert(printFlag);
 				if(printFlag){
-					printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+					//printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+					var param=new Object();
+					param.id=$('#id').val();
+					//已提交 40
+					param.state=$('#state').val();
+					// 确认出库后流程为出库完成
+					param.flow_state='40';
+                
+					upPickingDel(param,'stock.update.picking_state.update','打印成功','打印失败');
+					//已提交 40
+				
+					$('#flow_state').val('40');
 				}
 			}			
 			
-			function upPickingDel(param,upSqlConID,successInfo,errorInfo){
-				 var param = JSON.stringify(reqObj('u',upSqlConID,JSON.stringify(param)));
+			function upPickingDel(param1,upSqlConID,successInfo,errorInfo){
+				 var param = JSON.stringify(reqObj('u',upSqlConID,JSON.stringify(param1)));
 					
 					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 						if (data) {
