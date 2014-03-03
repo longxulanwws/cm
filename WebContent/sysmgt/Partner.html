@@ -8,10 +8,12 @@
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
 		<script src="../js/jquery.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
+		<script src="../js/validate/messages_zh.js" type="text/javascript"></script>
 		<script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
 		<script src="../js/common.js" type="text/javascript"></script>
 		<script src="../js/json2.js" type="text/javascript"></script>
-		<script type="text/javascript" src="../js/md5.js"></script>
 		<script type="text/javascript">
 			var defGrid;
 			var userid;
@@ -294,7 +296,7 @@
 				addDialog = $.ligerDialog.open({
 					target:$("#new_user_def"),
 					title:"新增往来单位",
-					width:650,
+					width:850,
 					height:550
 				});
 			}
@@ -314,6 +316,15 @@
 			
 			// 新增保存处理
 			function toAdd() {
+				var valid = true;
+				$('*[id$="S"],*[id$="_combobox"]').each(function(index, element) {
+					if (!$(this).rules()) return;
+					if (!$(element).valid()) {
+						valid = false;
+						return;
+					}
+				});
+				if (!valid) return;
 				var param = new Object();
 				param.code=$("#code").val();
 				param.name = $("#newName").val();
@@ -410,75 +421,75 @@
 			<div class="line-div" style="margin-bottom:10px;">
 				<span class="title l-icon-add">添加往来单位</span>
 			</div>
-			<div class="line-div">
-				<div class="label-div"><label>编号</label></div>
-				<div class="in-div"><input type="text" class="s-text txt-def" id="code" /></div>
+			<form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
+				<div class="line-div">
+					<div class="label-div"><label>编号</label></div>
+					<div class="in-div"><input type="text" class="required s-text txt-def" id="codeS" /></div>
+					<div class="label-div"><label>名称</label></div>
+					<div class="in-div"><input type="text" class="required s-text txt-def" id="newName" /></div>
+				</div>
+				<div class="line-div">
+					<div class="label-div"><label>所属机构</label></div>
+					<div class="in-div"><input type="text" id="org_combobox" ltype="combobox" class="required txt-def"/></div>
+					<input type="hidden" id="Dept_ID" />
+					
+					<div class="label-div"><label>所属行政区划</label></div>
+					 
+					<div class="in-div"><input type="text" id="region_combobox" ltype="combobox" class="required" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+					<input type="hidden" id="Of_Region" />
+				</div>	
+				<div class="line-div">
+					<div class="label-div"><label>组织机构代码证号</label></div>
+					<div class="in-div"><input type="text" class="required s-text txt-def" id="newuuid_code" /></div>
 				
-				<div class="label-div"><label>名称</label></div>
-				<div class="in-div"><input type="text" class="s-text txt-def" id="newName" /></div>
-			</div>
-		
-			<div class="line-div">
-				<div class="label-div"><label>所属机构</label></div>
-				<div class="in-div"><input type="text" id="org_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
-				<input type="hidden" id="Dept_ID" />
+					<div class="label-div"><label>税号</label></div>
+					<div class="in-div"><input type="text" class="required s-text txt-def" id="newTax_code" /></div>
+				</div>
+				<div class="line-div">
+					<div class="label-div"><label>所属行业</label></div>
+				    <div class="in-div"><input type="text" id="trade_combobox" ltype="combobox" class="required" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+					<input type="hidden" id="newOf_trade" />
 				
-				<div class="label-div"><label>所属行政区划</label></div>
-				 
-				<div class="in-div"><input type="text" id="region_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
-				<input type="hidden" id="Of_Region" />
-			</div>	
-			<div class="line-div">
-				<div class="label-div"><label>组织机构代码证号</label></div>
-				<div class="in-div"><input type="text" class="s-text txt-def" id="newuuid_code" /></div>
-			
-				<div class="label-div"><label>税号</label></div>
-				<div class="in-div"><input type="text" class="s-text txt-def" id="newTax_code" /></div>
-			</div>
-			<div class="line-div">
-				<div class="label-div"><label>所属行业</label></div>
-			    <div class="in-div"><input type="text" id="trade_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
-				<input type="hidden" id="newOf_trade" />
-			
-				<div class="label-div"><label>法人代表</label></div>
-				<div class="in-div"><input type="text" class="s-text txt-def" id="newLegal_body" /></div>
-			</div>
-			<div class="line-div">
-				<!--  <div class="label-div"><label>信用级别</label></div>
-			    <div class="in-div"><input type="text" id="lecel_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
-				<input type="hidden" id="newCredit_level" />
-			-->
-				<div class="label-div"><label>开户行</label></div>
-			    <div class="in-div"><input type="text" id="bank_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
-				<input type="hidden" id="newBank" />
+					<div class="label-div"><label>法人代表</label></div>
+					<div class="in-div"><input type="text" class="required s-text txt-def" id="newLegal_body" /></div>
+				</div>
+				<div class="line-div">
+					<!--  <div class="label-div"><label>信用级别</label></div>
+				    <div class="in-div"><input type="text" id="lecel_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+					<input type="hidden" id="newCredit_level" />
+				-->
+					<div class="label-div"><label>开户行</label></div>
+				    <div class="in-div"><input type="text" id="bank_combobox" ltype="combobox" class="" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+					<input type="hidden" id="newBank" />
+					
+					<div class="label-div"><label>银行帐号</label></div>
+					  <div class="in-div"><input type="text" class="s-text txt-def" id="newBank_account" /></div>
 				
-				<div class="label-div"><label>银行帐号</label></div>
-				  <div class="in-div"><input type="text" class="s-text txt-def" id="newBank_account" /></div>
-			
-			</div>
-			<div class="line-div">
+				</div>
+				<div class="line-div">
+					
+					<div class="label-div"><label>联系人</label></div>
+					<div class="in-div"><input type="text" class="s-text txt-def" id="newLink_man" /></div>
+					
+					<div class="label-div"><label>手机号</label></div>
+					<div class="in-div"><input type="text" class="s-text txt-def" id="newMobile" /></div>
 				
-				<div class="label-div"><label>联系人</label></div>
-				<div class="in-div"><input type="text" class="s-text txt-def" id="newLink_man" /></div>
+				</div>
+				<div class="line-div">
+					
+					<div class="label-div"><label>单位电话</label></div>
+					<div class="in-div"><input type="text" class="s-text txt-def" id="newPhone" /></div>
+					
+					<div class="label-div"><label>单位传真</label></div>
+					<div class="in-div"><input type="text" class="s-text txt-def" id="newFax" /></div>
 				
-				<div class="label-div"><label>手机号</label></div>
-				<div class="in-div"><input type="text" class="s-text txt-def" id="newMobile" /></div>
-			
-			</div>
-			<div class="line-div">
-				
-				<div class="label-div"><label>单位电话</label></div>
-				<div class="in-div"><input type="text" class="s-text txt-def" id="newPhone" /></div>
-				
-				<div class="label-div"><label>单位传真</label></div>
-				<div class="in-div"><input type="text" class="s-text txt-def" id="newFax" /></div>
-			
-			</div>
-			<div class="line-div">
-				<div class="label-div"><label>说明</label></div>
-				<div class="in-div"><textarea cols="40" rows="2" id="newDesc"></textarea></div>
-			</div>
-			<div class="line-div" style="margin-top:40px;padding-left:40%;">
+				</div>
+				<div class="line-div">
+					<div class="label-div"><label>说明</label></div>
+					<div class="in-div"><textarea cols="80" rows="5" id="newDesc"></textarea></div>
+				</div>
+			</form>
+			<div class="line-div" style="margin-top:95px;padding-left:40%;">
 				<input type="button" value="保存" onclick="toAdd();" />
 				<input type="button" value="清空" onclick="toReset('#new_user_def input,select,textarea')" />
 			</div>
