@@ -26,9 +26,11 @@
 				$("#d-menu").ligerToolBar({items:[
 				    {text:'保存',click:toAdd,icon:'save'},
 				    {line:true},
-				    {text:'驳回修改',icon:'prev'},
+				    {text:'驳回修改',click:toDismiss,icon:'prev'},
 				    {line:true},
-				    {text:'确认发货',id:'quality',click:Quality,icon:'ok'},
+				    {text:'打印出库单',id:'quality',click:toPrint,icon:'print'},
+					{line:true},
+				    {text:'确认出库',id:'quality',click:toConfirm,icon:'ok'},
 					{line:true},
 				    {text:'返回',click:toBack,icon:'back'},
 				    {line:true}
@@ -60,12 +62,7 @@
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: queryProd
 				});
-				//appendAddBtn(function(){
-				//	pGrid.addEditRow();
-				//	c_row = pGrid.getRow(pGrid.rows.length - 1);
-				//}, "添加商品明细");
-				//appendModifyBtn(function(){}, "修改商品明细");
-				//appendDeleteBtn(function(){}, "删除商品明细");
+
 
 				var str = window.location.toString().replace(/^[^?]+\??/, "");
 				if (str) {
@@ -200,19 +197,56 @@
 				} 
 				
 			}
-			function Quality() {
+			// 驳回修改处理，即 退回到 
+			function toDismiss()
+			{
+				var param=new Object();
+				param.id=$('#idS').val();
+				// 单据状态 state      新建  00 ，未审核 10、已审核 20 、未提交30 、已提交 40     已驳回 60
+				// 流程状态 flow_state 00 新建（制单） 10  入库质检  20 收货     30 发货  40 入库 50 出库 60 入库完成  70 出库完成
+				// 驳回后状态被修改
+				param.state="60";
+				
+				upPickingDel(param,'驳回成功','驳回失败');
+				
+				$('#stateS').val(60);
+			}
+			
+			function upPickingDel(param,successInfo,errorInfo)
+			{
+				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param)));
+					
+					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+						if (data) {
+							if (parseInt(data['status']) > 0) {
+								
+								$.ligerDialog.success(successInfo);
+
+							} else {
+								
+								$.ligerDialog.error(errorInfo);
+							}
+						}
+					});
+			}
+			//确认出库
+			function toConfirm() {
+				if($('#stateS').val()=='60')
+					$.ligerDialog.error('该单据已驳回，不能出库确认，请确认！');
+				
 				if($('#stateS').val()=='30')
-					$.ligerDialog.error('已提交发货，不能重复发货，请确认！');
+					$.ligerDialog.error('已出库完成，不能重复出库确认，请确认！');
 				else
 					
 				   if(window.confirm('您确定要提交该项数据吗？')==true)
 			         
-				//	var row = defGrid.getRow(rowid);
-					//$('#id').val(row.id);
-					//$('#state').val(32);
-					var param1=new Object();
-					param1.id=$('#idS').val();
-					param1.state='30';
+				var param1=new Object();
+				param1.id=$('#idS').val();
+					
+					// 单据状态 state      新建  00 ，未审核 10、已审核 20 、未提交30 、已提交 40
+					// 流程状态 flow_state 00 新建（制单） 10  入库质检  20 收货     30 发货  40 入库 50 出库 60 入库完成  70 出库完成
+					// 确认出库后 出库完成
+					param1.flow_state="70";
 					
 					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 					

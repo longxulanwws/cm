@@ -39,7 +39,11 @@
 		 						{
 	 								h += "已提交发货  ";
 		 						}
-								
+	 						//
+	 						if(row.state  == '60') 
+	 						{
+ 								h = "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToDismiss(" + rowindex + ")'>驳回待办</a> ";
+	 						}	
 							
                            	return h; 
  						},frozen:true
@@ -142,6 +146,11 @@
 			var printWin;
 			function toPrint(rowid) {
 				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+			}
+			// 接收驳回
+			function submitToDismiss()
+			{
+				
 			}
 			/* 
 				单据审核处理

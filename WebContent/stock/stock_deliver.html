@@ -19,7 +19,7 @@
  						{display:'操作',isSort:false,width:100,render:function(rowdata,rowindex,value) {
 							
 							// 单据状态 state      新建  00 ，未审核 10、已审核 20 、未提交30 、已提交 40
-							// 流程状态 flow_state 00 新建（制单） 10  入库质检  20 收货     30 发货  40 入库 50 出库
+							// 流程状态 flow_state 00 新建（制单） 10  入库质检  20 收货     30 发货  40 入库 50 出库 60 入库完成  70 出库完成
 							
 							var h = "";
 							var row = defGrid.getRow(rowindex);
@@ -29,11 +29,35 @@
  							    h += "<a href='javascript:void(0);' class='opt-link' onclick='toReceive(" + rowindex + ")'>待办接收</a> ";
 							  }
 							//再进行出库审核
- 							h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
- 							 var row = defGrid.getRow(rowindex);
- 							 if(row.state == '31' )
-                               h += "待确认发货 "; 
-                        	return h; 
+							
+							  if( row.state <= '10' && row.flow_state =='40'   )
+							 	{
+							  		h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitSH(" + rowindex + ")'>审核</a> ";
+								}
+							  if(row.state  >= '20' && row.flow_state >='40') 
+							  	{
+								  h += "已审核  ";
+							  	}
+							  
+							//打印出库单
+							  if(row.state  >= '20' && row.flow_state >='40') 
+							  	{							
+ 									h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
+							  	}
+							//待确认出库 ，在里面进行 确认出库 
+ 							 if(row.state == '40' )
+                               h += "待确认出库 ";
+							
+ 							 if(row.flow_state >='70') 
+							  	{ 
+ 								h += "出库完成 ";
+							  	}
+ 							 //驳回
+ 	 						 if(row.state  == '60') 
+	 							{
+ 									h = "已驳回 ";
+	 							}	
+                        	 return h; 
                         },frozen:true},
                         //{display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
                         {display:'单据状态',name:'state',width:80,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
