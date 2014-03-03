@@ -161,9 +161,14 @@
 			function openModify() {
 				var row = defGrid.getSelectedRow();
 				if (!row) {
-					$.ligerDialog.error('请先选择入库单记录。','错误');
+					$.ligerDialog.error('请先选择出库单记录。','错误');
 					return;
 				}
+				if(row.state=='60'){
+					$.ligerDialog.error('该单据已驳回，不能被编辑，请确认！');
+					return;
+				}
+				
 				parent.f_addTab('deliver_stockp','出库单维护','./stock/new_stock_deliver.html?o=m&code='.concat(row.code));
 			}
 			var printWin;
