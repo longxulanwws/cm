@@ -27,6 +27,7 @@
 								<entry key="move_type" value="" />
 								<entry key="createuser" value="" />
 								<entry key="move_in_user" value="" />
+								<entry key="flow_state" value=":&gt;" />
 							</map>
 						</property>
 					</bean>
@@ -65,7 +66,7 @@
 								<entry key="state" value="" />
 								<entry key="createuser" value="" />
 								<entry key="move_in_user" value="" />
-								<entry key="flow_state" value=":&gt;" />
+								
 							</map>
 						</property>
 						<property name="order" value="WriteDate"/>
@@ -297,7 +298,8 @@ Warehose_ID={warehose_id},Move_IN_User={move_in_user},Note={note},WriteUser={wri
 					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
 						<property name="sql">
 							<value>
-<![CDATA[UPDATE STOCK_PICKING SET ORIGIN={origin},PARTNER_ID={partner},PRED_DATE={preddate},WAREHOSE_ID={warehose},MOVE_IN_USER={moveinuser},NOTE={note} WHERE CODE={code}]]>
+<![CDATA[UPDATE STOCK_PICKING SET ORIGIN={origin},PARTNER_ID={partner},PRED_DATE={preddate},WAREHOSE_ID={warehose},MOVE_IN_USER={moveinuser},NOTE={note},WriteUser={writeusercode}
+,WriteDate={writedate} WHERE CODE={code}]]>
 							</value>
 						</property>
 					</bean>

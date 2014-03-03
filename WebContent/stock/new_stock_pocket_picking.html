@@ -28,7 +28,7 @@
 					$(this).removeClass("l-textarea");
 				});
 				$("#d-menu").ligerToolBar({items:[
-				    {text:'保存',click:toSave,icon:'save'},
+				    {text:'保存',click:toAdd,icon:'save'},
 					{line:true},
 					 {text:'返回',click:toBack,icon:'back'},
 				     {line:true},
@@ -39,7 +39,7 @@
                     columns:[
 						{display:'商品编号',name:'code',width:160,editor:{type:'popup',onButtonClick:selectProduct},textField:'code',valueField:'categ_id'},
 	                    {display:'品名',name:'name',width:160},
-			            {display:'规格/型号',name:'specs',width:160,render:function(item){return paramRender(item,'product_specs',item.code);}},
+			            {display:'规格/型号',name:'specs',width:160},
 			        	{display:'单位',name:'product_uom',width:100,render:function(item){return paramRender(item,'uom',item.product_uom);}},
 			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}
 			            ,editor:{type:'select',data:getData('Brand'),valueField:'value',textField:'name'}},
@@ -59,7 +59,7 @@
                     fixedCellHeight:false,
                     colDraggable:false,
                     enabledEdit:true,
-                    clickToEdit:false,
+                    clickToEdit:true,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: queryProd,                   
                     param_partner:'partner_list'
@@ -162,8 +162,26 @@
 			// 选择商品 处理
 			var curRow, selDialog;
 			function selectProduct() {
-				curRow = this;
-				selDialog = $.ligerDialog.open({height:500,width:800,isResize: true,url:'../sysmgt/product_query.html?o=s',title:'选择商品'});
+				var selDialog = $.ligerDialog.open({height:500,width:650,isResize:false,url:'../sysmgt/product_query2.html?o=s',title:'选择商品',
+					buttons: [
+						{text:'确定',onclick: function(item, dialog){
+							var data = dialog.frame.getSelectedRow();
+				            if (!data) {
+				                $.ligerDialog.warn('请选择商品!');
+				                return;
+				            }
+				            pGrid.endEdit();
+				            pGrid.updateCell('name', data.name, pGrid.getSelected());
+				            pGrid.updateCell('specs', data.specs, pGrid.getSelected());
+				            pGrid.updateCell('product_uom', data.uom_id, pGrid.getSelected());
+				            pGrid.updateCell('code', data.code, pGrid.getSelected());
+				            dialog.close();
+						}},
+					    {text:'取消',onclick: function(item, dialog){
+					    	dialog.close();
+						}}
+				]});
+				return false;
 			}
 			
 			// 查询时数据值绑定  应该可以抽象为公共的功能
@@ -200,59 +218,42 @@
 			 }
 			// 保存业务处理
 			function toSave() {
-				
-// 				// 数据项校验控制
-// 				var valid = true;
-// 				// 数据项校验控制
-// 				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
-// 					if (!$(this).rules()) return;
-// 					if (!$(element).valid()) {
-// 						valid = false;
-// 						return;
-// 					}
-// 				});
-// 				if (!valid) return;
-				
+				// 必输数据项校验控制
+				var valid = true;
+				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+					if (!$(this).rules()) return;
+					if (!$(element).valid()) {
+						valid = false;
+						return;
+					}
+				});
+				if (!valid) return;
 				if (pGrid.rows.length === 0) {
-					$.ligerDialog.error('请添加商品。','错误');
+					$.ligerDialog.error('请添加入库商品。','错误');
 					return;
 				}
+				
+				var param = {
+					origin:$("#originS").val(),
+					partner:$("#partnerS").val(),
+					preddate:$("#predDateS").val(),
+					warehose:$("#warehouseS").val(),
+					moveinuser:$("#moveInIdS").val(),
+					note:$("#noteS").val()
+				};
+				var en = 'stock.add.yclrk.picking.add', optType = 'a';
 				//编辑时处理
 				if (opt === 'm') {
 					
-					var param = new Object();
-					//入库编号
-					param.code=$('#codeS').val();
-					//采购编号
-					param.origin=$('#originS').val();
-					//供应商
-					param.partner_id=$('#partnerS').val();
-					//预计到货日期
-					param.pred_date=$('#predDateS').val();
-					//入库仓库
-					param.warehose_id=$('#warehouseS').val();
-				
-					param.move_in_user=$('#moveInIdS').val();
-					//备注
-					param.note=$('#note').val();
+					param.code = $('#codeS').val();
 					//修改人
 					param.writeusercode=$('#WriteUserCodeS').val();
 					//修改日期
 					param.writedate=$('#WriteDateS').val();
-
-					var param = JSON.stringify(reqObj('u','stock.update.stockpicking.update',JSON.stringify(param)));
-					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
-							if (data) {
-								if (parseInt(data['status']) > 0) {
-									$.ligerDialog.success('保存成功');
-								} else {
-									$.ligerDialog.error('保存失败');
-								}
-							}
-						});
-					/* 
-					  	商品列表更新 未能更新保存	
-					*/	
+					// 进行修改数据库处理
+					en = 'stock.update.picking';
+					// 操作类型为 update
+					optType = 'u';
 					
 				} else {
 					// 新增时处理
@@ -326,7 +327,137 @@
 					});
 				}
 			}
-			
+			function toAdd() {
+				
+				// 必输数据项校验控制
+				var valid = true;
+				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+					if (!$(this).rules()) return;
+					if (!$(element).valid()) {
+						valid = false;
+						return;
+					}
+				});
+				if (!valid) return;
+				if (pGrid.rows.length === 0) {
+					$.ligerDialog.error('请添加入库商品。','错误');
+					return;
+				}
+				
+				var param = {
+					origin:$("#originS").val(),
+					partner:$("#partnerS").val(),
+					preddate:$("#predDateS").val(),
+					warehose:$("#warehouseS").val(),
+					moveinuser:$("#moveInIdS").val(),
+					note:$("#note").val()
+				};
+				var en = 'stock.add.yclrk.picking.add', optType = 'a';
+				if (opt === 'm') {
+				
+					param.code = $('#codeS').val();
+					//修改人
+					param.writeusercode=$('#WriteUserCodeS').val();
+					//修改日期
+					param.writedate=$('#WriteDateS').val();
+					//alert($('#WriteDateS').val())
+					// 进行修改数据库处理
+					en = 'stock.update.picking';
+					// 操作类型为 update
+					optType = 'u';
+				} else {
+					// 新增时 数据处理
+					param.company = "";
+					param.dept = $("#deptCodeS").val();
+					param.busiorg = "";
+					param.name = "";
+				//	param.type = "0";
+					param.createuser = $("#createUserCodeS").val();
+					param.createdate = $("#createDateS").val();
+					param.writedate=$('#WriteDateS').val();
+					//param.movetype="01";
+					//param.state="00";
+                  
+					// 单据的状态处理
+					
+					//单据性质 0 收货 1 发货
+					param.type = "1";
+					// 指单据类型 ，03  生产领用单
+					param.movetype="03";
+					// 单据状态 state      00 新建  10 未审核 20 已审核 30 未提交 40已提交  50 已驳回
+					// 流程状态 flow_state 00 新建（制单） 10 入库质检     20 入、出库审核   30 打印出入库单   40 入、出库确认    50 入、出库完成					 
+					param.state="00";
+					// 单据流程状态 是指， 单据的流转去向，及业务流程中的各处理环节 如：生产领用单据   生产管理中制单、库存管理中的出库
+					param.flow_state="00";
+					
+				}
+				var data = JSON.stringify(reqObj(optType,en,JSON.stringify(param)));
+				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+					var rows = pGrid.rows;
+					if (opt === 'm') {
+						var addRows = [], updateRows = [];
+						for (var i = 0; i < rows.length; i++) {
+							if (rows[i].__status === 'add') {
+								rows[i].picking_id = $('#codeS').val();
+								rows[i].origin = $('#originS').val();
+								rows[i].type = '0';
+								rows[i].createuser = $('#createUserCodeS').val();
+								rows[i].createdate = $('#createDateS').val();
+								rows[i].dept_id = $('#deptCodeS').val();
+								rows[i].company_id = '';
+								rows[i].busiorg_id = '';
+								addRows.push(rows[i]);
+							} else if (rows[i].__status === 'update') {
+								updateRows.push(rows[i]);
+							}
+						}
+						var ar = 0, br = 0;
+						if (addRows.length > 0) {
+							var data_a = JSON.stringify(reqObj('ba','stock.add.stock_move',addRows));
+							ajaxSubmit("/cm/rbac/cm.do?m=ba", data_a, function(result) {
+								ar = result['status'];
+								if (updateRows.length === 0)
+									$.ligerDialog.success('保存成功', '操作完成', reloadPage);
+							}, null, false);
+						} else {
+							ar = 1;
+						}
+						if (ar > 0 && updateRows.length > 0) {
+							var data_u = JSON.stringify(reqObj('bu','stock.update.stock_move', updateRows));
+							ajaxSubmit("/cm/rbac/cm.do?m=bu", data_u, function(result) {
+								$.ligerDialog.success('保存成功', '操作完成', reloadPage);
+								br = result['status'];
+							});
+						} else {
+							br = 1;
+						}
+						if (ar > 0 && br > 0) {
+							$.ligerDialog.success('保存成功', '操作完成', reloadPage);
+						}
+					} else {
+						// 新增处理
+						var picking = data['added'];
+						c_code = picking['#stock.picking.ycl.rk.code'];
+						for (var i = 0; i < rows.length; i++) {
+							rows[i].picking_id = c_code;
+							rows[i].origin = $('#originS').val();
+							rows[i].type = '0';
+							rows[i].createuser = $('#createUserCodeS').val();
+							rows[i].createdate = $('#createDateS').val();
+							rows[i].dept_id = $('#deptCodeS').val();
+							rows[i].company_id = '';
+							rows[i].busiorg_id = '';
+						}
+						var data = JSON.stringify(reqObj('ba','stock.add.stock_move',rows));
+						ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
+							$.ligerDialog.success('保存成功', '操作完成', reloadPage);
+						});
+					}
+				});
+			}
+			 function reloadPage() {
+		        	window.location = './new_stock_pocket_picking.html?o=m&code='.concat(c_code);
+			    }
 	        function beginEdit(rowid) { 
 	        	pGrid.beginEdit(rowid);
 	        }
@@ -383,7 +514,7 @@
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">
 				<div id="d-menu" class="toolbar"></div>
 				<div style="height:25px;"></div>
-				<form name="basic-form" method="post" id="basic_form">
+				<form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
 					<div class="line-div">
 						<div class="label-div"><label>出库单号</label></div>
 						<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
