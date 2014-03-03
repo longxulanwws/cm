@@ -18,6 +18,7 @@
 			var pTree, pGrid;
 			var pType = getData('product.type');
 			var pNode;
+			var uomSel, uomPreSel, typeSel;
 			$(function() {
 				var opt = window.location.toString().replace(/^[^?]+\?o=/, '');
 				$("#layout_main").ligerLayout({
@@ -112,6 +113,33 @@
 				    {text:'清空',click:resetArea,icon:'clear'},
 					{line:true}
 				]});
+				uomPreSel = $("#uomPresS").ligerComboBox({
+					autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:getData('uom_pres'),
+                    onSelected:function(v,t) {
+                        $("#uomPresS_val").val(v);
+                    }
+				});
+				uomSel = $("#uomIdS").ligerComboBox({
+					autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:getData('uom'),
+                    onSelected:function(v,t) {
+                        $("#uomIdS_val").val(v);
+                    }
+				});
+				typeSel = $("#typeS").ligerComboBox({
+					autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:getData('product_category'),
+                    onSelected:function(v,t) {
+                        $("#typeS_val").val(v);
+                    }
+				});
 
 				$("#pageloading").hide();
 			});
@@ -176,12 +204,12 @@
 				$('#nameS').val(row.name);
 				$('#brandS').val(row.brand);
 				$('#specsS').val(row.specs);
-				$('#uomIdS').val(row.uom_id);
-				$('#uomIdS_txt').val($('#uomIdS option:selected').text());
-				$('#uomPresS').val(row.uom_precision);
-				$('#uomPresS_txt').val($('#uomPresS option:selected').text());
-				$('#typeS').val(row.type);
-				$('#typeS_txt').val($('#typeS option:selected').text());
+				$('#uomIdS_val').val(row.uom_id);
+				uomSel.setValue(row.uom_id);
+				$('#uomPresS_val').val(row.uom_precision);
+				uomPreSel.setValue(row.uom_precision);
+				$('#typeS_val').val(row.type);
+				typeSel.setValue(row.type);
 				$('#noteS').val(row.note);
 				
 				detailDialog = $.ligerDialog.open({
@@ -196,7 +224,7 @@
 				// 比数据项校验控制
 				var valid = true;
 				// 比数据项校验控制
-				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+				$('*[id$="S"],*[id$="S_val"]').each(function(index, element) {
 					if (!$(this).rules()) return;
 					if (!$(element).valid()) {
 						valid = false;
@@ -207,13 +235,13 @@
 				
 				var param = new Object();
 				
-				param.type = $("#typeS").val();
+				param.type = $("#typeS_val").val();
 				param.categ_id = pNode;
 				param.name = $("#nameS").val();
 				param.specs = $("#specsS").val();
 				param.brand = $("#brandS").val();
-				param.uom_id = $("#uomIdS").val();
-				param.uom_precision = $("#uomPresS").val();
+				param.uom_id = $("#uomIdS_val").val();
+				param.uom_precision = $("#uomPresS_val").val();
 				param.note = $("#noteS").val().replace(/(?=[^\\])\n/g, '\\n');
 				param.state = $("#stateS").val();
 				param.dept_id = '';
@@ -242,10 +270,9 @@
 				$("#detail input:not(.readonly),select,textarea").each(function(index, element) {
 					$(element.parentNode).removeClass("l-text-invalid");
 				});
-
-				$('#uomIdS_txt').addClass("required");
-				$('#uomPresS_txt').addClass("required");
-				$('#typeS_txt').addClass("required");
+				uomSel.setValue('');
+				uomPreSel.setValue('');
+				typeSel.setValue('');
 			}
 			function toSelect(rowindex) {
 				if (!parent) {
@@ -299,7 +326,7 @@
 				</div>
 			</div>
 		</div>
-		<div id="detail" style="display:hidden;">
+		<div id="detail" style="display:none;">
 			<div id="d-menu"></div>
 			<div style="height:5px;"></div>
 			<form id="detail_form" class="liger-form" data-validate="{}">
@@ -315,13 +342,13 @@
 				</div>
                	<div class="line-div">
 					<div class="label-div"><label>计量单位</label></div>
-					<div class="in-div"><select id="uomIdS" param="uom" first="" default="m"></select></div>
+					<div class="in-div"><input type="text" id="uomIdS" ltype="combobox" class="required diff" /></select></div>
 					<div class="label-div"><label>单位精度</label></div>
-					<div class="in-div"><select id="uomPresS" param="uom_pres" first=""></select></div>
+					<div class="in-div"><input type="text" id="uomPresS" ltype="combobox" class="required diff" /></div>
 				</div>
                	<div class="line-div">
 					<div class="label-div"><label>物料性质</label></div>
-					<div class="in-div" style="width:72%;"><select id="typeS" param="product_category" first=""></select></div>
+					<div class="in-div" style="width:72%;"><input type="text" id="typeS" ltype="combobox" class="required diff" /></div>
 				</div>
 				<div class="line-div" style="height:76px;">
 					<div class="label-div"><label>备注</label></div>
