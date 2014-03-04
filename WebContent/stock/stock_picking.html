@@ -16,20 +16,33 @@
 			$(function(){
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
- 						{display:'操作',isSort:false,width:90,render:function(rowdata,rowindex,value) {
+ 						{display:'操作',isSort:false,width:120,render:function(rowdata,rowindex,value) {
  							
  							var h = ""; 
 							var row = defGrid.getRow(rowindex);
-							  if(row.state == '32'||row.state == '31' ) 
+							// 单据状态 state    入库制单  00 新建  10 未审核 20 已审核 30 未提交 40已提交      50 已驳回
+							//               质检  60 未审核   70 已审核  80 质检未完成 90 质检完成 100 提交入库 
+							//               入库  110 打印入库单    120 确认入库   130 入库完成
+							// 流程状态 flow_state 00 新建（制单） 10 入库质检     20 入、出库审核   30 打印出入库单   40 入、出库确认    50 入、出库完成 
+							  if(row.state >='20' ) 
 							  	{
 								  h += "已审核  ";
 							  	}
-							  if(row.state == '00' || row.state == 'null' )
-							 	{
-							  		h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitSH(" + rowindex + ")'>审核</a> ";
+							  else 
+								{
+								  h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='toConfirm(" + rowindex + ")'>审核</a> ";
 								}
- 							 if(row.state == '00' || row.state == 'null')
-                               h += "<a href='javascript:void(0);' id='to_quality' class='opt-link' onclick='to_quality(" + rowindex + ")'>提交质检</a> "; 
+							
+							 if(row.state<='20' && row.flow_state<'10')
+							  {
+								
+								 h += "<a href='javascript:void(0);' id='to_quality' class='opt-link' onclick='to_quality(" + rowindex + ")'>提交质检</a> ";
+							  }
+							 else{
+								 h += "已提交质检 ";
+							 }
+ 							// if(row.state == '00' || row.state == 'null')
+                              // h += "<a href='javascript:void(0);' id='to_quality' class='opt-link' onclick='to_quality(" + rowindex + ")'>提交质检</a> "; 
                         	return h; 
                         },frozen:true},
                         {display:'单据状态',name:'state',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
@@ -141,15 +154,24 @@
 				parent.f_addTab('new_stockp','新增原材料入库单','./stock/new_stock_picking.html');
 			}
 			function to_quality(rowid) {
-			   if(window.confirm('您确定要提交该项数据吗？')==true)
-		         
 				var row = defGrid.getRow(rowid);
-				$('#id').val(row.id);
+				//alert(row.state);
+ 				if(row.state < '20')
+			    {
+					
+					$.ligerDialog.error('该单据未审核，请先审核！');
+				    return;
+				}
+				else{
+			   if(window.confirm('您确定要提交该项数据吗？')==true)
+
+				//$('#id').val();
 				//提交质检，待质检状态 -11-
-				$('#state').val(11);
+				//$('#state').val(11);
 				var param1=new Object();
-				param1.id=$('#id').val();
-				param1.state=$('#state').val();
+				param1.id=row.id;
+				param1.state='40';
+				param1.flow_state='10';
 				
 				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 				
@@ -164,7 +186,39 @@
 							}
 						}
 					});
+ 				}
 	        }
+			// 审核确认
+			function toConfirm(rowid) {
+				var row = defGrid.getRow(rowid);
+				var param1=new Object();
+			     	param1.id=row.id;
+					//已审核 20
+					param1.state="20";
+                    param1.flow_state=row.flow_state;
+                    
+					upPickingDel(param1,'审核成功','审核失败');
+			
+		        }
+			function upPickingDel(param1,successInfo,errorInfo){
+				
+				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
+					
+					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+						if (data) {
+							if (parseInt(data['status']) > 0) {	
+								
+								$.ligerDialog.success(successInfo);
+								//自动刷新
+								toQuery();
+							} else {								
+								$.ligerDialog.error(errorInfo);
+							}
+						}
+					});
+				
+				
+			}
 			function openModify() {
 				var row = defGrid.getSelectedRow();
 				if (!row) {

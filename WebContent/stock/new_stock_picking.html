@@ -104,6 +104,7 @@
 						$('#createUserS').val(data['uname']);
 						$('#createUserCodeS').val(data['uid']);
 						$("#createDateS").val(data['date']);
+						$("#WriteDateS").val(data['date']);
 					}, null, false);
 				}
 				var moveInBox = $("#moveInS").ligerComboBox({
@@ -246,6 +247,8 @@
 					param.createdate = $("#createDateS").val();
 					param.movetype="01";
 					param.state="00";
+					param.flow_state="00";
+					param.writedate=$('#WriteDateS').val();
 				}
 				var data = JSON.stringify(reqObj(optType,en,JSON.stringify(param)));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {

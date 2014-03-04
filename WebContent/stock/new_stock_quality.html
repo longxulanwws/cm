@@ -133,7 +133,7 @@
 					data = data.Rows[0];
 					$('#idS').val(data.id);
 					$("#stateS").val(data.state);
-					
+					$("#flow_state").val(data.flow_state);
 					$('#codeS').val(data.code);
 					$('#originS').val(data.origin);
 					$('#partnerInS').val(paramRender(null,'partner_list',data.partner_id));
@@ -207,7 +207,7 @@
 				return '0.00';
 			}
 			function Quality() {
-				if($('#stateS').val()=='10')
+				if($('#stateS').val()=='90')
 					$.ligerDialog.error('已确认质检，不能重复确认，请确认！');
 				else
 					
@@ -218,14 +218,15 @@
 					//$('#state').val(32);
 					var param1=new Object();
 					param1.id=$('#idS').val();
-					param1.state='10';
+					param1.state='90';
+					param1.flow_state=$("#flow_state").val();
 					
 					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 					
 						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 							if (data) {
 								if (parseInt(data['status']) > 0) {
-									$('#stateS').val(10);
+									$('#stateS').val(90);
 									$.ligerDialog.success('提交成功');
 									//$("#quality").hide();
 									//toQuery();
@@ -244,6 +245,7 @@
 		<div id="pageloading"></div>  
 		<input  type="hidden" id="idS"/>
 	<input  type="hidden" id="stateS"/>
+	<input  type="hidden" id="flow_state"/>
 		<div id="layout_main">
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">
 				<div id="d-menu" class="toolbar"></div>
