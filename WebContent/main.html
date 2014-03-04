@@ -37,7 +37,7 @@
                             tabid = new Date().getTime();
                             $(node.target).attr("tabid", tabid)
                         } 
-                        f_addTab(tabid, node.data.text, node.data.url);
+                        f_addTab(tabid, node.data.text, decodeURIComponent(node.data.url));
                     },
 					onError: function() {
 						alert("error");
