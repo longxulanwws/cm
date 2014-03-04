@@ -65,6 +65,7 @@ WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID AND m.RESOURCE_ID=c
 								 <entry key="dict_def_id" value="" />
 							</map>
 						</property>
+						<property name="order" value="code"/>
 					</bean>
 				</entry>
 				<entry key="dict.item.query">
@@ -73,7 +74,7 @@ WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID AND m.RESOURCE_ID=c
 							<value>
 <![CDATA[SELECT ITEM.NAME,ITEM.VALUE,ITEM.SEQ,ITEM.STATUS FROM CM_DICT_ITEM ITEM INNER JOIN CM_DICT_DEF DEF ON ITEM.DICT_DEF_ID=DEF.ID AND DEF.CODE={d} ORDER BY SEQ]]>
 							</value>
-						</property>
+						</property> 
 					</bean>
 				</entry>
 				<entry key="key.generator.query">
