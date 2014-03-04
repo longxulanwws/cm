@@ -53,12 +53,7 @@
 	                    {display:'编号',name:'code',width:160,minWidth:60},
 	                    {display:'名称',name:'name',width:160,minWidth:60,align:'left'},
 	                    {display:'规格/型号',name:'specs',width:120,minWidth:60,align:'left'},
-	                    //{display:'品牌',name:'brand',width:140,minWidth:60,align:'left'},
-	                    //{display:'商品性质',name:'type',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'product_category',item.type);}},
 	                    {display:'计量单位',name:'uom_id',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'uom',item.uom_id);}}
-// 	                    {display:'副计量',name:'name',width:180,minWidth:60,align:'left'},
-// 	                    {display:'库存计量',name:'name',width:180,minWidth:60,align:'left'},
-// 	                    {display:'库存副计量',isSort:false,width:100}
                     ],
                     pageSize:20,
                     usePager: true,
@@ -74,7 +69,6 @@
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: toQuery,
                     url: '../common/q.jsp',                   
-                    //wws 2014-2-23 增加分页信息 start
                     onToFirst: function(item) {
                         toQuery(item, 1);
                     },
@@ -100,13 +94,11 @@
     					if (cp < p)
         					cp += 1;
         				toQuery(item, cp);
-                    },
-        		    //wws 2014-2-23 增加分页信息 end 
+                    }
    	   			});
    	   			if (opt !== 's')
 					appendAddBtn(toAdd);
 				
-				//$("#detail_form").ligerForm();
 				$("#d-menu").ligerToolBar({items:[
 				    {text:'保存',click:toSave,icon:'save'},
 					{line:true},
@@ -118,6 +110,7 @@
                     valueField:'value',
                     textField:'name',
                     data:getData('uom_pres'),
+                    value: '02',
                     onSelected:function(v,t) {
                         $("#uomPresS_val").val(v);
                     }
@@ -151,6 +144,8 @@
 					return;
 				}
 				resetArea();
+				uomPreSel.setValue('02');
+				typeSel.setValue(pNode.substring(0, 2));
 
 				detailDialog = $.ligerDialog.open({
 					target:$("#detail"),
@@ -338,13 +333,13 @@
 				</div>
                	<div class="line-div">					
 					<div class="label-div"> <label>规格型号</label></div>
-					<div class="in-div"><input type="text" id="specsS" ltype="text" class="required diff" /></div>
+					<div class="in-div"><input type="text" id="specsS" ltype="text" class="diff" /></div>
 				</div>
                	<div class="line-div">
 					<div class="label-div"><label>计量单位</label></div>
 					<div class="in-div"><input type="text" id="uomIdS" ltype="combobox" class="required diff" /></select></div>
 					<div class="label-div"><label>单位精度</label></div>
-					<div class="in-div"><input type="text" id="uomPresS" ltype="combobox" class="required diff" /></div>
+					<div class="in-div"><input type="text" id="uomPresS" ltype="combobox" class="diff" /></div>
 				</div>
                	<div class="line-div">
 					<div class="label-div"><label>物料性质</label></div>
