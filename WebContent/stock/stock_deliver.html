@@ -13,10 +13,25 @@
 		<script src="../js/json2.js" type="text/javascript"></script>
 		<script type="text/javascript">
 			var defGrid;
+			var opt;
+			//去传输过来的信息
+			var str = window.location.toString().replace(/^[^?]+\??/, "");
+			
+			var ss = str.split('?');
+			var query = new Object();
+			for (var i = 0; i < ss.length; i++) {
+				eval('query.'.concat(ss[i].split('=')[0]).concat('="').concat(ss[i].split('=')[1]).concat('"'));
+			}
+			opt = query['m'];
+			//alert(opt);
+			//c_code = query['code'];
 			$(function(){
                	defGrid = $("#query_list").ligerGrid({
+               		//var str = window.location.tostring();
+               	
+               		
                     columns:[
- 						{display:'操作',isSort:false,width:100,render:function(rowdata,rowindex,value) {
+ 						{display:'操作',isSort:false,width:120,render:function(rowdata,rowindex,value) {
 							
  							// 单据状态 state      00 新建  10 未审核 20 已审核 30 未提交 40已提交  50 已驳回
  							// 流程状态 flow_state 00 新建（制单） 10 入库质检     20 入、出库审核   30 打印出入库单   40 入、出库确认    50 入、出库完成							
@@ -125,8 +140,16 @@
 				param.origin = $("#originQ").val();
 				//param.partner_id = $("#partnerQ").val();
 				param.state=$("#stateS").val();
-				
+				// no 是销售发货，yes 生产领用发货
+				if(opt=='no'){
+					 param.move_type='04';
+					// alert(opt);
+				}
+				else {
                 param.move_type='03';
+                //alert(opt);
+				}
+				
                 param.move_in_user=$('#UserCodeS').val();
                 //处理flow_state大于20的数据
                 param.flow_state='20';

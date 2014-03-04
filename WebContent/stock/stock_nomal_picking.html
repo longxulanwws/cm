@@ -18,33 +18,35 @@
                     columns:[
  						{display:'操作',isSort:false,width:130,render:function(rowdata,rowindex,value) {
  							var h = "";
-							 // h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> "; 
-							 var row = defGrid.getRow(rowindex);
- 							// if(row.state == '00' || row.state == 'null')
- 	 							// {
-                             //  h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交发货</a> ";
-                             //  h += "<a href='javascript:void(0);'  class='opt-link' onclick='deleteRow(" + rowindex + ")'>删除</a> ";
- 	 							// } 
- 							 if(row.state == '32'||row.state == '31' ) 
-							  {
+ 							var row = defGrid.getRow(rowindex);
+ 						// 单据状态 state      00 新建  10 未审核 20 已审核 30 未提交 40已提交  50 已驳回
+							// 流程状态 flow_state 00 新建（制单） 10 入库质检     20 入、出库审核   30 打印出入库单   40 入、出库确认    50 入、出库完成
+							  if(row.state  >= '20' && row.flow_state >='00') 
+							  	{
 								  h += "已审核  ";
-							  }
-							  else
-							 {
-							  h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitSH(" + rowindex + ")'>审核</a> ";
-							  }
+							  	}
+								///alert(row.flow_state+row.state);
+								//if(row.state<='20'){ alert(1);}
+							  if( row.state < '20' && row.flow_state =='00'   )
+							 	{
+								  
+							  		h += "<a href='javascript:void(0);' id='toConfirm' class='opt-link' onclick='toConfirm(" + rowindex + ")'>审核</a> ";
+								}
 							
-	 							 if(row.state == '00' || row.state == 'null' ||row.state == '32')
-	 							 {
-                              h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交发货</a> ";
-							 
-                             // h += "<a href='javascript:void(0);'  class='opt-link' onclick='deleteRow(" + rowindex + ")'>删除</a> "; 
-								
-	 							 }
-	 							 else
-		 							 {
-	 								  h += "已提交发货  ";
-		 							 }
+	 						if(row.state <= '20' && row.flow_state =='00')
+ 	 							 {
+                               		h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交发货</a> ";
+								 }
+	 						if(row.state  >= '40' && row.flow_state >='20') 
+		 						{
+	 								h += "已提交发货  ";
+		 						}
+	 						//
+	 						if(row.state  == '50') 
+	 						{
+ 								h = "<a href='javascript:void(0);' id='toReceive' class='opt-link' onclick='toReceive(" + rowindex + ")'>接收驳回待办</a> ";
+	 						}	
+							
                         	return h; 
  						},frozen:true},
                         {display:'单据状态',name:'state',width:70,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
@@ -105,7 +107,7 @@
 				param.origin = $("#originQ").val();
 				param.state=$("#stateS").val();
                 param.move_type='04';
-                
+                param.createuser=$('#createUserCodeS').val();
 				var data = JSON.stringify(reqObj('q','stock.select.picking_nomal.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					defGrid.set({data: data['data']});
@@ -155,65 +157,71 @@
 			function toPrint(rowid) {
 				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_nomal_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
 			}
-			 function submitSH(rowid)
-			 {
-				 var row = defGrid.getRow(rowid);
-					//$('#id').val(row.id);
-					// 待发货状态--- 31---
-					//$('#state').val(31);
-					var param1=new Object();
-					param1.id=row.id;
-					param1.state='32';
-					
-					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
-					
-						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
-							if (data) {
-								if (parseInt(data['status']) > 0) {
-									//$.ligerDialog.success('提交成功');
-									//$("#submitToPick").hide();
-									toQuery();
-								} else {
-									$.ligerDialog.error('提交失败');
-								}
-							}
-						});
-			 }
-			//提交仓库发货
-			function submitToPick(rowid) {
-				var row = defGrid.getRow(rowid);
-				if(row.state=='00')
-				{
-					$.ligerDialog.error('该单据未审核不能提交，请先审核！');
-					return;
-				}
-			   if(window.confirm('您确定要提交该项数据吗？')==true)
-			   {
-				//$('#id').val(row.id);
-				// 待发货状态--- 31---
-				//$('#state').val(31);
-				var param1=new Object();
-				param1.id=row.id;
-				param1.state='31';
-				
-				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
-				
-					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
-						if (data) {
-							if (parseInt(data['status']) > 0) {
-								//$.ligerDialog.success('提交成功');
-								$("#submitToPick").hide();
-								toQuery();
-							} else {
-								$.ligerDialog.error('提交失败');
-							}
-						}
-					});
-			   }
+			/* 
+			单据流程流程
+		           单据状态 state      00 新建  10 未审核 20 已审核 30 未提交 40已提交  50 已驳回
+			流程状态 flow_state 00 新建（制单） 10 入库质检     20 入、出库审核   30 打印出入库单   40 入、出库确认    50 入、出库完成
+		*/
+		// 接收驳回
+		function toReceive(rowid)
+		{
+			var row = defGrid.getRow(rowid);
+			var param1=new Object();
+			param1.id=row.id;
+			// 驳回后状态被修改
+			param1.state='10';
+			param1.flow_state='00';
+			upPickingDel(param1,'stock.update.picking_state.update','接收成功','接收失败');
+	
+		}
+		// 审核确认
+		function toConfirm(rowid) {
+			var row = defGrid.getRow(rowid);
+			var param1=new Object();
+		     	param1.id=row.id;
+				//已审核 20
+				param1.state="20";
+                param1.flow_state=row.flow_state;
+                
+				upPickingDel(param1,'审核成功','审核失败');
+		
 	        }
+		
+		//提交出库
+		function submitToPick(rowid) {
+			var row = defGrid.getRow(rowid);
+			var param1=new Object();
+			param1.id=row.id;
+			// 状态被修改
+			param1.state='40';
+			param1.flow_state='30';
+			upPickingDel(param1,'提交出库成功','提交出库失败');
+
+			
+		}
+		function upPickingDel(param1,successInfo,errorInfo){
+			
+			 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
+				
+				ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+					if (data) {
+						if (parseInt(data['status']) > 0) {	
+							
+							$.ligerDialog.success(successInfo);
+							//自动刷新
+							toQuery();
+						} else {								
+							$.ligerDialog.error(errorInfo);
+						}
+					}
+				});
+			
+			
+		}
+			 
 			 function deleteRow(rowid) {
 				 var row = defGrid.getRow(rowid);
-				 alert(row.state);
+				
 				 if(row.state=='32')
 					{
 					 $.ligerDialog.error('该单据已审核，不能删除！');
@@ -233,28 +241,51 @@
 		                defGrid.deleteRow(rowid);
 		            })
 		        }
-			 function toDel(row) {
-				
-				 var param = JSON.stringify(reqObj('d','stock.delete.stock_move.prckingid',row));
-					ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
-						if (data) {
-							if (parseInt(data['status']) > 0) {
-								
-						     var param = JSON.stringify(reqObj('d','stock.delete.stock_picking.code',row));
-						      ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
-								if (parseInt(data['status']) > 0) {
-								  $.ligerDialog.success('删除成功');
-								}
-								else{
-										$.ligerDialog.error('删除失败');
-									}
-									});
-							} else {
-								$.ligerDialog.error('删除失败');
-							}
+			 /*	删除处理 
+				*/
+				 function deleteRow(rowid) {
+					 
+					 var row = defGrid.getSelectedRow();
+					 
+					 if(row.state >= '20')
+						{
+						 $.ligerDialog.error('该单据已审核或已提交，不能删除！');
+							return;
 						}
-					});
-			}
+					  
+			            $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
+				            if (!r)
+					            return;
+			                
+			                if (row['__status'] !== 'add')
+			                	toDel(JSON.stringify(row));
+			                defGrid.deleteRow(rowid);
+			            })
+			        }
+				// 删除处理业务处理
+				 function toDel(row) {
+					
+					 var param = JSON.stringify(reqObj('d','stock.delete.stock_move.prckingid',row));
+						ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
+							if (data) {
+								if (parseInt(data['status']) > 0) {
+									
+							     var param = JSON.stringify(reqObj('d','stock.delete.stock_picking.code',row));
+							      ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
+									if (parseInt(data['status']) > 0) {
+										toQuery();
+									  $.ligerDialog.success('删除成功');
+									}
+									else{
+											$.ligerDialog.error('删除失败');
+										}
+										});
+								} else {
+									$.ligerDialog.error('删除失败');
+								}
+							}
+						});
+				}
 	    </script>
 		<style type="text/css">
 			label{margin: 5px 20px 5px 15px;}
@@ -270,6 +301,7 @@
 	</head>
 	<body style="padding:0;">
 		<div id="pageloading"></div>  
+			<input type="hidden" id="createUserCodeS" />
 		<div id="layout_main">
 			<div position="center" id="a_center" title="入库单列表">
 				<div id="query_cond" class="fields">
