@@ -309,6 +309,27 @@ function appendDeleteBtn(action, title) {
 		title = "删除";
 	appendBtnForGridToolbar("l-bar-btndel", "l-icon-delete", action, title);
 }
+/**
+ * 解析URL中的Query String部分传递的参数
+ * 
+ * @param url 请求url
+ * @returns {Object} 将query string中的参数封装为对象
+ */
+function getQueryString(url) {
+	var qs = uri.replace(/^[^?]+\??/, '');
+	var queryObj = new Object();
+	if (qs.length === 0)
+		return queryObj;
+	
+	var qsa = qs.split('&');
+	for (var i = 0; i < qsa.length; i++) {
+		if (qsa[i].match(/[^=]+=[^=]+/))
+			eval('queryObj.'.concat(qsa[i].replace('=', '="')).concat('"'));
+		else if (qsa[i].match(/[^=]+=/))
+			eval('queryObj.'.concat(qsa[i]).concat('""'));
+	}
+	return queryObj;
+}
 $(function() {
 	selectInjector();
 });
