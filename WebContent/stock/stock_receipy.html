@@ -178,7 +178,7 @@
 				var row = defGrid.getRow(rowid);
 				
 				
-				alert(row.state);
+			//	alert(row.state);
 				var printFlag =false
 				if(row.state >=110){
 					if(window.confirm('该单据已打印过，请确认是否需要第二次打印？')==true)
@@ -193,20 +193,20 @@
 					
 					printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
 					
-// 					var param1=new Object();
-// 					param1.id=row.id;
-// 					param1.state='110';
-// 					param1.flow_state=row.flow_state;
-// 					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
+// 					VAR PARAM1=NEW OBJECT();
+// 					PARAM1.ID=ROW.ID;
+// 					PARAM1.STATE='110';
+// 					PARAM1.FLOW_STATE=ROW.FLOW_STATE;
+// 					 VAR PARAM = JSON.STRINGIFY(REQOBJ('U','STOCK.UPDATE.PICKING_STATE.UPDATE',JSON.STRINGIFY(PARAM1)));
 					
-// 						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
-// 							if (data) {
-// 								if (parseInt(data['status']) > 0) {
-// 									//$.ligerDialog.success('提交成功');
-// 									//$("#quality").hide();
-// 									toQuery();
-// 								} else {
-// 									$.ligerDialog.error('提交失败');
+// 						AJAXSUBMIT("/CM/RBAC/CM.DO?M=U", PARAM, FUNCTION(DATA) {
+// 							IF (DATA) {
+// 								IF (PARSEINT(DATA['STATUS']) > 0) {
+// 									//$.LIGERDIALOG.SUCCESS('提交成功');
+// 									//$("#QUALITY").HIDE();
+// 									TOQUERY();
+// 								} ELSE {
+// 									$.LIGERDIALOG.ERROR('提交失败');
 // 								}
 // 							}
 // 						});

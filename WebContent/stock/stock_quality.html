@@ -165,7 +165,14 @@
 				   }
 	        }
 			function openModify() {
+				
 				var row = defGrid.getSelectedRow();
+				//alert(row.state);
+				if(row.state >= 70 ) 
+			  	{
+					$.ligerDialog.error('该单据不允许编辑！');
+					return;
+			  	}
 				if (!row) {
 					$.ligerDialog.error('请先选择入库单记录。','错误');
 					return;
