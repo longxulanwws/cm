@@ -309,6 +309,21 @@ function appendDeleteBtn(action, title) {
 		title = "删除";
 	appendBtnForGridToolbar("l-bar-btndel", "l-icon-delete", action, title);
 }
+function getQueryString(uri) {
+	var qs = uri.replace(/^[^?]+\??/, '');
+	var queryObj = new Object();
+	if (qs.length === 0)
+		return queryObj;
+	
+	var qsa = qs.split('&');
+	for (var i = 0; i < qsa.length; i++) {
+		if (qsa[i].match(/[^=]+=[^=]+/))
+			eval('queryObj.'.concat(qsa[i].replace('=', '="')).concat('"'));
+		else if (qsa[i].match(/[^=]+=/))
+			eval('queryObj.'.concat(qsa[i]).concat('""'));
+	}
+	return queryObj;
+}
 $(function() {
 	selectInjector();
 });
