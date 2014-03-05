@@ -150,9 +150,16 @@
 				}
 			}
 			function Quality(rowid) {
-				if($('#stateS').val()=='20')
+				if($('#stateS').val()==100)
+			    {
+					$.ligerDialog.error('该单据未打印，不能确认出库，请确认！');
+					return;
+			    }
+				else if($('#stateS').val()==120){
 					$.ligerDialog.error('已提交收货，不能重复收货，请确认！');
+				}
 				else
+					{
 				   if(window.confirm('您确定要提交该项数据吗？')==true)
 			         
 					//var row = defGrid.getRow(rowid);
@@ -160,14 +167,14 @@
 					//$('#state').val(20);
 					var param1=new Object();
 					param1.id=$('#idS').val();
-					param1.state='20';
-					
+					param1.state='120';
+					param1.flow_state='50';
 					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 					
 						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 							if (data) {
 								if (parseInt(data['status']) > 0) {
-									$('#stateS').val(20);
+									$('#stateS').val(120);
 									$.ligerDialog.success('提交成功');
 									//$("#quality").hide();
 									//toQuery();
@@ -176,6 +183,7 @@
 								}
 							}
 						});
+					}
 		        }
 			function queryProd() {}
 			function toAdd() {

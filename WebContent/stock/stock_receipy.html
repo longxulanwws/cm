@@ -16,23 +16,40 @@
 			$(function(){
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
- 						{display:'操作',isSort:false,width:150,render:function(rowdata,rowindex,value) {
+ 						{display:'操作',isSort:false,width:120,render:function(rowdata,rowindex,value) {
  							var h = "";
+ 						// 单据状态 state    入库制单  00 新建  10 未审核 20 已审核 30 未提交 40已提交      50 已驳回
+ 							//               质检  60 未审核   70 已审核  80 质检未完成 90 质检完成 100 提交入库 
+ 							//               入库  110 打印入库单    120 确认入库   
+ 							// 流程状态 flow_state 00 新建（制单） 10 入库质检     20 入、出库审核   30 打印出入库单   40 入、出库确认    50 入、出库完成 
+ 								 var row = defGrid.getRow(rowindex);
+ 						   if(row.state == 100)
+ 							{
  							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
- 							 var row = defGrid.getRow(rowindex);
- 							 if(row.state == '21' )
-                               h += "待确认收货"; 
+ 							}
+ 						   else
+ 						   {
+ 							  h += "打印完成  ";
+ 						   }
+ 							 if(row.state ==120 )
+ 						     {
+ 								 h += "已确认收货";
+ 						     }
+ 							 else
+ 							{
+                               h += "待确认收货";
+ 							}
                         	return h; 
                         },frozen:true},
-                        {display:'单据状态',name:'state',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
+                        {display:'单据状态',name:'state',width:80,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
                         {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
-                        {display:'修改时间',name:'writedate',width:150},
-                        {display:'入库单号',name:'code',width:80,minWidth:60},
-	                    {display:'采购单号',name:'origin',width:80},
-			            {display:'供应商',name:'partner_id',render:sw_partner,width:70,align:'left'},
+                        {display:'修改时间',name:'writedate',width:130},
+                        {display:'入库单号',name:'code',width:130,minWidth:60},
+	                    {display:'采购单号',name:'origin',width:130},
+			            {display:'供应商',name:'partner_id',width:130,render:sw_partner,align:'left'},
 			            //{display:'预计到货日期',name:'pred_date',width:80},
 			            {display:'入库仓库',name:'warehose_id',render:sw_warehose,width:90,align:'left'},
-			            {display:'收货人',name:'move_in_user',render:sw_opt,align:'left'},
+			            {display:'收货人',name:'move_in_user',width:90,render:sw_opt,align:'left'},
 			            {display:'备注',name:'note',width:210}
                     ],
                     pageSize:20,
@@ -58,6 +75,9 @@
 				$("#pageloading").hide();
 				//默认查询全部数据 
 				toQuery();
+				ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
+					$('#UserCodeS').val(data['uid']);
+				}, null, false);
 			});
 			
 			function sw_opt(item) {
@@ -89,7 +109,8 @@
 				param.origin = $("#originQ").val();
 				param.partner_id = $("#partnerQ").val();
 				param.state=$("#stateS").val();
-                     
+				param.move_type='01';
+				param.move_in_user=$('#UserCodeS').val();
 				var data = JSON.stringify(reqObj('q','stock.select.picking.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					defGrid.set({data: data['data']});
@@ -107,7 +128,7 @@
 				var param1=new Object();
 				param1.id=row.id;
 				param1.state='20';
-				
+				param1.flow_state='50';
 				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 				
 					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
@@ -132,7 +153,44 @@
 			}
 			var printWin;
 			function toPrint(rowid) {
-				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+				
+				var row = defGrid.getRow(rowid);
+				
+				
+				alert(row.state);
+				var printFlag =false
+				if(row.state >=110){
+					if(window.confirm('该单据已打印过，请确认是否需要第二次打印？')==true)
+				    printFlag=true;
+// 					$.ligerDialog.error('已打印请勿重复打印，不能打印，请确认！');
+// 					return;					
+				}else{
+					printFlag=true;
+				}
+				
+				if(printFlag){
+					
+					printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+					
+// 					var param1=new Object();
+// 					param1.id=row.id;
+// 					param1.state='110';
+// 					param1.flow_state=row.flow_state;
+// 					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
+					
+// 						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+// 							if (data) {
+// 								if (parseInt(data['status']) > 0) {
+// 									//$.ligerDialog.success('提交成功');
+// 									//$("#quality").hide();
+// 									toQuery();
+// 								} else {
+// 									$.ligerDialog.error('提交失败');
+// 								}
+// 							}
+// 						});
+				}
+				
 			}
 	    </script>
 		<style type="text/css">
@@ -150,6 +208,7 @@
 	<body style="padding:0;">
 	<input type="hidden" id="id" />
 	<input type="hidden" id="state" />
+	<input type="hidden" id="UserCodeS" />
 		<div id="pageloading"></div>  
 		<div id="layout_main">
 			<div position="center" id="a_center" title="入库单列表">
@@ -158,7 +217,7 @@
 					<label>采购订单号</label><input type="text" class="s-text txt-def" id="originQ" />
 					<label>供应商</label>
 					<select id="partnerQ" param="partner_list" first="" ></select>
-					<label>状态</label><select id="stateS" param="stockreceipy"  ></select>
+					<label>状态</label><select id="stateS" param="stockreceipy" first="" ></select>
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
 					<input type="button" value="清空" onclick="toReset('#codeQ,#originQ,#partnerQ');" />
 				</div>

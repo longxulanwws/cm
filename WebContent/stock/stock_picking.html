@@ -103,7 +103,11 @@
 				});
 				appendAddBtn(openDictDef, "添加原材料入库单");
 				appendModifyBtn(openModify, "编辑原材料入库单");
+				appendDeleteBtn(deleteRow, "删除单据信息");
 				$("#pageloading").hide();
+				ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
+					$('#createUserCodeS').val(data['uid']);
+				}, null, false);
 				//默认查询全部数据 
 				toQuery();
 			});
@@ -137,6 +141,7 @@
 				param.partner_id = $("#partnerQ").val();
 				param.state=$("#stateS").val();
 				param.move_type='01';
+				param.createuser=$("#createUserCodeS").val();
 				var data = JSON.stringify(reqObj('q','stock.select.picking.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					var d = data['data'].Rows;
@@ -178,8 +183,8 @@
 					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 						if (data) {
 							if (parseInt(data['status']) > 0) {
-								//$.ligerDialog.success('提交成功');
-								$("#to_quality").hide();
+								$.ligerDialog.success('提交成功');
+								//$("#to_quality").hide();
 								toQuery();
 							} else {
 								$.ligerDialog.error('提交失败');
@@ -221,6 +226,11 @@
 			}
 			function openModify() {
 				var row = defGrid.getSelectedRow();
+				if(row.state >=20)
+			    {
+					$.ligerDialog.error('该单据不能编辑！');
+				    return;
+				}
 				if (!row) {
 					$.ligerDialog.error('请先选择原材料入库单记录。','错误');
 					return;
@@ -243,6 +253,47 @@
 			function toPrint(rowid) {
 				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
 			}
+			 function deleteRow(rowid) {
+				    var row = defGrid.getSelectedRow(rowid);
+					if(row.state >=20)
+				    {
+						$.ligerDialog.error('该单据不能删除！');
+					    return;
+					}
+					else
+						{
+		            $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
+			            if (!r)
+				            return;
+		            
+		                if (row['__status'] !== 'add')
+		                	toDel(JSON.stringify(row));
+		                defGrid.deleteRow(rowid);
+		            })
+					}
+		        }
+			 function toDel(row) {
+				
+				 var param = JSON.stringify(reqObj('d','stock.delete.stock_move.prckingid',row));
+					ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
+						if (data) {
+							if (parseInt(data['status']) > 0) {
+								
+						     var param = JSON.stringify(reqObj('d','stock.delete.stock_picking.code',row));
+						      ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
+								if (parseInt(data['status']) > 0) {
+								  $.ligerDialog.success('删除成功');
+								}
+								else{
+										$.ligerDialog.error('删除失败');
+									}
+									});
+							} else {
+								$.ligerDialog.error('删除失败');
+							}
+						}
+					});
+			}
 	    </script>
 		<style type="text/css">
 			label{margin: 5px 20px 5px 15px;}
@@ -259,6 +310,7 @@
 	<body style="padding:0;">
 	<input type="hidden" id="id" />
 	<input type="hidden" id="state" />
+	<input type="hidden" id="createUserCodeS" />
 		<div id="pageloading"></div>  
 		<div id="layout_main">
 			<div position="center" id="a_center" title="原材料入库单列表">
