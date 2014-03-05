@@ -23,13 +23,9 @@
 				eval('query.'.concat(ss[i].split('=')[0]).concat('="').concat(ss[i].split('=')[1]).concat('"'));
 			}
 			opt = query['m'];
-			//alert(opt);
-			//c_code = query['code'];
+			
 			$(function(){
                	defGrid = $("#query_list").ligerGrid({
-               		//var str = window.location.tostring();
-               	
-               		
                     columns:[
  						{display:'操作',isSort:false,width:120,render:function(rowdata,rowindex,value) {
 							
