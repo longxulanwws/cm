@@ -24,6 +24,7 @@
 								<entry key="origin" value=":like(lr)" />
 								<entry key="partner_id" value=":like(lr)" />
 								<entry key="state" value="" />
+								<entry key="type" value="" />
 								<entry key="move_type" value="" />
 								<entry key="createuser" value="" />
 								<entry key="move_in_user" value="" />

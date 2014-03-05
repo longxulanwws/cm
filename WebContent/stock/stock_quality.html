@@ -59,16 +59,18 @@
                         	return h; 
                         },frozen:true},
 			            {display:'单据状态',name:'state',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
-                        //{display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
+                        {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
                         {display:'修改时间',name:'writedate',width:130},
                         {display:'入库单号',name:'code',width:130,minWidth:60},
 	                    {display:'采购申请单号',name:'origin',width:130},
 			            {display:'供应商',name:'partner_id',render:sw_partner,width:190,align:'left'},
 			            {display:'预计到货日期',name:'pred_date',width:80},
+			            {display:'入库异常',name:'QC_Anomaly_Sate',width:80},
+			            {display:'质检结论',width:100,name:'QC_Note',align:'left'},
 			            {display:'入库仓库',name:'warehose_id',render:sw_warehose,width:80},
 			            {display:'收货人',name:'move_in_user',render:sw_opt,width:80},
-			            {display:'入库异常',name:'move_in_user',width:80},
-			            {display:'备注',width:200,name:'note',align:'left'}
+			            {display:'其他备注',width:200,name:'note',align:'left'}
+			            
                     ],
                     pageSize:20,
                     usePager: true,
@@ -88,7 +90,7 @@
                     param_partner:'partner_list'
 				});
 				//appendAddBtn(openDictDef, "添加入库单");
-				appendModifyBtn(openModify, "修改入库单");
+				appendModifyBtn(openModify, "编辑质检单");
 				$("#pageloading").hide();
 				//默认查询全部数据 
 				toQuery();
@@ -122,7 +124,7 @@
 				param.origin = $("#originQ").val();
 				param.partner_id = $("#partnerQ").val();
 				//param.state=$("#stateS").val();
-				param.move_type='01';
+				param.type='0';
 				var data = JSON.stringify(reqObj('q','stock.select.picking.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					defGrid.set({data: data['data']});
