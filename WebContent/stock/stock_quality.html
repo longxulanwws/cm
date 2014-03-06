@@ -17,46 +17,40 @@
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
  						{display:'操作',isSort:false,width:150,render:function(rowdata,rowindex,value) {
+ 							
+ 							var row = defGrid.getRow(rowindex);
  							var h = "";
- 							//  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
- 							 var row = defGrid.getRow(rowindex);
- 							// 单据状态 state    入库制单  00 新建  10 未审核 20 已审核 30 未提交 40已提交      50 已驳回
- 							//               质检  60 未审核   70 已审核  80 质检未完成 90 质检完成 100 提交入库 
- 							//               入库  110 打印入库单    120 确认入库   130 入库完成
- 							// 流程状态 flow_state 00 新建（制单） 10 入库质检     20 入、出库审核   30 打印出入库单   40 入、出库确认    50 入、出库完成 
- 							if(row.state >= 70 ) 
-						  	{
-							  h += "已审核  ";
-						  	}
-						  else 
-							{
-							  h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='toConfirm(" + rowindex + ")'>审核</a> ";
-							}
- 							if(row.state<80 && row.flow_state<=10)
+ 							// 制单环节：单据状态  state      00 未审核     >>审核 >>    10 已审核     >>提交>>     20已提交                 99 驳回修改
+ 							// 质检环节：                                               20 待质检    >>质检确认>>  30已质检     >>审核>>      40已审核  >>提交>>  50已提交
+ 							// 出入库确认环节                                       50待打印     >>打印>>     60已打印   >>出入库确认>>   70出库完成           
+ 							
+ 							// 流程状态 flow_state 00 新建（制单） 10 入库质检     20入、出库确认    30 入、出库完成
+
+ 							if(row.state  < 30 )
  							  {
  								h += "待质检  ";
  							  }
  							else {
  								h += "已质检  ";
  							  }
-						 if(row.state<100 && row.flow_state<=10)
+ 							if(row.state > 40 ) 
+						  	{
+							  h += "已审核  ";
+						  	}
+						  else 
+							{
+							  h += "<a href='javascript:void(0);' id='toConfirm' class='opt-link' onclick='toConfirm(" + rowindex + ")'>审核</a> ";
+							}
+ 							
+						 if(row.state < 50 )
 						  {
-							 h += "<a href='javascript:void(0);' id='to_quality' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交入库</a> ";
+							 h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交入库</a> ";
 						  }
 						 else{
 							 h += "已提交入库";
 						 }
-//  							 if(row.state == '12') 
-// 							  {
-// 								  h += "已审核  ";
-// 							  }
-// 							  else
-// 							 {
-// 							  h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitSH(" + rowindex + ")'>审核</a> ";
-// 							  }
-//  							 if(row.state == '10'||row.state == '12'  )
-//                                h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交入库</a> "; 
-                        	return h; 
+							return h;
+						
                         },frozen:true},
 			            {display:'单据状态',name:'state',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
                         {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
@@ -125,6 +119,7 @@
 				param.partner_id = $("#partnerQ").val();
 				//param.state=$("#stateS").val();
 				param.type='0';
+				
 				var data = JSON.stringify(reqObj('q','stock.select.picking.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					defGrid.set({data: data['data']});
@@ -179,53 +174,41 @@
 				}
 				parent.f_addTab('quality_stockp','质检单维护','./stock/new_stock_quality.html?o=m&code='.concat(row.code));
 			}
+			
 			var printWin;
 			function toPrint(rowid) {
 				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
 			}
-			function submitSH(rowid)
-			 {
-				 var row = defGrid.getRow(rowid);
-				// alert(row.state);
-				 
-				 if(row.state=='11')
-			     {
-					 $.ligerDialog.error('该单据未质检，请先质检！');
-						return;
-				  }
-					//$('#id').val(row.id);
-					// 待发货状态--- 31---
-					//$('#state').val(31);
-					var param1=new Object();
-					param1.id=row.id;
-					param1.state='12';
-					
-					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
-					
-						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
-							if (data) {
-								if (parseInt(data['status']) > 0) {
-									//$.ligerDialog.success('提交成功');
-									//$("#submitToPick").hide();
-									toQuery();
-								} else {
-									$.ligerDialog.error('提交失败');
-								}
-							}
-						});
-			 }
+			
+
 			// 审核确认
 			function toConfirm(rowid) {
 				var row = defGrid.getRow(rowid);
 				var param1=new Object();
 			     	param1.id=row.id;
-					//已审核 20
-					param1.state="70";
+					//已审核 40
+					param1.state="40";
                     param1.flow_state=row.flow_state;
                     
 					upPickingDel(param1,'审核成功','审核失败');
 			
 		        }
+			//提交出库
+			function submitToPick(rowid) {
+				var row = defGrid.getRow(rowid);
+				if(row.state < 40){
+					$.ligerDialog.error('该单据还未审核，请先审核！');
+					return;
+				}
+				var param1=new Object();
+				param1.id=row.id;
+				// 状态被修改
+				param1.state='50';
+				param1.flow_state='20';
+				upPickingDel(param1,'提交出库成功','提交出库失败');
+
+				
+			}
 			function upPickingDel(param1,successInfo,errorInfo){
 				
 				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
