@@ -119,46 +119,14 @@
 				param.partner_id = $("#partnerQ").val();
 				//param.state=$("#stateS").val();
 				param.type='0';
-				
-				var data = JSON.stringify(reqObj('q','stock.select.picking.query',JSON.stringify(param),'l',true,page,pageSize));
+				param.flow_state='10';
+				var data = JSON.stringify(reqObj('q','stock.select.picking.quality.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					defGrid.set({data: data['data']});
 				});
 			}
-			function openDictDef() {
-				parent.f_addTab('new_stockp','新增入库单','./stock/new_stock_picking.html');
-			}
-			function submitToPick(rowid) {
-				var row = defGrid.getRow(rowid);
-			//	alert(row.state);
-				if(row.state<90)
-					{
-					$.ligerDialog.error('该单据未确认质检，请先质检！');
-					return;
-					}
-			   if(window.confirm('您确定要提交该项数据吗？')==true)
-				   {
-				$('#id').val(row.id);
-				$('#state').val(100);
-				var param1=new Object();
-				param1.id=$('#id').val();
-				param1.state=$('#state').val();
-				param1.flow_state='30';
-				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
-				
-					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
-						if (data) {
-							if (parseInt(data['status']) > 0) {
-								$.ligerDialog.success('提交成功');
-								//$("#submitToPick").hide();
-								toQuery();
-							} else {
-								$.ligerDialog.error('提交失败');
-							}
-						}
-					});
-				   }
-	        }
+
+
 			function openModify() {
 				
 				var row = defGrid.getSelectedRow();
@@ -184,6 +152,10 @@
 			// 审核确认
 			function toConfirm(rowid) {
 				var row = defGrid.getRow(rowid);
+				if(row.state < 30){
+					$.ligerDialog.error('该单据还未质检确认，请先审核！');
+					return;
+				}
 				var param1=new Object();
 			     	param1.id=row.id;
 					//已审核 40
