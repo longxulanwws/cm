@@ -133,6 +133,7 @@
 				curRow = this;
 				selDialog = $.ligerDialog.open({height:600,width:800,isResize: true,url:'../sysmgt/product_query.html?o=s',title:'选择商品'});
 			}
+			function queryProd(){}
 			function bindVal(data) {
 				if (data.Rows && data.Rows.length === 1) {
 					data = data.Rows[0];
