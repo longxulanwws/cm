@@ -33,7 +33,7 @@
  							else {
  								h += "已质检  ";
  							  }
- 							if(row.state > 40 ) 
+ 							if(row.state >= 40 ) 
 						  	{
 							  h += "已审核  ";
 						  	}
@@ -153,7 +153,7 @@
 			function toConfirm(rowid) {
 				var row = defGrid.getRow(rowid);
 				if(row.state < 30){
-					$.ligerDialog.error('该单据还未质检确认，请先审核！');
+					$.ligerDialog.error('该单据还未质检确认，请先质检确认！');
 					return;
 				}
 				var param1=new Object();
@@ -177,7 +177,7 @@
 				// 状态被修改
 				param1.state='50';
 				param1.flow_state='20';
-				upPickingDel(param1,'提交出库成功','提交出库失败');
+				upPickingDel(param1,'提交入库成功','提交入库失败');
 
 				
 			}
