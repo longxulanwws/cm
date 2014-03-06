@@ -10,6 +10,9 @@
 		<script src="../js/jquery.js" type="text/javascript"></script>
 		<script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
 		<script src="../js/common.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
+		<script src="../js/validate/messages_zh.js" type="text/javascript"></script>
 		<script type="text/javascript">
 			var pGrid, c_row, opt, c_code;
 			var udata;
@@ -47,7 +50,7 @@
 			            },
 			            {display:'采购数量',name:'tar_product_qty',width:90,align:'right',render:function(item){return parseFloat(item.tar_product_qty).toFixed(0);}},
 			            {display:'收货数量',name:'product_qty',width:90,id:'num',align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
-			            {display:'质检方式',name:'qc_type',width:150,align:'right',render:function(item){return paramRender(item,'QCType',item.qc_type);}
+			            {display:'质检方式',name:'qc_type',width:150,render:function(item){return paramRender(item,'QCType',item.qc_type);}
 			            ,editor:{type:'select',data:getData('QCType'),valueField:'value',textField:'name'}},
 			            {display:'质检结果',name:'qc_flag',width:150,render:function(item){return paramRender(item,'QCResult',item.qc_flag);}
 			            ,editor:{type:'select',data:getData('QCResult'),valueField:'value',textField:'name'}}
@@ -121,8 +124,21 @@
                         $("#moveInIdS").val(v);
                     }
 				});
+				//质检状态
+				$("#QC_Anomaly_SateInS").ligerComboBox({
+					autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:Nomaldata,
+                    onSelected:function(v,t) {
+                        $("#QC_Anomaly_SateS").val(v);
+                    }
+				});
 				$("#pageloading").hide();
 			});
+			var Nomaldata=new function () {
+				return getData('QCAnomalySate');
+			}
 			function resetArea() {
 				toReset('#a_center input:not(.readonly),select,textarea');
 			}
@@ -152,6 +168,11 @@
 					$('#createUserS').val(paramRender(null,'user',data.createuser));
 					$('#createUserCodeS').val(data.createuser);
 					$('#createDateS').val(data.createdate);
+					//质检异常状态
+ 					$('#QC_Anomaly_SateInS').val(paramRender(null,'QCAnomalySate',data.qc_anomaly_sate));
+ 					$('#QC_Anomaly_SateS').val(data.qc_anomaly_sate);
+					//质检备注
+      				$('#QC_NoteS').val(data.qc_note);
 				}
 			}
 			function queryProd() {}
@@ -162,15 +183,108 @@
 			   
 			 }
 			function toAdd() {
-				if (pGrid.rows.length === 0) {
-					$.ligerDialog.error('请添加入库商品。','错误');
-					return;
-				}
-				
-				//pGrid.endEdit(c_row.rowindex);
-				if (opt === 'm') {
-					//编辑方式
-				} 
+				var param = {
+						origin:$("#originS").val(),
+						partner:$("#partnerS").val(),
+						preddate:$("#predDateS").val(),
+						warehose:$("#warehouseS").val(),
+						moveinuser:$("#moveInIdS").val(),
+						note:$("#noteS").val()
+					};
+					var en = 'stock.add.yclrk.picking.add', optType = 'a';
+					if (opt === 'm') {
+						param.code = $('#codeS').val();
+						//修改人
+						param.writeusercode=$('#WriteUserCodeS').val();
+						//修改日期
+						param.writedate=$('#WriteDateS').val();
+						//质检日期
+						param.qc_date=$('#WriteDateS').val();
+						//质检状态
+						param.qc_anomaly_sate=$("#QC_Anomaly_SateS").val();
+						//质检结论
+						param.qc_note=$("#QC_NoteS").val();
+						// 进行修改数据库处理
+						en = 'stock.update.picking.Anomaly';
+						// 操作类型为 update
+						optType = 'u';
+					} else {
+						// 新增时 数据处理
+						param.company = "";
+						param.dept = $("#deptCodeS").val();
+						param.busiorg = "";
+						param.name = "";
+						param.type = "0";
+						param.createuser = $("#createUserCodeS").val();
+						param.createdate = $("#createDateS").val();
+						param.movetype="01";
+						param.state="00";
+						param.flow_state="00";
+						param.writedate=$('#WriteDateS').val();
+					}
+					var data = JSON.stringify(reqObj(optType,en,JSON.stringify(param)));
+					ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+						var rows = pGrid.rows;
+						if (opt === 'm') {
+							var addRows = [], updateRows = [];
+							for (var i = 0; i < rows.length; i++) {
+								if (rows[i].__status === 'add') {
+									rows[i].picking_id = $('#codeS').val();
+									rows[i].origin = $('#originS').val();
+									rows[i].type = '0';
+									rows[i].createuser = $('#createUserCodeS').val();
+									rows[i].createdate = $('#createDateS').val();
+									rows[i].dept_id = $('#deptCodeS').val();
+									rows[i].company_id = '';
+									rows[i].busiorg_id = '';
+									addRows.push(rows[i]);
+								} else if (rows[i].__status === 'update') {
+									updateRows.push(rows[i]);
+								}
+							}
+							var ar = 0, br = 0;
+							if (addRows.length > 0) {
+								var data_a = JSON.stringify(reqObj('ba','stock.add.stock_move',addRows));
+								ajaxSubmit("/cm/rbac/cm.do?m=ba", data_a, function(result) {
+									ar = result['status'];
+									if (updateRows.length === 0)
+										$.ligerDialog.success('保存成功', '操作完成', reloadPage);
+								}, null, false);
+							} else {
+								ar = 1;
+							}
+							if (ar > 0 && updateRows.length > 0) {
+								var data_u = JSON.stringify(reqObj('bu','stock.update.stock_move', updateRows));
+								ajaxSubmit("/cm/rbac/cm.do?m=bu", data_u, function(result) {
+									$.ligerDialog.success('保存成功', '操作完成', reloadPage);
+									br = result['status'];
+								});
+							} else {
+								br = 1;
+							}
+							if (ar > 0 && br > 0) {
+								$.ligerDialog.success('保存成功', '操作完成', reloadPage);
+							}
+						} else {
+							// 新增处理
+							var picking = data['added'];
+							c_code = picking['#stock.picking.ycl.rk.code'];
+							for (var i = 0; i < rows.length; i++) {
+								rows[i].picking_id = c_code;
+								rows[i].origin = $('#originS').val();
+								rows[i].type = '0';
+								rows[i].createuser = $('#createUserCodeS').val();
+								rows[i].createdate = $('#createDateS').val();
+								rows[i].dept_id = $('#deptCodeS').val();
+								rows[i].company_id = '';
+								rows[i].busiorg_id = '';
+							}
+							var data = JSON.stringify(reqObj('ba','stock.add.stock_move',rows));
+							ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
+								$.ligerDialog.success('保存成功', '操作完成', reloadPage);
+							});
+						}
+					});
 				
 			}
 	        function beginEdit(rowid) { 
@@ -281,7 +395,7 @@
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">
 				<div id="d-menu" class="toolbar"></div>
 				<div style="height:25px;"></div>
-				<form name="basic-form" method="post" id="basic_form">
+				<form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
 					<div class="line-div">
 						<div class="label-div"><label>入库单号</label></div>
 						<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
@@ -309,7 +423,7 @@
 					</div>
 					<div class="line-div">
 						<div class="label-div"><label>质检异常状态</label></div>
-						<div class="in-div" ><input type="text" id="QC_Anomaly_SateInS" ltype="text" class="diff" /></div>
+						<div class="in-div" ><input type="text" id="QC_Anomaly_SateInS" ltype="combobox" class="required diff" /></div>
 						<input type="hidden" id="QC_Anomaly_SateS" />
 					</div>
 					<div class="line-div" style="height:76px;">
