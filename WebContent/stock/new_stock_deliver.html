@@ -188,36 +188,28 @@
 				
 			}
 			
-			// 单据状态 state      00 新建  10 未审核 20 已审核 30 未提交 40已提交  50 已驳回
-			// 流程状态 flow_state 00 新建（制单） 10 入库质检     20 入、出库审核   30 打印出入库单   40 入、出库确认    50 入、出库完成
-			// 驳回修改处理，即 退回到 
+
+			// 驳回修改处理，即 退回到 制单环节
 			function toDismiss()
 			{
 				var param=new Object();
-				param.id=$('#idH').val();
+				param.id=$('#id').val();
 				// 驳回后状态被修改
-				param.state="50";
+				param.state="99";
+				param.flow_state="00";
 				upPickingDel(param,'stock.update.picking_state.update','驳回成功','驳回失败');
 				$('#state').val(50);
 			}
-			// 审核确认
-			function toConfirm() {
-				var param=new Object();
-				param.id=$('#id').val();
-				//已审核 20
-				param.state='20';                
-				upPickingDel(param,'stock.update.picking_state.update','确认出库成功','确认出库失败');		
-					
-		        }
+
 			//确认出库
 			function submitConfirm() {
 			  			
-				if($('#state').val()=='40')
+				if($('#state').val()=='70')
 					{
-					$.ligerDialog.error('已确认出库，不能重复出库确认，请确认！');
+					$.ligerDialog.error('已确认出库，不能重复确认，请确认！');
 				   return;
 					}
-				else if($('#flow_state').val()=='30')
+				else if($('#flow_state').val()=='50')
 					{
 					$.ligerDialog.error('该单据未打印，不能确认出库，请确认！');
 					return;
@@ -227,27 +219,24 @@
 				   if(window.confirm('您确定要提交该项数据吗？')==true)
     				var param=new Object();
 					param.id=$('#id').val();
-					//已提交 40
-					param.state='40';
+					//
+					param.state='70';
 					// 确认出库后流程为出库完成
-					param.flow_state='50';
+					param.flow_state='30';
                 
 					upPickingDel(param,'stock.update.picking_state.update','确认出库成功','确认出库失败');
 					//已提交 40
-					$('#state').val('40');
-					$('#flow_state').val('50');
+					$('#state').val('70');
+					$('#flow_state').val('30');
 					}
 		        }
 			//打印处理
 			var printWin;
 			function toPrint(rowid) {
-				if(!$('#state').val()=='20'){
-					$.ligerDialog.error('该单据未审核，不能打印，请确认！');
-					return;					
-				}
+	
 				
 				var printFlag =false
-				if(!$('#flow_state').val() >='40'){
+				if(!$('#state').val() >='60'){
 					if(window.confirm('该单据已打印过，请确认是否需要第二次打印？')==true)
 				    printFlag=true;
 // 					$.ligerDialog.error('已打印请勿重复打印，不能打印，请确认！');
@@ -260,15 +249,15 @@
 					//printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
 					var param=new Object();
 					param.id=$('#id').val();
-					//已提交 40
-					param.state=$('#state').val();
+					
+					param.state="60";
 					// 确认出库后流程为出库完成
-					param.flow_state='40';
+					param.flow_state=$('#flow_state').val();
                 
 					upPickingDel(param,'stock.update.picking_state.update','打印成功','打印失败');
 					//已提交 40
 				
-					$('#flow_state').val('40');
+					$('#state').val('60');
 				}
 			}			
 			

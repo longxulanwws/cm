@@ -28,7 +28,7 @@
 								<entry key="move_type" value="" />
 								<entry key="createuser" value="" />
 								<entry key="move_in_user" value="" />
-								<entry key="flow_state" value=":&gt;" />
+								<entry key="flow_state" value=":&gt;=" />
 							</map>
 						</property>
 					</bean>
