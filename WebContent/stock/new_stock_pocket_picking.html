@@ -176,7 +176,7 @@
 						result = '出库数量必须录入大于0的整数';
 						break;
 					}
-					
+				
 					if ( parseInt(r.product_qty) >parseInt(r.product_enable_qty) ) {
 						result = '出库数量不能大于可用数量';
 						break;
@@ -223,6 +223,10 @@
 				            pGrid.updateCell('specs', data.specs, pGrid.getSelected());
 				            pGrid.updateCell('product_uom', data.uom_id, pGrid.getSelected());
 				            pGrid.updateCell('code', data.code, pGrid.getSelected());
+				            pGrid.updateCell('product_actual_qty', data.product_actual_qty, pGrid.getSelected());
+				            pGrid.updateCell('product_enable_qty', data.product_enable_qty, pGrid.getSelected());
+				            pGrid.updateCell('product_occupy_qty', data.product_occupy_qty, pGrid.getSelected());
+				   
 				            dialog.close();
 						}},
 					    {text:'取消',onclick: function(item, dialog){
@@ -449,6 +453,7 @@
 						}
 						var ar = 0, br = 0;
 						if (addRows.length > 0) {
+							
 							var data_a = JSON.stringify(reqObj('ba','stock.add.stock_move',addRows));
 							ajaxSubmit("/cm/rbac/cm.do?m=ba", data_a, function(result) {
 								ar = result['status'];
