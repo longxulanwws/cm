@@ -59,8 +59,8 @@
 	                    {display:'采购申请单号',name:'origin',width:130},
 			            {display:'供应商',name:'partner_id',render:sw_partner,width:190,align:'left'},
 			            {display:'预计到货日期',name:'pred_date',width:80},
-			            {display:'入库异常',name:'QC_Anomaly_Sate',width:80},
-			            {display:'质检结论',width:100,name:'QC_Note',align:'left'},
+			            {display:'入库异常',name:'qc_anomaly_sate',width:80,render:function(item){return paramRender(item,'QCAnomalySate',item.move_type);}},
+			            {display:'质检结论',name:'qc_note',width:100},
 			            {display:'入库仓库',name:'warehose_id',render:sw_warehose,width:80},
 			            {display:'收货人',name:'move_in_user',render:sw_opt,width:80},
 			            {display:'其他备注',width:200,name:'note',align:'left'}
@@ -79,6 +79,35 @@
                     clickToEdit:false,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: toQuery,
+                    url: '../common/q.jsp', 
+                    //wws 2014-2-23 增加分页信息 start
+                      onToFirst: function(item) {
+                          toQuery(item, 1);
+                      },
+                      onToLast: function(item) {
+          				var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+          				if (defGrid.options.total % defGrid.options.pageSize > 0)
+          					p += 1;
+          				toQuery(item, p);
+                      },
+                      onToPrev: function(item) {
+          				var p = parseInt(defGrid.options.page);
+          				if (p > 1)
+          					p -= 1;
+          				else
+              				return;
+          				toQuery(item, p);
+                      },
+                      onToNext: function(item) {
+                      	var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+          				if (defGrid.options.total % defGrid.options.pageSize > 0)
+          					p += 1;
+      					var cp = parseInt(defGrid.options.page); 
+      					if (cp < p)
+          					cp += 1;
+          				toQuery(item, cp);
+                      },
+                      //wws 2014-2-23 增加分页信息 end 
                     param_movein:'user',
                     param_warehose:'base_point',
                     param_partner:'partner_list'
@@ -122,6 +151,16 @@
 				param.flow_state='10';
 				var data = JSON.stringify(reqObj('q','stock.select.picking.quality.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+					 //wws 2014-2-23 增加分页信息 start 
+					var d = data['data'].Rows;
+					var ps = defGrid.options.pageSize, p = defGrid.options.page, t = parseInt(data['data'].Total);
+					if (t > ps) {
+						for (var i = 0; i < (p - 1) * ps; i++) {
+							d.unshift(null);
+						}
+					}
+					defGrid.data = data['data'];
+					 //wws 2014-2-23 增加分页信息  end 
 					defGrid.set({data: data['data']});
 				});
 			}
