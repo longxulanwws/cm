@@ -10,6 +10,9 @@
 		<script src="../js/jquery.js" type="text/javascript"></script>
 		<script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
 		<script src="../js/common.js" type="text/javascript"></script>
+				<script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
+		<script src="../js/validate/messages_zh.js" type="text/javascript"></script>
 		<script type="text/javascript">
 			var pGrid, c_row, opt, c_code;
 			var udata;
@@ -39,13 +42,17 @@
 				]});
                	pGrid = $("#p-div").ligerGrid({
                     columns:[
-						{display:'商品编号',name:'code',width:90,editor:{type:'popup',onButtonClick:selectProduct},textField:'code',valueField:'categ_id'},
-	                    {display:'品名',name:'name',width:150},
-			            {display:'规格/型号',name:'specs',width:150,render:function(item){return paramRender(item,'product_specs',item.code);}},
-			            {display:'单位',name:'product_uom',width:90,render:function(item){return paramRender(item,'uom',item.product_uom);},editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}},
-			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);},editor:{type:'select',data:getData('Brand'),valueField:'value',textField:'name'}},
-			            {display:'出库数量',name:'product_qty',width:90,id:'num',align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
-			           
+                         	{display:'商品编号',name:'code',width:160,editor:{type:'popup',onButtonClick:selectProduct},textField:'code',valueField:'categ_id'},
+    	                    {display:'品名',name:'name',width:160},
+    			            {display:'规格/型号',name:'specs',width:160},
+    			        	{display:'单位',name:'product_uom',width:100,render:function(item){return paramRender(item,'uom',item.product_uom);}},
+    			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}
+    			            ,editor:{type:'select',data:getData('Brand'),valueField:'value',textField:'name'}},
+    			            {display:'库存数量',name:'product_actual_qty',width:100,align:'right'},
+    			            {display:'已占用数量',name:'product_occupy_qty',width:100,align:'right'},
+    			            {display:'可用数量',name:'product_enable_qty',width:100,align:'right'},
+    			            {display:'出库数量',name:'product_qty',width:100,align:'right',editor:{type:'string'},render:function(item){return item.product_qty ? parseFloat(item.product_qty).toFixed(0) : '';}}
+    			     
                     ],
                     pageSize:20,
                     usePager: true,
@@ -313,7 +320,7 @@
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">
 				<div id="d-menu" class="toolbar"></div>
 				<div style="height:25px;"></div>
-				<form name="basic-form" method="post" id="basic_form">
+				<form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
 					<div class="line-div">
 						<div class="label-div"><label>出库单号</label></div>
 						<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
@@ -332,7 +339,7 @@
 						<input type="hidden" id="warehouseS" />
 						</div>
 						<div class="label-div"><label>发货人</label></div>
-						<div class="in-div"><input type="text" id="moveInS" ltype="combobox" class="diff" /></div>
+						<div class="in-div"><input type="text" id="moveInS" ltype="combobox" class="required diff" /></div>
 						<input type="hidden" id="moveInIdS" />
 					</div>
 					<div class="line-div" style="height:76px;">
