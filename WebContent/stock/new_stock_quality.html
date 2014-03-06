@@ -26,10 +26,13 @@
 				$("#d-menu").ligerToolBar({items:[
 				    {text:'保存',click:toAdd,icon:'save'},
 					{line:true},
-				    {text:'清空',click:resetArea,icon:'clear'},
-					{line:true},
 					{text:'确认质检',id:'quality',click:Quality,icon:'save'},
-					{line:true}
+					{line:true},
+					{text:'驳回修改',id:'toDismiss',click:toDismiss,icon:'prev'},
+				    {line:true},
+					{text:'返回',click:toBack,icon:'back'},
+				    {line:true}
+
 				]});
                	pGrid = $("#p-div").ligerGrid({
                     columns:[
@@ -152,6 +155,12 @@
 				}
 			}
 			function queryProd() {}
+		    function toBack()
+		    {
+		        //关闭 出库单维护界面
+		    	parent.tabManager.removeTabItem("quality_stockp"); 
+			   
+			 }
 			function toAdd() {
 				if (pGrid.rows.length === 0) {
 					$.ligerDialog.error('请添加入库商品。','错误');
@@ -206,19 +215,28 @@
 				}
 				return '0.00';
 			}
+			// 驳回修改处理，即 退回到 制单环节
+			function toDismiss()
+			{
+				var param=new Object();
+				param.id=$('#idS').val();
+				// 驳回后状态被修改
+				param.state="99";
+				param.flow_state="00";
+				upPickingDel(param,'stock.update.picking_state.update','驳回成功','驳回失败');
+				$('#state').val(99);
+			}
+			//质检确认
 			function Quality() {
-				if($('#stateS').val()=='90')
+				if($('#stateS').val()>=30)
 					$.ligerDialog.error('已确认质检，不能重复确认，请确认！');
 				else
 					
 				   if(window.confirm('请确认物品已全部质检完成，您确定要提交该项数据吗？')==true)
-			         
-				//	var row = defGrid.getRow(rowid);
-					//$('#id').val(row.id);
-					//$('#state').val(32);
+
 					var param1=new Object();
 					param1.id=$('#idS').val();
-					param1.state='90';
+					param1.state='30';
 					param1.flow_state=$("#flow_state").val();
 					
 					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
@@ -226,16 +244,29 @@
 						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 							if (data) {
 								if (parseInt(data['status']) > 0) {
-									$('#stateS').val(90);
-									$.ligerDialog.success('提交成功');
+									$('#stateS').val(30);
+									$.ligerDialog.success('确认质检成功');
 									//$("#quality").hide();
 									//toQuery();
 								} else {
-									$.ligerDialog.error('提交失败');
+									$.ligerDialog.error('确认质检失败');
 								}
 							}
 						});
 		        }
+			function upPickingDel(param1,upSqlConID,successInfo,errorInfo){
+				 var param = JSON.stringify(reqObj('u',upSqlConID,JSON.stringify(param1)));
+					
+					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+						if (data) {
+							if (parseInt(data['status']) > 0) {								
+								$.ligerDialog.success(successInfo);
+							} else {								
+								$.ligerDialog.error(errorInfo);
+							}
+						}
+					});
+			}
 	    </script>
 		<style type="text/css">
 			.center-height{height: 100%;}
