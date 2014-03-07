@@ -32,7 +32,14 @@
 						<property name="group" value="true" />
 					</bean>
 				</entry>
-
+				<!-- 产成品入库单编号规则 -->			
+				<entry key="stock.picking.ccp.rk.code">
+					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+						<property name="rule" value="'CCPRK'{date}{seq(4)}" />
+						<property name="circle" value="year" />
+						<property name="group" value="true" />
+					</bean>
+				</entry>
 				<!-- 生产领用出库单编号规则 -->
 				<entry key="stock.picking.ly.ck.code">
 					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">

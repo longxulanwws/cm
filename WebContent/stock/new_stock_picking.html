@@ -391,9 +391,9 @@
 	        }
 			function calcTotal(item) {
 				if (item.product_qty && item.price_unit) {
-					return (parseFloat(item.product_qty) * parseFloat(item.price_unit)).toFixed(2);
+					return (parseFloat(item.product_qty) * parseFloat(item.price_unit)).toFixed(4);
 				}
-				return '0.00';
+				return '0.0000';
 			}
 			function getPData() {
 				var data = JSON.stringify(reqObj('q','stock.select.product.query','{}','l',false));

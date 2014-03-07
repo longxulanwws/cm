@@ -192,7 +192,7 @@
 			function toConfirm(rowid) {
 				var row = defGrid.getRow(rowid);
 				if(row.state < 30){
-					$.ligerDialog.error('该单据还未质检确认，请先质检确认！');
+					$.ligerDialog.error('该单据还未质检确认，请进入通过编辑按钮，进入单据明细界面，进行质检确认！');
 					return;
 				}
 				var param1=new Object();
