@@ -213,11 +213,11 @@
 								ajaxSubmit("/cm/rbac/cm.do?m=u", stock_move_param_J, function(data1) {
 									if (data1) {
 										if (parseInt(data1['status']) > 0) {
-											//修改单据的 state ='20'
+											//修改单据的 state ='50'
 											var param1=new Object();
 											param1.id=row.id;
 											// 状态被修改
-											param1.state='20';
+											param1.state='50';
 											param1.flow_state='20';
 											upPickingDel(param1,'提交出库成功','提交出库失败');
 										} else {
