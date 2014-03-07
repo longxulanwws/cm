@@ -41,17 +41,22 @@
                     columns:[
 						{display:'商品编号',name:'code',width:90,editor:{type:'popup',onButtonClick:selectProduct},textField:'code',valueField:'categ_id'},
 	                    {display:'品名',name:'name',width:150},
-			            {display:'规格/型号',name:'specs',width:150,render:function(item){return paramRender(item,'product_specs',item.code);}},
+	                    {display:'规格/型号',name:'specs',width:150},
+			            //{display:'规格/型号',name:'specs',width:150,render:function(item){return paramRender(item,'product_specs',item.code);}},
 			            {display:'单位',name:'product_uom',width:90,render:function(item){return paramRender(item,'uom',item.product_uom);},editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}},
 			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}
 			            ,editor:{type:'select',data:getData('Brand'),valueField:'value',textField:'name'}
 			            },
 			           // {display:'采购数量',name:'tar_product_qty',width:90,align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.tar_product_qty).toFixed(0);}},
 			            {display:'收货数量',name:'product_qty',width:90,id:'num',align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
-			            {display:'质检方式',name:'qc_type',width:150,render:function(item){return paramRender(item,'methods',item.qc_type);}
-			            ,editor:{type:'select',data:getData('methods'),valueField:'value',textField:'name'}},
-			            {display:'质检结果',name:'qc_flag',width:150,render:function(item){return paramRender(item,'result',item.qc_flag);}
-			            ,editor:{type:'select',data:getData('result'),valueField:'value',textField:'name'}}
+// 			            {display:'质检方式',name:'qc_type',width:150,render:function(item){return paramRender(item,'methods',item.qc_type);}
+// 			            ,editor:{type:'select',data:getData('methods'),valueField:'value',textField:'name'}},
+// 			            {display:'质检结果',name:'qc_flag',width:150,render:function(item){return paramRender(item,'result',item.qc_flag);}
+// 			            ,editor:{type:'select',data:getData('result'),valueField:'value',textField:'name'}}
+			            {display:'质检方式',name:'qc_type',width:150,render:function(item){return paramRender(item,'QCType',item.qc_type);}
+			            },
+			            {display:'质检结果',name:'qc_flag',width:150,render:function(item){return paramRender(item,'QCResult',item.qc_flag);}
+			            }
                     ],
                     pageSize:20,
                     usePager: true,
@@ -160,7 +165,7 @@
 		    function toBack()
 		    {
 		        //关闭 出库单维护界面
-		    	parent.tabManager.removeTabItem("deliver_stockp"); 
+		    	parent.tabManager.removeTabItem("receipy_stockp"); 
 			   
 			 }	
 			function toSave() {

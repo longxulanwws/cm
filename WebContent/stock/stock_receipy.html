@@ -29,7 +29,7 @@
 							// 流程状态 flow_state 00 新建（制单） 10 入库质检     20入、出库确认    30 入、出库完成
 							
 						var row = defGrid.getRow(rowindex);
- 						   if(row.state < 50)
+ 						   if(row.state <= 50)
  							{
  							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
  							}
@@ -37,13 +37,14 @@
  						   {
  							  h += "打印完成  ";
  						   }
- 						if(row.state ==120 )
+ 						if(row.state < 70 )
  						   {
- 								 h += "已确认入库";
+ 							  h += "待确认入库";
  						   }
  							 else
  							{
-                               h += "待确认入库";
+                               
+                               h += "已确认入库";
  							}
                         	return h; 
                         },frozen:true},
@@ -51,7 +52,7 @@
                         {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
                         {display:'修改时间',name:'writedate',width:130},
                         {display:'入库单号',name:'code',width:130,minWidth:60},
-	                    {display:'采购单号',name:'origin',width:130},
+	                    {display:'采购申请单号',name:'origin',width:130},
 	                 
 			            {display:'供应商',name:'partner_id',width:190,render:sw_partner,align:'left'},
 			            //{display:'预计到货日期',name:'pred_date',width:80},
@@ -150,15 +151,16 @@
 				//01 resale采购入库  02 sale产成品入库	
 				
 				if(opt=='resale'){
-				param.move_type='01';
+					param.move_type='01';
 				}else{
 					param.move_type='02';
 				}
 				
 				param.move_in_user=$('#UserCodeS').val();
 				  //处理flow_state大于20的数据
-                param.flow_state='10';
+                param.flow_state='20';
 				var data = JSON.stringify(reqObj('q','stock.select.picking_sale.query',JSON.stringify(param),'l',true,page,pageSize));
+				
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					 //wws 2014-2-23 增加分页信息 start 
 					var d = data['data'].Rows;
@@ -173,33 +175,10 @@
 					defGrid.set({data: data['data']});
 				});
 			}
-			function openDictDef() {
-				parent.f_addTab('new_recei	py','新增入库单','./stock/new_stock_picking.html');
-			}
-			function Quality(rowid) {
-			   if(window.confirm('您确定要提交该项数据吗？')==true)
-		         
-				var row = defGrid.getRow(rowid);
-				//$('#id').val(row.id);
-				//$('#state').val(20);
-				var param1=new Object();
-				param1.id=row.id;
-				param1.state='20';
-				param1.flow_state='50';
-				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
-				
-					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
-						if (data) {
-							if (parseInt(data['status']) > 0) {
-								//$.ligerDialog.success('提交成功');
-								$("#quality").hide();
-								toQuery();
-							} else {
-								$.ligerDialog.error('提交失败');
-							}
-						}
-					});
-	        }
+// 			function openDictDef() {
+// 				parent.f_addTab('new_recei	py','新增入库单','./stock/new_stock_picking.html');
+// 			}
+
 			function openModify() {
 				var row = defGrid.getSelectedRow();
 				if (!row) {
@@ -216,7 +195,7 @@
 				
 			//	alert(row.state);
 				var printFlag =false
-				if(row.state >=60){
+				if(row.state >= 60){
 					if(window.confirm('该单据已打印过，请确认是否需要第二次打印？')==true)
 				    printFlag=true;
 // 						
