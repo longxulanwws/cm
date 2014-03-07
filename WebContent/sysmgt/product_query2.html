@@ -88,8 +88,8 @@
 				param.code=$("#codeQ").val();
 				param.name = $("#nameQ").val();
 				param.specs = $("#specsQ").val(); 
-
-				var data = JSON.stringify(reqObj('q','stock.select.product.query',JSON.stringify(param),'l',true,page,pageSize));
+// 				param.product_product.type=$("#typeQ"),val();
+            	var data = JSON.stringify(reqObj('q','stock.select.product.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=q", data, function(data) {
                     //wws 2014-2-23 增加分页信息 start 
 					var d = data['data'].Rows;
@@ -127,6 +127,7 @@
 				<div id="query_cond" class="fields">
 				    <label>编号</label><input type="text" class="s-text-sort txt-def" id="codeQ" />
 					<label>名称</label><input type="text" class="s-text-sort txt-def" id="nameQ" />
+<!-- 					    <input id="typeQ"value="01"/> -->
 					<label>规格/型号</label><input type="text" class="s-text-sort txt-def" id="specsQ" />
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
 					<input type="button" value="清空" onclick="toReset('#codeQ,#originQ,#partnerQ');" />

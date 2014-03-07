@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<title>收货</title>
+		<title>入库确认管理</title>
 		
 		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -29,26 +29,30 @@
 							// 流程状态 flow_state 00 新建（制单） 10 入库质检     20入、出库确认    30 入、出库完成
 							
 						var row = defGrid.getRow(rowindex);
- 						   if(row.state <= 50)
- 							{
- 							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
- 							}
- 						   else
- 						   {
- 							  h += "打印完成  ";
- 						   }
- 						if(row.state < 70 )
- 						   {
- 							  h += "待确认入库";
- 						   }
- 							 else
- 							{
-                               
-                               h += "已确认入库";
- 							}
-                        	return h; 
+						//打印出库单
+//						  if(row.state  <= 50 ){							
+//								h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
+//						  	}
+//						
+//						  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
+						  
+						//待确认出库 ，在里面进行 确认出库 
+						 if(row.state <= 60 )
+                          h += "待确认入库 ";
+						
+						 if(row.state >='70') 
+						  	{  								
+							h += "入库完成  ";
+						  	}
+						 //驳回
+ 						 if(row.state  == '09') 
+							{
+								h = "已驳回修改 ";
+							}
+                   	 	return h;
+                        	
                         },frozen:true},
-                        {display:'单据状态',name:'state',width:80,minWidth:60,render:function(item){return paramRender(item,'stockBillSate',item.state);}},
+                        {display:'单据状态',name:'state',width:80,minWidth:60,render:function(item){return paramRender(item,'inStockState',item.state);}},
                         {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
                         {display:'修改时间',name:'writedate',width:130},
                         {display:'入库单号',name:'code',width:130,minWidth:60},
@@ -110,11 +114,13 @@
 				//appendAddBtn(openDictDef, "添加入库单");
 				appendModifyBtn(openModify, "修改入库单");
 				$("#pageloading").hide();
-				//默认查询全部数据 
-				toQuery();
+
 				ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
 					$('#UserCodeS').val(data['uid']);
 				}, null, false);
+				
+				//默认查询全部数据 
+				toQuery();
 			});
 			
 			function sw_opt(item) {
@@ -187,6 +193,7 @@
 				}
 				parent.f_addTab('receipy_stockp','收货维护','./stock/new_stock_receipy.html?o=m&code='.concat(row.code));
 			}
+			
 			var printWin;
 			function toPrint(rowid) {
 				
@@ -252,7 +259,7 @@
 					<label>采购订单号</label><input type="text" class="s-text-qCond txt-def" id="originQ" />
 					<label>供应商</label>
 					<select id="partnerQ" param="partner_list" first="" ></select>
-					<label>状态</label><select id="stateS" param="stockreceipy" first="" ></select>
+					<label>单据状态</label><select id="stateS" param="inStockState" first="" ></select>
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
 					<input type="button" value="清空" onclick="toReset('#codeQ,#originQ,#partnerQ');" />
 				</div>

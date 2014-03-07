@@ -44,10 +44,10 @@
 						{display:'单位',name:'product_uom',width:100,render:function(item){return paramRender(item,'uom',item.product_uom);}},
 						{display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}
 						,editor:{type:'select',data:getData('Brand'),valueField:'value',textField:'name'}},
-						{display:'库存数量',name:'product_actual_qty',width:100,align:'right'},
-						{display:'已占用数量',name:'product_occupy_qty',width:100,align:'right'},
-						{display:'可用数量',name:'product_enable_qty',width:100,align:'right'},
-						{display:'发货数量',name:'product_qty',width:100,align:'right',editor:{type:'string'},render:function(item){return item.product_qty ? parseFloat(item.product_qty).toFixed(0) : '';}}
+						{display:'库存数量',name:'product_actual_qty',width:100,align:'right',render:function(item){return item.product_actual_qty?parseFloat(item.product_actual_qty).toFixed(2):''}},
+						{display:'已占用数量',name:'product_occupy_qty',width:100,align:'right',render:function(item){return item.product_occupy_qty?parseFloat(item.product_occupy_qty).toFixed(2):''}},
+						{display:'可用数量',name:'product_enable_qty',width:100,align:'right',render:function(item){return item.product_enable_qty:parseFloat(item.product_enable_qty).toFixed(2):''}},
+						{display:'发货数量',name:'product_qty',width:100,align:'right',editor:{type:'string'},render:function(item){return item.product_qty ? parseFloat(item.product_qty).toFixed(2) : '';}}
 // 			            {display:'发货数量',name:'product_qty',width:100,id:'num',align:'right',editor:{type:'int'},render:function(item){return parseFloat(item.product_qty).toFixed(0);}},
 			           
                     ],
