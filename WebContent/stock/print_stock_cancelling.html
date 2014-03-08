@@ -76,7 +76,7 @@
 								.replace(/\$\{specs\}/, moves[i].specs)
 								.replace(/\$\{brand\}/, paramRender(null,'brand',moves[i].brand))
 								.replace(/\$\{product_uom\}/, paramRender(null,'uom',moves[i].product_uom))
-								.replace(/\$\{product_qty\}/, parseInt(moves[i].product_qty).toFixed(0)));
+								.replace(/\$\{product_qty\}/, parseInt(moves[i].product_qty).toFixed(2)));
 					}
 					if (moves.length < minLine) {
 						for (var i = 0; i < minLine - moves.length; i++)
