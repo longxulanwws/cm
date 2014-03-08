@@ -36,7 +36,7 @@
 							function(data) {
 								if (data) {
 									if (parseInt(data['status']) > 0) {								
-										$.ligerDialog.success('打印成功');
+										$.ligerDialog.success('打印成功','操作完成', reloadPage);
 									} else {								
 										$.ligerDialog.error('打印失败');
 									}
@@ -64,7 +64,7 @@
 // 						return;
 // 					}
 					//供应商
-					$("#partnerS").text(picking.partner_id);
+					$("#partnerS").text(paramRender(null,'partner_list',picking.partner_id));
 					//制单日期
 					$("#moveInDateS").text(picking.recpt_in_date);
 					//编码
@@ -105,6 +105,9 @@
 					$('#moveT').append(ta);
 				});
 			}
+	        function reloadPage() {
+	        	parent.window.location = './new_stock_receipy.html?o=m&code='.concat(codeQ);
+		    }
 	    </script>
 		<style type="text/css" media="print">
 			.no-print{display:none;}
@@ -145,14 +148,14 @@
 						<td style="padding-left:7.5%;">
 							<table class="no-border">
 								<tr>
-									<th style="width:40%;">供应商：<span id="deptS"></span></th>
+									<th style="width:40%;">供应商：<span id="partnerS"></span></th>
 									<th style="width:30%;">入库日期：<span id="moveInDateS"></span></th>
 									<th style="width:20%;">NO：<span id="codeS"></span></th>
 								</tr>
 								<tr>
-									<th style="width:60%;">采购申请单号：<span id="deptS"></span></th>
+									<th style="width:60%;">采购申请单号：<span id="originS"></span></th>
 									
-									<th style="width:40%;">入库仓库：<span id="codeS"></span></th>
+									<th style="width:40%;">入库仓库：<span id="warehoseS"></span></th>
 								</tr>
 								<tr style="height:10px;"><th colspan="3"></th></tr>
 							</table>

@@ -144,6 +144,7 @@
 					data = data.Rows[0];
 					$('#id').val(data.id);
 					$('#state').val(data.state);
+					$('#flow_state').val(data.flow_state);
 					$('#move_type').val(data.move_type);
 					$('#codeS').val(data.code);
 					$('#originS').val(data.origin);
@@ -217,6 +218,11 @@
 			// 驳回修改处理，即 退回到 制单环节
 			function toDismiss()
 			{
+				if($('#state').val() >= 70 )
+				{
+				$.ligerDialog.error('已确认入库，不能驳回修改，请确认！');
+			   return;
+				}
 				var param=new Object();
 				param.id=$('#id').val();
 				// 驳回后状态被修改
@@ -289,7 +295,7 @@
 		        }
 			//打印处理		
 			var printWin;
-			var printFormatUrl;
+			var printFormatUrl='';
 			function toPrint(rowid) {
 				var printFlag =false
 				if(!$('#state').val() >='60'){
@@ -320,12 +326,14 @@
 						printFormatUrl='./print_rawMat_back_inStock.html?id=';
 					}
 					
-					if(!printFormatUrl)	
-					printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
-					else{
+					if(!printFormatUrl==''){
+						printWin = $.ligerDialog.open({height:600,width:800,url:printFormatUrl.concat($('#codeS').val()),title:'打印入库单'});
+						//reloadPage();
+					}	else{
 						$.ligerDialog.error('打印格式未找到','错误');
 						return;
 					}
+					//
 				}
 			}			
 			function upPickingDel(param1,successInfo,errorInfo){
@@ -354,6 +362,9 @@
 	        function cancelEdit(rowid) { 
 	        	pGrid.cancelEdit(rowid);
 	        }
+	        function reloadPage() {
+	        	window.location = './new_stock_receipy.html?o=m&code='.concat(c_code);
+		    }
 	        function deleteRow(rowid) {
 	            $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
 		            if (!r)

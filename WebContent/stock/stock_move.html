@@ -122,7 +122,7 @@
 				param.origin = $("#moveorigin").val();
 				//param.state = $("#moveState").val();
 
-				var data = JSON.stringify(reqObj('q','stock.select.stock_qty.query',JSON.stringify(param),'l',true,page,pageSize));
+				var data = JSON.stringify(reqObj('q','stock.select.product.stock.qty.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					 //wws 2014-2-23 增加分页信息 start 
 					var d = data['data'].Rows;

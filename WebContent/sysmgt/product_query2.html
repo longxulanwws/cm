@@ -40,7 +40,7 @@
                     enabledEdit:true,
                     clickToEdit:false,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
-                    onReload: toQuery,
+                    //onReload: toQuery,
                     url: '../common/q.jsp',
                     //wws 2014-2-23 增加分页信息 start
                     onToFirst: function(item) {
@@ -73,9 +73,10 @@
                   
 				});
 				
+
+				$("#pageloading").hide();
 				//默认查询全部数据 
 				toQuery();
-				$("#pageloading").hide();
 			});
 			
 			function toQuery(item, page, pageSize) {
@@ -89,7 +90,7 @@
 				param.name = $("#nameQ").val();
 				param.specs = $("#specsQ").val(); 
 // 				param.product_product.type=$("#typeQ"),val();
-            	var data = JSON.stringify(reqObj('q','stock.select.product.query',JSON.stringify(param),'l',true,page,pageSize));
+            	var data = JSON.stringify(reqObj('q','stock.select.product.stock.qty.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=q", data, function(data) {
                     //wws 2014-2-23 增加分页信息 start 
 					var d = data['data'].Rows;
@@ -102,7 +103,7 @@
 					defGrid.data = data['data'];
 					 //wws 2014-2-23 增加分页信息  end 
 					defGrid.set({data: data['data']});
-				},null,false);
+				},null,true);
 			}
 			function getSelectedRow() {
 				return defGrid.getSelectedRow();

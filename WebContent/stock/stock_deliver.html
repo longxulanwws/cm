@@ -196,7 +196,7 @@
 
 
 			var printWin;
-			var printFormatUrl;
+			var printFormatUrl='';
 			function toPrint(rowid) {
 				var row = defGrid.getRow(rowid);
 				var printFlag =false
@@ -210,12 +210,11 @@
 					if(opt=='no'){
 						//销售发货
 						printFormatUrl='./print_proSale_outStock.html?id=';
-					}
-					if(opt=='yes'){
+					}else if(opt=='yes'){
 						//生产领用出库
 						printFormatUrl='./print_req_rawMat_outStock.html?id=';
 					}
-					if(!printFormatUrl)	
+					if(!printFormatUrl=='')	
 					printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
 					else{
 						$.ligerDialog.error('打印格式未找到','错误');

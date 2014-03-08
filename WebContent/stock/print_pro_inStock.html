@@ -36,7 +36,7 @@
 							function(data) {
 								if (data) {
 									if (parseInt(data['status']) > 0) {								
-										$.ligerDialog.success('打印成功');
+										$.ligerDialog.success('打印成功','操作完成', reloadPage);
 									} else {								
 										$.ligerDialog.error('打印失败');
 									}
@@ -64,7 +64,7 @@
 // 						return;
 // 					}
 					//供应商
-					$("#partnerS").text(picking.partner_id);
+					$("#partnerS").text(paramRender(null,'partner_list',picking.partner_id));
 					//制单日期
 					$("#moveInDateS").text(picking.recpt_in_date);
 					//编码
@@ -105,6 +105,9 @@
 					$('#moveT').append(ta);
 				});
 			}
+	        function reloadPage() {
+	        	parent.window.location = './new_stock_receipy.html?o=m&code='.concat(codeQ);
+		    }
 	    </script>
 		<style type="text/css" media="print">
 			.no-print{display:none;}

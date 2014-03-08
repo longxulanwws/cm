@@ -177,11 +177,7 @@
 						<property name="dmlType" value="cond" />
 						<property name="sql">
 							<value>
-<![CDATA[SELECT CASE WHEN Actual IS NULL THEN 0 ELSE Actual END AS Product_Actual_Qty,CASE WHEN Occupy IS NULL THEN 0 ELSE Occupy END AS Product_Occupy_Qty, CASE WHEN (Actual-Occupy) IS NULL THEN 0 ELSE (Actual-Occupy) END  AS Product_Enable_Qty, product_product.ID,product_product.COMPANY_ID,product_product.DEPT_ID,product_product.BUSIORG_ID,product_product.TYPE,product_product.CATEG_ID,product_product.CODE,product_product.NAME,product_product.SHORT_NAME,product_product.HELP_TAG,product_product.BAR_CODE,product_product.SPECS,product_product.BRAND,product_product.WARRANTY,product_product.UOM_ID,product_product.UOM_PRECISION,product_product.EACH_WEIGHT,product_product.WEIGHT_UNIT_ID,product_product.EACH_VOLUME,product_product.VOLUME_UNIT_ID,product_product.SUPPLY_METHOD,product_product.PURCHASE_OK,product_product.SALE_OK,product_product.SALE_DELAY,product_product.DESC_PURCHASE,product_product.PRODUCE_DELAY,product_product.PRODUCT_MANAGER,product_product.PROCURE_METHOD,product_product.COST_METHOD,product_product.DESC_SALE,product_product.LOC_RACK,product_product.LOC_ROW,product_product.STATE,product_product.NOTE,product_product.CREATECOMPANY_ID,product_product.CREATEDATE,product_product.CREATEUSER,product_product.WRITEDATE,product_product.WRITEUSER
-FROM product_product
-LEFT JOIN (SELECT Code, sum((CASE WHEN (Type = '0') THEN Product_Qty ELSE  (0 - Product_Qty ) END)) AS Actual FROM stock_move WHERE stock_move.State ='20'  GROUP BY CODE) AS mva ON mva.code=product_product.code
-LEFT JOIN (SELECT Code, sum((CASE WHEN (Type = '1') THEN Product_Qty ELSE 0 END )) AS Occupy FROM stock_move WHERE stock_move.State ='10') AS mvb ON mvb.code=product_product.code
-]]>
+<![CDATA[SELECT ID, Company_ID, Dept_ID, BusiOrg_ID, Type, Categ_ID, Code, Name, Short_Name, Help_Tag, Bar_Code, Specs, Brand, Warranty, Uom_ID, Uom_Precision, Each_Weight, Weight_Unit_ID, Each_Volume, Volume_Unit_ID, Supply_Method, Purchase_Ok, Sale_Ok, Sale_Delay, Desc_Purchase, Produce_Delay, Product_Manager, Procure_Method, Cost_Method, Desc_Feature, Desc_Sale, Loc_Rack, Loc_Row, State, Note, CreateCompany_ID, CreateDate, CreateUser, WriteDate, WriteUser FROM product_product]]>
 							</value>
 						</property>
 						<property name="conditions">
@@ -189,12 +185,36 @@ LEFT JOIN (SELECT Code, sum((CASE WHEN (Type = '1') THEN Product_Qty ELSE 0 END 
 								<entry key="code" value=":like(lr)" />
 								<entry key="name" value=":like(lr)" />
 								<entry key="specs" value=":like(lr)" />
-								<entry key="product_product.type" value=""></entry>
+								<entry key="type" value=""/>
 							</map>
 						</property>
 					</bean>
 				</entry>
-
+				<entry key="product.stock.qty.query">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="dmlType" value="cond" />
+						<property name="sql">
+							<value>
+<![CDATA[SELECT Product_Actual_Qty, Product_Occupy_Qty,(Product_Actual_Qty-Product_Occupy_Qty) AS Product_Enable_Qty,product_product.ID,product_product.COMPANY_ID,product_product.DEPT_ID,product_product.BUSIORG_ID,product_product.TYPE,product_product.CATEG_ID,product_product.CODE,product_product.NAME,product_product.SHORT_NAME,product_product.HELP_TAG,product_product.BAR_CODE,product_product.SPECS,product_product.BRAND,product_product.WARRANTY,product_product.UOM_ID,product_product.UOM_PRECISION,product_product.EACH_WEIGHT,product_product.WEIGHT_UNIT_ID,product_product.EACH_VOLUME,product_product.VOLUME_UNIT_ID,product_product.SUPPLY_METHOD,product_product.PURCHASE_OK,product_product.SALE_OK,product_product.SALE_DELAY,product_product.DESC_PURCHASE,product_product.PRODUCE_DELAY,product_product.PRODUCT_MANAGER,product_product.PROCURE_METHOD,product_product.COST_METHOD,product_product.DESC_SALE,product_product.LOC_RACK,product_product.LOC_ROW,product_product.STATE,product_product.NOTE,product_product.CREATECOMPANY_ID,product_product.CREATEDATE,product_product.CREATEUSER,product_product.WRITEDATE,product_product.WRITEUSER
+FROM ( SELECT CASE WHEN Actual IS NULL THEN 0 ELSE Actual END AS Product_Actual_Qty,
+CASE WHEN Occupy IS NULL THEN 0 ELSE Occupy END AS Product_Occupy_Qty , 
+product_product.ID,product_product.COMPANY_ID,product_product.DEPT_ID,product_product.BUSIORG_ID,product_product.TYPE,product_product.CATEG_ID,product_product.CODE,product_product.NAME,product_product.SHORT_NAME,product_product.HELP_TAG,product_product.BAR_CODE,product_product.SPECS,product_product.BRAND,product_product.WARRANTY,product_product.UOM_ID,product_product.UOM_PRECISION,product_product.EACH_WEIGHT,product_product.WEIGHT_UNIT_ID,product_product.EACH_VOLUME,product_product.VOLUME_UNIT_ID,product_product.SUPPLY_METHOD,product_product.PURCHASE_OK,product_product.SALE_OK,product_product.SALE_DELAY,product_product.DESC_PURCHASE,product_product.PRODUCE_DELAY,product_product.PRODUCT_MANAGER,product_product.PROCURE_METHOD,product_product.COST_METHOD,product_product.DESC_SALE,product_product.LOC_RACK,product_product.LOC_ROW,product_product.STATE,product_product.NOTE,product_product.CREATECOMPANY_ID,product_product.CREATEDATE,product_product.CREATEUSER,product_product.WRITEDATE,product_product.WRITEUSER
+FROM product_product
+LEFT JOIN (SELECT Code, sum((CASE WHEN (Type = '0') THEN Product_Qty ELSE  (0 - Product_Qty ) END)) AS Actual FROM stock_move WHERE stock_move.State ='20'  GROUP BY CODE) AS mva ON mva.code=product_product.code
+LEFT JOIN (SELECT Code, sum((CASE WHEN (Type = '1') THEN Product_Qty ELSE 0 END )) AS Occupy FROM stock_move WHERE stock_move.State ='10'   GROUP BY CODE) AS mvb ON mvb.code=product_product.code
+) AS product_product]]>
+							</value>
+						</property>
+						<property name="conditions">
+							<map>
+								<entry key="code" value=":like(lr)" />
+								<entry key="name" value=":like(lr)" />
+								<entry key="specs" value=":like(lr)" />
+								<entry key="type" value=""/>
+							</map>
+						</property>
+					</bean>
+				</entry>
 				<entry key="move.query">
 					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
 						<property name="dmlType" value="cond" />
@@ -426,7 +446,7 @@ Warehose_ID={warehose_id},Move_IN_User={move_in_user},Note={note},WriteUser={wri
 <![CDATA[UPDATE STOCK_MOVE SET CODE={code},NAME={name},TAR_PRODUCT_QTY={tar_product_qty},PRODUCT_QTY={product_qty}
 ,ORIGIN={origin},PRODUCT_UOM={product_uom},SOURCE_PRICE_UNIT={source_price_unit}
 ,PRICE_UNIT={price_unit},QC_Flag={qc_flag},QC_Type={qc_type}
-,product_actual_qty={product_actual_qty},product_occupy_qty={product_occupy_qty},product_enable_qty={product_enable_qty} WHERE ID={id}]]>
+,product_actual_qty={product_actual_qty},product_occupy_qty={product_occupy_qty},product_enable_qty={product_enable_qty},brand={brand} WHERE ID={id}]]>
 							</value>
 						</property>
 					</bean>

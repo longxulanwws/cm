@@ -199,7 +199,7 @@
 			}
 			
 			var printWin;
-			var printFormatUrl;
+			var printFormatUrl='';
 			function toPrint(rowid) {
 				var row = defGrid.getRow(rowid);
 				var printFlag =false
@@ -209,21 +209,25 @@
 				}else{
 					printFlag=true;
 				}
+				
 				if(printFlag){
+					 
 					if(opt=='resale'){
 						// 原材料采购入库
 						printFormatUrl='./print_purchase_inStock.html?id=';
-					}
-					if(opt=='sale'){
+					} else if(opt=='sale'){
 						//产成品入库
 						printFormatUrl='./print_pro_inStock.html?id=';
 					}else{
 						//原材料退库
 						printFormatUrl='./print_rawMat_back_inStock.html?id=';
 					}
-					if(!printFormatUrl)	
-					printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
-					else{
+					
+					if(!printFormatUrl==''){
+						
+						printWin = $.ligerDialog.open({height:600,width:800,url:printFormatUrl.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+						
+					}else{
 						$.ligerDialog.error('打印格式未找到','错误');
 						return;
 					}

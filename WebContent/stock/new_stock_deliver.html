@@ -132,9 +132,10 @@
 			function bindVal(data) {
 				if (data.Rows && data.Rows.length === 1) {
 					data = data.Rows[0];
-					$('#id').val(data.id);
-					$('#flow_state').val(data.flow_state);
+					$('#id').val(data.id); 
 					$('#state').val(data.state);
+					$('#flow_state').val(data.flow_state);
+					$('#move_type').val(data.move_type);
 					$('#codeS').val(data.code);
 					$('#originS').val(data.origin);
 					$('#partnerInS').val(paramRender(null,'partner_list',data.partner_id));
@@ -199,9 +200,9 @@
 			// 驳回修改处理，即 退回到 制单环节
 			function toDismiss()
 			{
-				if($('#state').val() >= 60 )
+				if($('#state').val() >= 70 )
 				{
-				$.ligerDialog.error('已打印出库单或已确认出库，不能驳回修改，请确认！');
+				$.ligerDialog.error('已确认出库，不能驳回修改，请确认！');
 			   return;
 				}
 				var param=new Object();
@@ -215,13 +216,13 @@
 
 			//确认出库
 			function submitConfirm() {
-			  			
+				alert ($('#state').val());
 				if($('#state').val() >= 70 )
 					{
 					$.ligerDialog.error('已确认出库，不能重复确认，请确认！');
 				   return;
 					}
-
+                
 				if($('#state').val() < 60 )
 					{
 					$.ligerDialog.error('该单据未打印，不能确认出库，请确认！');
@@ -253,7 +254,7 @@
 											// 状态被修改
 											param1.state='70';
 											param1.flow_state='30';
-											upPickingDel(param1,'提交出库成功','提交出库失败');
+											upPickingDel(param1,'stock.update.picking_state.update','提交出库成功','提交出库失败');
 						 					$('#state').val('70');
 						 					$('#flow_state').val('30');
 										} else {
@@ -297,7 +298,7 @@
 		        }
 				//打印处理		
 				var printWin;
-				var printFormatUrl;
+				var printFormatUrl='';
 				function toPrint(rowid) {
 					var printFlag =false
 					if(!$('#state').val() >='60'){
@@ -307,6 +308,7 @@
 						printFlag=true;
 					}
 					if(printFlag){
+						
 						if($('#move_type').val()=='01'){
 							// 原材料采购入库
 							printFormatUrl='./print_purchase_inStock.html?id=';
@@ -328,17 +330,17 @@
 							printFormatUrl='./print_rawMat_back_inStock.html?id=';
 						}
 						
-						if(!printFormatUrl)	
-						printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+						if(!printFormatUrl=='')	
+							printWin = $.ligerDialog.open({height:600,width:800,url:printFormatUrl.concat($('#codeS').val()),title:'打印入库单'});
 						else{
 							$.ligerDialog.error('打印格式未找到','错误');
 							return;
 						}
 					}
 				}	
-			function upPickingDel(param1,successInfo,errorInfo){
+			function upPickingDel(param1,upSqlConID,successInfo,errorInfo){
 				
-				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
+				 var param = JSON.stringify(reqObj('u',upSqlConID,JSON.stringify(param1)));
 					
 					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
 						if (data) {
@@ -346,7 +348,7 @@
 								
 								$.ligerDialog.success(successInfo);
 								//自动刷新
-								toQuery();
+								//toQuery();
 							} else {								
 								$.ligerDialog.error(errorInfo);
 							}
@@ -389,6 +391,7 @@
 	<input  type="hidden" id="id"/>
 	<input  type="hidden" id="state"/>
 	<input  type="hidden" id="flow_state"/>
+	<input  type="hidden" id="move_type"/>
 		<div id="pageloading"></div>  
 		<div id="layout_main">
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">
