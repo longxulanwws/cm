@@ -28,7 +28,7 @@
 				            				    {line:true},
 //				             				    {text:'出库单审核',id:'toConfirm',click:toConfirm,icon:'ok'},
 //				             				    {line:true},
-				            				    {text:'打印入库单',id:'',click:toPrint,icon:'print'},
+				            				    {text:'打印入库单',id:'toPrint',click:toPrint,icon:'print'},
 				            					{line:true},
 				            				    {text:'确认入库',id:'submitConfirm',click:submitConfirm,icon:'ok'},
 				            					{line:true},
@@ -144,6 +144,7 @@
 					data = data.Rows[0];
 					$('#id').val(data.id);
 					$('#state').val(data.state);
+					$('#move_type').val(data.move_type);
 					$('#codeS').val(data.code);
 					$('#originS').val(data.origin);
 					$('#partnerInS').val(paramRender(null,'partner_list',data.partner_id));
@@ -270,7 +271,7 @@
 											$.ligerDialog.error('提交失败');
 										}
 									}
-								});
+								}, null, false);
  				});	
 // 				   if(window.confirm('您确定要提交该项数据吗？')==true)
 //     				var param=new Object();
@@ -286,33 +287,45 @@
 // 					$('#flow_state').val('30');
 					
 		        }
-			//打印处理
+			//打印处理		
 			var printWin;
-			function toPrint(rowid) {	
-				
+			var printFormatUrl;
+			function toPrint(rowid) {
 				var printFlag =false
 				if(!$('#state').val() >='60'){
-					if(window.confirm('该单据已打印过，请确认是否需要第二次打印？')==true)
-				    printFlag=true;
-// 					$.ligerDialog.error('已打印请勿重复打印，不能打印，请确认！');
-// 					return;					
+					if(window.confirm('该单据已打印过，请确认是否需要再次打印？')==true)
+				    printFlag=true;			
 				}else{
 					printFlag=true;
 				}
-				//alert(printFlag);
 				if(printFlag){
-					//printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
-					var param=new Object();
-					param.id=$('#id').val();
+					if($('#move_type').val()=='01'){
+						// 原材料采购入库
+						printFormatUrl='./print_purchase_inStock.html?id=';
+					}
+					if($('#move_type').val()=='02'){
+						//产成品入库
+						printFormatUrl='./print_pro_inStock.html?id=';
+					}
+					if($('#move_type').val()=='03'){
+						//生产领用出库
+						printFormatUrl='./print_req_rawMat_outStock.html?id=';
+					}
+					if($('#move_type').val()=='04'){
+						//销售发货
+						printFormatUrl='./print_proSale_outStock.html?id=';
+					}
+					if($('#move_type').val()=='05'){
+						//	原材料退库
+						printFormatUrl='./print_rawMat_back_inStock.html?id=';
+					}
 					
-					param.state="60";
-					// 确认出库后流程为出库完成
-					param.flow_state=$('#flow_state').val();
-                
-					upPickingDel(param,'打印成功','打印失败');
-					//已提交 40
-				
-					$('#state').val('60');
+					if(!printFormatUrl)	
+					printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+					else{
+						$.ligerDialog.error('打印格式未找到','错误');
+						return;
+					}
 				}
 			}			
 			function upPickingDel(param1,successInfo,errorInfo){
@@ -330,23 +343,11 @@
 								$.ligerDialog.error(errorInfo);
 							}
 						}
-					});
+					}, null, false);
 				
 				
 			}
-// 			function upPickingDel(param1,upSqlConID,successInfo,errorInfo){
-// 				 var param = JSON.stringify(reqObj('u',upSqlConID,JSON.stringify(param1)));
-					
-// 					ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
-// 						if (data) {
-// 							if (parseInt(data['status']) > 0) {								
-// 								$.ligerDialog.success(successInfo);
-// 							} else {								
-// 								$.ligerDialog.error(errorInfo);
-// 							}
-// 						}
-// 					});
-// 			}
+
 	        function beginEdit(rowid) { 
 	        	pGrid.beginEdit(rowid);
 	        }
@@ -377,6 +378,7 @@
 	<body style="padding:0;">
 	<input  type="hidden" id="id"/>
 	<input  type="hidden" id="state"/>
+	<input  type="hidden" id="move_type"/>
 	<input  type="hidden" id="flow_state"/>
 		<div id="pageloading"></div>  
 		<div id="layout_main">

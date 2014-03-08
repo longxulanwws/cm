@@ -295,37 +295,47 @@
 // 								});
 // 					}
 		        }
-			//打印处理
-			var printWin;
-			function toPrint() {
-	
-				
-				var printFlag =false
-				if(!$('#state').val() >='60'){
-					if(window.confirm('该单据已打印过，请确认是否需要第二次打印？')==true)
-				    printFlag=true;
-// 					$.ligerDialog.error('已打印请勿重复打印，不能打印，请确认！');
-// 					return;					
-				}else{
-					printFlag=true;
-				}
-				//alert(printFlag);
-				if(printFlag){
-					//printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
-					var param=new Object();
-					param.id=$('#id').val();
-					
-					param.state="60";
-					// 确认出库后流程为出库完成
-					param.flow_state=$('#flow_state').val();
-                
-					upPickingDel(param,'打印成功','打印失败');
-					//已打印 60
-				
-					$('#state').val('60');
-				}
-			}			
-			
+				//打印处理		
+				var printWin;
+				var printFormatUrl;
+				function toPrint(rowid) {
+					var printFlag =false
+					if(!$('#state').val() >='60'){
+						if(window.confirm('该单据已打印过，请确认是否需要再次打印？')==true)
+					    printFlag=true;			
+					}else{
+						printFlag=true;
+					}
+					if(printFlag){
+						if($('#move_type').val()=='01'){
+							// 原材料采购入库
+							printFormatUrl='./print_purchase_inStock.html?id=';
+						}
+						if($('#move_type').val()=='02'){
+							//产成品入库
+							printFormatUrl='./print_pro_inStock.html?id=';
+						}
+						if($('#move_type').val()=='03'){
+							//生产领用出库
+							printFormatUrl='./print_req_rawMat_outStock.html?id=';
+						}
+						if($('#move_type').val()=='04'){
+							//销售发货
+							printFormatUrl='./print_proSale_outStock.html?id=';
+						}
+						if($('#move_type').val()=='05'){
+							//	原材料退库
+							printFormatUrl='./print_rawMat_back_inStock.html?id=';
+						}
+						
+						if(!printFormatUrl)	
+						printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+						else{
+							$.ligerDialog.error('打印格式未找到','错误');
+							return;
+						}
+					}
+				}	
 			function upPickingDel(param1,successInfo,errorInfo){
 				
 				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));

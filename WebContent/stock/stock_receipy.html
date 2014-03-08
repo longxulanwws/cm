@@ -35,7 +35,7 @@
 //								h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
 //						  	}
 //						
-//						  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
+						h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
 						if(row.state == '50')
 							h += "待打印  "; 
 						if(row.state > 50)
@@ -160,7 +160,9 @@
 				//01 resale采购入库  02 sale产成品入库	
 				
 				if(opt=='resale'){
-					param.move_type='01';
+					// 原材料入库
+					param.move_type='01';				
+					
 				}else{
 					param.move_type='02';
 				}				
@@ -197,44 +199,35 @@
 			}
 			
 			var printWin;
+			var printFormatUrl;
 			function toPrint(rowid) {
-				
 				var row = defGrid.getRow(rowid);
-				
-				
-			//	alert(row.state);
 				var printFlag =false
 				if(row.state >= 60){
-					if(window.confirm('该单据已打印过，请确认是否需要第二次打印？')==true)
+					if(window.confirm('该单据已打印过，请确认是否需要再次打印？')==true)
 				    printFlag=true;
-// 						
 				}else{
 					printFlag=true;
 				}
-				
 				if(printFlag){
-					
+					if(opt=='resale'){
+						// 原材料采购入库
+						printFormatUrl='./print_purchase_inStock.html?id=';
+					}
+					if(opt=='sale'){
+						//产成品入库
+						printFormatUrl='./print_pro_inStock.html?id=';
+					}else{
+						//原材料退库
+						printFormatUrl='./print_rawMat_back_inStock.html?id=';
+					}
+					if(!printFormatUrl)	
 					printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
-					
-// 					VAR PARAM1=NEW OBJECT();
-// 					PARAM1.ID=ROW.ID;
-// 					PARAM1.STATE='110';
-// 					PARAM1.FLOW_STATE=ROW.FLOW_STATE;
-// 					 VAR PARAM = JSON.STRINGIFY(REQOBJ('U','STOCK.UPDATE.PICKING_STATE.UPDATE',JSON.STRINGIFY(PARAM1)));
-					
-// 						AJAXSUBMIT("/CM/RBAC/CM.DO?M=U", PARAM, FUNCTION(DATA) {
-// 							IF (DATA) {
-// 								IF (PARSEINT(DATA['STATUS']) > 0) {
-// 									//$.LIGERDIALOG.SUCCESS('提交成功');
-// 									//$("#QUALITY").HIDE();
-// 									TOQUERY();
-// 								} ELSE {
-// 									$.LIGERDIALOG.ERROR('提交失败');
-// 								}
-// 							}
-// 						});
+					else{
+						$.ligerDialog.error('打印格式未找到','错误');
+						return;
+					}
 				}
-				
 			}
 	    </script>
 		<style type="text/css">

@@ -195,27 +195,34 @@
 			}
 
 
-			//打印处理
 			var printWin;
+			var printFormatUrl;
 			function toPrint(rowid) {
 				var row = defGrid.getRow(rowid);
-
-				
 				var printFlag =false
-				if(row.state >='60'){
-					if(window.confirm('该单据已打印过，请确认是否需要第二次打印？')==true)
+				if(row.state >= 60){
+					if(window.confirm('该单据已打印过，请确认是否需要再次打印？')==true)
 				    printFlag=true;
-// 					$.ligerDialog.error('已打印请勿重复打印，不能打印，请确认！');
-// 					return;					
 				}else{
 					printFlag=true;
 				}
-				
 				if(printFlag){
-					printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+					if(opt=='no'){
+						//销售发货
+						printFormatUrl='./print_proSale_outStock.html?id=';
+					}
+					if(opt=='yes'){
+						//生产领用出库
+						printFormatUrl='./print_req_rawMat_outStock.html?id=';
+					}
+					if(!printFormatUrl)	
+					printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+					else{
+						$.ligerDialog.error('打印格式未找到','错误');
+						return;
+					}
 				}
-			}			
-			
+			}
 			function upPickingDel(param1,upSqlConID,successInfo,errorInfo){
 				 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
 					
