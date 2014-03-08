@@ -222,7 +222,7 @@ LEFT JOIN product_product ON Stock_Move.Code=product_product.Code]]>
 						<property name="dmlType" value="cond" />
 						<property name="sql">
 							<value>
-<![CDATA[SELECT  Product_ID,Code,Name,Specs,Ware_Hose_ID,Product_Qty,Uom_ID FROM view_stock_qty]]>
+<![CDATA[SELECT  ID,Code,Name,Specs,'' AS WareHose_ID,Uom_ID,Product_Actual_Qty, Product_Occupy_Qty, Product_Enable_Qty FROM view_stock_qty]]>
 							</value>
 						</property>
 						<property name="conditions">

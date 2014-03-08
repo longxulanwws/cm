@@ -17,16 +17,16 @@
 				var opt = window.location.toString().replace(/^[^?]+\?o=/, ''); 
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
- 						{display:'编号',name:'code',width:180,minWidth:60},
- 	                    {display:'名称',name:'name',width:180,minWidth:60,align:'left'},
- 	                    {display:'规格/型号',name:'specs',width:150,minWidth:60,align:'left'},
+ 						{display:'编号',name:'code',width:80,minWidth:60},
+ 	                    {display:'名称',name:'name',width:150,minWidth:60,align:'left'},
+ 	                    {display:'规格/型号',name:'specs',width:120,minWidth:60,align:'left'},
  	                    //{display:'品牌',name:'brand',width:140,minWidth:60,align:'left'},
  	                    //{display:'类型',name:'categ_id',width:120,minWidth:60,align:'left',render:function(item){return paramRender(item,'product.type2',item.categ_id);}},
  	                    //{display:'商品性质',name:'type',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'product_category',item.type);}},
- 	                    {display:'单位',name:'uom_id',width:100,minWidth:60,align:'left',render:function(item){return paramRender(item,'uom',item.uom_id);}},
- 	       			    {display:'库存数量',name:'product_actual_qty',width:180,minWidth:60},
-	                    {display:'已占用数量',name:'product_occupy_qty',width:180,minWidth:60,align:'left'},
-	                    {display:'可用数量',name:'product_enable_qty',width:150,minWidth:60,align:'left'}
+ 	                    {display:'单位',name:'uom_id',width:40,minWidth:40,align:'left',render:function(item){return paramRender(item,'uom',item.uom_id);}},
+ 	       			    {display:'库存数量',name:'product_actual_qty',width:70,minWidth:60,align:'right',render:function(item){return item.product_actual_qty ? parseFloat(item.product_actual_qty).toFixed(2) : '0.00';}},
+	                    {display:'已占用数量',name:'product_occupy_qty',width:70,minWidth:60,align:'right',render:function(item){return item.product_occupy_qty ? parseFloat(item.product_occupy_qty).toFixed(2) : '0.00';}},
+	                    {display:'可用数量',name:'product_enable_qty',width:70,minWidth:60,align:'right',render:function(item){return item.product_enable_qty ? parseFloat(item.product_enable_qty).toFixed(2) : '0.00';}}
                     ],
                     pageSize:15,
                     usePager: true,
@@ -102,7 +102,7 @@
 					defGrid.data = data['data'];
 					 //wws 2014-2-23 增加分页信息  end 
 					defGrid.set({data: data['data']});
-				});
+				},null,false);
 			}
 			function getSelectedRow() {
 				return defGrid.getSelectedRow();

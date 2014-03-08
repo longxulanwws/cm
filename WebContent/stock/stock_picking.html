@@ -106,6 +106,7 @@
 				appendAddBtn(openDictDef, "添加原材料入库单");
 				appendModifyBtn(openModify, "编辑原材料入库单");
 				appendDeleteBtn(deleteRow, "删除单据信息");
+				appendSearchBtn(searchRow, "查看单据信息");
 				$("#pageloading").hide();
 				ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
 					$('#createUserCodeS').val(data['uid']);
@@ -176,7 +177,18 @@
 				    return;
 				}
 				parent.f_addTab('modify_stockp','原材料入库单维护','./stock/new_stock_picking.html?o=m&code='.concat(row.code));
-			}			
+			}
+			//通用单据查询 界面
+			function searchRow(){
+				var row = defGrid.getSelectedRow();
+
+				if (!row) {
+					$.ligerDialog.error('请先选择要查看的单据！','错误');
+					return;
+				}
+				
+				parent.f_addTab('new_search_stockS','单据明细信息','./stock/search_stock_picking.html?o=m&code='.concat(row.code));
+			}
 			// 审核确认
 			function toConfirm(rowid) {
 				var row = defGrid.getRow(rowid);

@@ -24,8 +24,6 @@
 							// 出入库确认环节                                       50待打印     >>打印>>     60已打印   >>出入库确认>>   70出库完成           
 							
 							// 流程状态 flow_state 00 新建（制单） 10 入库质检     20入、出库确认    30 入、出库完成
-							alert(row.state);
-					         alert(row.flow_state);
 							if( row.state < 10  )
 							 	{								  
 							  	  h += "<a href='javascript:void(0);' id='toConfirm' class='opt-link' onclick='toConfirm(" + rowindex + ")'>审核</a> ";
