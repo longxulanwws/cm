@@ -159,7 +159,7 @@
 		    function toBack()
 		    {
 		        //关闭 出库单维护界面
-		    	parent.tabManager.removeTabItem("deliver_stockp"); 
+		    	parent.tabManager.removeTabItem('deliver_stockp'); 
 			   
 			 }
 			function toSave() {
@@ -216,7 +216,7 @@
 
 			//确认出库
 			function submitConfirm() {
-				alert ($('#state').val());
+				//alert ($('#state').val());
 				if($('#state').val() >= 70 )
 					{
 					$.ligerDialog.error('已确认出库，不能重复确认，请确认！');
