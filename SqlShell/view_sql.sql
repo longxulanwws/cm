@@ -56,3 +56,38 @@ LEFT JOIN  vw_actual_stock  AS mva ON mva.code=product_product.code
 LEFT JOIN  vw_occupy_stock AS mvb ON mvb.code=product_product.code
 WHERE mva.actual>0 OR mvb.Occupy>0 ;
 */
+
+
+/*
+ * 按品牌统计库存处理 
+ */
+
+CREATE VIEW vw_actual_stock_brand AS 
+SELECT Code, (CASE WHEN brand IS NULL THEN '' ELSE brand END) AS brand ,sum((CASE WHEN (Type = '0') THEN Product_Qty ELSE  (0 - Product_Qty ) END)) AS Actual FROM stock_move WHERE stock_move.State ='20'  GROUP BY brand,CODE;
+
+DROP VIEW IF EXISTS vw_occupy_stock;
+
+CREATE VIEW vw_occupy_stock_brand AS 
+SELECT Code, (CASE WHEN brand IS NULL THEN '' ELSE brand END) AS brand,sum((CASE WHEN (Type = '1') THEN Product_Qty ELSE 0 END )) AS Occupy FROM stock_move WHERE stock_move.State ='10' GROUP BY brand,CODE;
+
+/*
+ * 
+ * 
+ * */
+SELECT code FROM cm_dict_item WHERE DICT_DEF_ID='0023'
+
+
+SELECT * FROM stock_move
+
+
+(SELECT brand.code AS brandcode,product_product.* FROM product_product
+,(SELECT code FROM cm_dict_item WHERE DICT_DEF_ID='0023') AS brand
+) AS product_brand
+
+SELECT * FROM 
+(
+SELECT brand.code AS brandcode,product_product.* FROM product_product
+,(SELECT code FROM cm_dict_item WHERE DICT_DEF_ID='0023') AS brand
+) AS product_brand
+LEFT JOIN vw_actual_stock_brand  AS vma ON vma.brand =product_brand.brandcode AND product_brand.Code=vma.code
+LEFT JOIN vw_occupy_stock_brand  AS vmb ON vmb.brand =product_brand.brandcode AND product_brand.Code=vmb.code

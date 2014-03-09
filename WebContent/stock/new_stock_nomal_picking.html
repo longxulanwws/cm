@@ -157,7 +157,7 @@
 			// 选择商品 处理
 			var curRow, selDialog;
 			function selectProduct() {
-				var selDialog = $.ligerDialog.open({height:500,width:650,isResize:false,url:'../sysmgt/product_query2.html?o=s',title:'选择商品',
+				var selDialog = $.ligerDialog.open({height:400,width:650,isResize:true,url:'../sysmgt/product_query2.html?o=s',title:'选择商品',
 					buttons: [
 						{text:'确定',onclick: function(item, dialog){
 							var data = dialog.frame.getSelectedRow();
@@ -194,7 +194,7 @@
 					$('#warehouseS').val(data.warehose_id);
 					$('#moveInS').val(paramRender(null,'user',data.move_in_user));
 					$('#moveInIdS').val(data.move_in_user);
-					$('#note').val(data.note);
+					$('#noteS').val(data.note);
 					$('#deptS').val(paramRender(null,'org_list',data.dept_id));
 					$('#deptCodeS').val(data.dept_id);
 					$('#createUserS').val(paramRender(null,'user',data.createuser));
@@ -452,7 +452,7 @@
 					<div class="line-div" style="height:76px;">
 						<div class="label-div"><label>备注</label></div>
 						<div class="in-div" style="width:72%;">
-							<textarea cols="73" rows="3" id="note"></textarea>
+							<textarea cols="73" rows="3" id="noteS"></textarea>
 						</div>
 					</div>
 					<div class="line-div">

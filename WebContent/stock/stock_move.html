@@ -19,7 +19,7 @@
                     columns:[
 							{display:'商品编号',name:'code',width:130,minWidth:60},
 		                    {display:'品	名',name:'name',width:130,minWidth:60},
-		                    {display:'规格型号',name:'specs',width:130},
+		                    {display:'规格/型号',name:'specs',width:130},
 				            {display:'单	位',name:'uom_id',width:80,align:'left'},
 				            //{display:'仓	库',name:'ware_hose_id',width:80},
 				            {display:'库存数量',name:'product_actual_qty',width:80,align:'left',render:function(item){return item.product_actual_qty?parseFloat(item.product_actual_qty).toFixed(2):'';}},
@@ -119,7 +119,8 @@
 				var param = new Object();
 				param.ware_hose_id=$("#moveware_hose").val();
 				param.name = $("#movename").val();
-				param.origin = $("#moveorigin").val();
+				param.code = $("#movecode").val();
+				param.specs = $("#movespecs").val();
 				//param.state = $("#moveState").val();
 
 				var data = JSON.stringify(reqObj('q','stock.select.product.stock.qty.query',JSON.stringify(param),'l',true,page,pageSize));
@@ -176,8 +177,9 @@
 					<!-- <label>仓库选择</label>
 					<select id="moveware_hose" param="base_point" first=""></select>
 					 -->
-					<label>商品名称</label><input type="text" class="s-text txt-def" id="movename" />
-					<label>商品规格</label><input type="text" class="s-text txt-def" id="moveorigin" />
+					<label>编号</label><input type="text" class="s-text txt-def" id="movecode" />
+					<label>名称</label><input type="text" class="s-text txt-def" id="movename" />
+					<label>规格/规格</label><input type="text" class="s-text txt-def" id="movespecs" />
 					<!--  <label>状态</label><select id="moveState" param="rbac.status" first=""></select>-->
 					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
 					<input type="button" value="清空" onclick="toReset('#query_cond input,select,textarea');" />

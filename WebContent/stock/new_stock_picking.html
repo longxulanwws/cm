@@ -141,7 +141,7 @@
 				toReset('#a_center input:not(.readonly),select,textarea');
 			}
 			function selectProduct() {
-				var selDialog = $.ligerDialog.open({height:500,width:650,isResize:false,url:'../sysmgt/product_query2.html?o=s',title:'选择商品',
+				var selDialog = $.ligerDialog.open({height:400,width:650,isResize:true,url:'../sysmgt/product_query2.html?o=s',title:'选择商品',
 					buttons: [
 						{text:'确定',onclick: function(item, dialog){
 							var data = dialog.frame.getSelectedRow();
