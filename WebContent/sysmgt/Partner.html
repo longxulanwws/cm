@@ -34,7 +34,7 @@
                             }
                             return h;
                         },frozen:true},
-                        {display:'单位类型',name:'type',width:80,minWidth:60,data:get_type_list,render:switcher_type,editor:{type:'select',data:get_type_list,textField:'name',valueField:'value',selectBoxHeight:50}},
+                        //{display:'单位类型',name:'type',width:80,minWidth:60,data:get_type_list,render:switcher_type,editor:{type:'select',data:get_type_list,textField:'name',valueField:'value',selectBoxHeight:50}},
                         {display:'编号',name:'code',width:40,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'名称',name:'name',width:200,minWidth:60,align:'left',editor:{type:'text'}},
 	                    {display:'所属机构',name:'dept_id',width:80,minWidth:60,data:get_org_list,render:switcher_org,editor:{type:'select',data:get_org_list,textField:'name',valueField:'value',selectBoxHeight:50}},
@@ -326,7 +326,7 @@
 				});
 				if (!valid) return;
 				var param = new Object();
-				param.code=$("#code").val();
+				param.code=$("#codeS").val();
 				param.name = $("#newName").val();
 				param.type = $("#newType").val();
 				param.Of_Region= $("#Of_Region").val();
