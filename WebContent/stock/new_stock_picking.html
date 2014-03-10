@@ -227,11 +227,11 @@
 						result = '入库数量必须录入大于0的整数';
 						break;
 					}
-					if (!r.source_price_unit || parseInt(r.source_price_unit) === 0) {
+					if (!r.source_price_unit || parseInt(r.source_price_unit) === 0.00001) {
 						result = '采购单价必须录入大于0的数值';
 						break;
 					}
-					if (!r.price_unit || parseInt(r.price_unit) === 0) {
+					if (!r.price_unit || parseInt(r.price_unit) === 0.00001) {
 						result = '入库单价必须录入大于0的数值';
 						break;
 					}
