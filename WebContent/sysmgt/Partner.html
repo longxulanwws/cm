@@ -17,6 +17,7 @@
 		<script type="text/javascript">
 			var defGrid;
 			var userid;
+			var region,org,typeC,trade,lecel,bank;
 			$(function(){
 				$("#layout_main").ligerLayout({
                 });
@@ -114,7 +115,7 @@
 			
 			
 				//var org_data = getData('org_list');
-				$("#region_combobox").ligerComboBox({
+				region=$("#region_combobox").ligerComboBox({
 					autocomplete: true,
                 	valueField:'value',
                 	textField:'name',
@@ -123,7 +124,7 @@
                     	$("#Of_Region").val(v);
                 }
 			   });
-				$("#org_combobox").ligerComboBox({
+				org=$("#org_combobox").ligerComboBox({
 					autocomplete: true,
                 	valueField:'value',
                 	textField:'name',
@@ -132,7 +133,7 @@
                     	$("#Dept_ID").val(v);
                 }
 			   });  
-				$("#type_combobox").ligerComboBox({
+				typeC=$("#type_combobox").ligerComboBox({
 					autocomplete: true,
                 	valueField:'value',
                 	textField:'name',
@@ -142,7 +143,7 @@
                 }
 			});
 				
-				$("#trade_combobox").ligerComboBox({
+				trade=$("#trade_combobox").ligerComboBox({
 					autocomplete: true,
                 	valueField:'value',
                 	textField:'name',
@@ -151,7 +152,7 @@
                     	$("#newOf_trade").val(v);
                 }
 			});
-				$("#lecel_combobox").ligerComboBox({
+				lecel=$("#lecel_combobox").ligerComboBox({
 					autocomplete: true,
                 	valueField:'value',
                 	textField:'name',
@@ -161,7 +162,7 @@
                 }
 			});
 
-				$("#bank_combobox").ligerComboBox({
+				bank=$("#bank_combobox").ligerComboBox({
 					autocomplete: true,
                 	valueField:'value',
                 	textField:'name',
@@ -293,6 +294,15 @@
 		    // parent.f_addTab('partner_add'+index+'','新增公司单位','./sysmgt/partner_add.html');
 		            
 				toReset('#new_user_def input,select,textarea');
+				//var region,org,type,trade,lecel,bank
+				
+				region.setValue('');
+				org.setValue('');
+				typeC.setValue('');
+				trade.setValue('');
+				lecel.setValue('');
+				bank.setValue('');
+				
 				addDialog = $.ligerDialog.open({
 					target:$("#new_user_def"),
 					title:"新增往来单位",
