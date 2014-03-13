@@ -186,6 +186,7 @@
 								<entry key="name" value=":like(lr)" />
 								<entry key="specs" value=":like(lr)" />
 								<entry key="type" value=""/>
+								<entry key="categ_id" value=""/>
 							</map>
 						</property>
 						<property name="order" value="code"/>
