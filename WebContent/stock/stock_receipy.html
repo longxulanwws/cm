@@ -135,8 +135,14 @@
 					$.ligerDialog.error('请先选择要查看的单据！','错误');
 					return;
 				}
-				
+				//判断 movetype 是否是05 退回单据
+				if(row.move_type=='05')
+				{
+					parent.f_addTab('quality_stockp','单据明细信息','./stock/search_stock_picking.html?o=m&t=th&code='.concat(row.code));
+				}
+				else{
 				parent.f_addTab('new_search_stockS','单据明细信息','./stock/search_stock_picking.html?o=m&code='.concat(row.code));
+				}
 			}
 			
 			function sw_opt(item) {
@@ -171,14 +177,15 @@
 				param.partner_id = $("#partnerQ").val();
 				param.state=$("#stateS").val();
 				//01 resale采购入库  02 sale产成品入库	
-				
 				if(opt=='resale'){
 					// 原材料入库
 					param.move_type='01';				
 					
-				}else{
+				}else if(opt=='sale'){
 					param.move_type='02';
-				}				
+				}else {
+					param.move_type='05';
+				}	
 				param.move_in_user=$('#UserCodeS').val();
 				  //处理flow_state大于20的数据
                 param.flow_state='20';
@@ -224,21 +231,24 @@
 				}
 				
 				if(printFlag){
-					 
+					 var title;
 					if(opt=='resale'){
 						// 原材料采购入库
+						title='原材料入库单';
 						printFormatUrl='./print_purchase_inStock.html?id=';
 					} else if(opt=='sale'){
 						//产成品入库
+						title='产成品入库单';
 						printFormatUrl='./print_pro_inStock.html?id=';
 					}else{
 						//原材料退库
+						title='原材料退库单';
 						printFormatUrl='./print_rawMat_back_inStock.html?id=';
 					}
 					
 					if(!printFormatUrl==''){
 						
-						printWin = $.ligerDialog.open({height:600,width:800,url:printFormatUrl.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
+						printWin = $.ligerDialog.open({height:600,width:800,url:printFormatUrl.concat(defGrid.getRow(rowid).code),title:title});
 						
 					}else{
 						$.ligerDialog.error('打印格式未找到','错误');

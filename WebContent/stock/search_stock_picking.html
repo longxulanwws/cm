@@ -34,6 +34,7 @@
 				]});
 				var query = getQueryString(window.location.toString());
 				opt = query.o;
+				th =query.t;
 				if (opt) {
 					c_code = query.code;
 					if (opt === 'm') {
@@ -89,7 +90,7 @@
 					    			            {display:'单位',name:'product_uom',width:90,render:function(item){return paramRender(item,'uom',item.product_uom);}},
 					    			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}},
 					    			            //{display:'采购数量',name:'tar_product_qty',align:'right',render:function(item){return item.tar_product_qty ? parseFloat(item.tar_product_qty).toFixed(2) : '0.00';}},
-					    			            {display:'退回数量',name:'product_qty',id:'num',width:150,align:'right',render:function(item){return item.product_qty ? parseFloat(item.product_qty).toFixed(2) : '0.00';}},
+					    			            {display:'退回数量',name:'product_qty',width:90,align:'right',render:function(item){return parseFloat(item.product_qty).toFixed(2);}},
 					    			            {display:'质检方式',name:'qc_type',width:150,render:function(item){return paramRender(item,'QCType',item.qc_type);}
 								            	,editor:{type:'select',data:getData('QCType'),valueField:'value',textField:'name'}},
 								            	{display:'质检结果',name:'qc_flag',width:150,render:function(item){return paramRender(item,'QCResult',item.qc_flag);}
@@ -236,10 +237,10 @@
 				if (data.Rows && data.Rows.length === 1) {
 					data = data.Rows[0];
 					$('#codeS').val(data.code);
-					$('#state').val(changeParam(data.state));
+					$('#state').val(paramRender(null,'inStockState',data.state));
 					$('#move_type').val(data.move_type);
 					$('#move_typeS').val(changeType(data.move_type));
-					$('#qc_anomaly_sate').val(data.qc_anomaly_sate);
+					$('#qc_anomaly_sate').val(paramRender(null,'QCAnomalySate',data.qc_anomaly_sate));
 					$('#qc_note').val(data.qc_note);
 					$('#originS').val(data.origin);
 					$('#partnerInS').val(paramRender(null,'partner_list',data.partner_id));

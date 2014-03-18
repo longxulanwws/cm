@@ -133,7 +133,7 @@
 				//判断 movetype 是否是05 退回单据
 				if(row.move_type=='05')
 				{
-					parent.f_addTab('quality_stockp','质检单维护','./stock/search_stock_picking.html?o=m&t=th&code='.concat(row.code));
+					parent.f_addTab('quality_stockp','单据明细信息','./stock/search_stock_picking.html?o=m&t=th&code='.concat(row.code));
 				}
 				else{
 				parent.f_addTab('new_search_stockS','单据明细信息','./stock/search_stock_picking.html?o=m&code='.concat(row.code));

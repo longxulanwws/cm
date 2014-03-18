@@ -139,13 +139,48 @@
 				selDialog = $.ligerDialog.open({height:600,width:800,isResize: true,url:'../sysmgt/product_query.html?o=s',title:'选择商品'});
 			}
 			function queryProd(){}
+			function changeType(param){
+				var str="";
+				if(param==01){
+					str+="原材料入库";
+				}else if(param==02){
+					str+="产成品入库";
+				}
+				else if(param==05){
+					str+="原材料退库";
+				}
+				return str;
+			}
+			function changeParam(state){
+				var str="";
+				if(state==0){
+					str+=" 未审核";
+				}else if(state==10){
+					str+="已审核";
+				}else if(state==20){
+					str+="已提交";
+				}else if(state==9){
+					str+="驳回修改";
+				}else if(state==30){
+					str+="已质检";
+				}else if(state==40){
+					str+="已审核";
+				}else if(state==9){
+					str+="驳回修改";
+				}
+				return str;
+			}
 			function bindVal(data) {
 				if (data.Rows && data.Rows.length === 1) {
 					data = data.Rows[0];
 					$('#id').val(data.id);
 					$('#state').val(data.state);
+					$('#stateS').val(paramRender(null,'inStockState',data.state));
 					$('#flow_state').val(data.flow_state);
 					$('#move_type').val(data.move_type);
+					$('#move_typeS').val(changeType(data.move_type));
+					$('#qc_anomaly_sate').val(paramRender(null,'QCAnomalySate',data.qc_anomaly_sate));
+					$('#qc_note').val(data.qc_note);
 					$('#codeS').val(data.code);
 					$('#originS').val(data.origin);
 					$('#partnerInS').val(paramRender(null,'partner_list',data.partner_id));
@@ -305,29 +340,35 @@
 					printFlag=true;
 				}
 				if(printFlag){
+					 var title;
 					if($('#move_type').val()=='01'){
 						// 原材料采购入库
+						title='原材料入库单';
 						printFormatUrl='./print_purchase_inStock.html?id=';
 					}
 					if($('#move_type').val()=='02'){
 						//产成品入库
+						title='产成品入库单';
 						printFormatUrl='./print_pro_inStock.html?id=';
 					}
 					if($('#move_type').val()=='03'){
 						//生产领用出库
+						title='生产领用出库单';
 						printFormatUrl='./print_req_rawMat_outStock.html?id=';
 					}
 					if($('#move_type').val()=='04'){
 						//销售发货
+						title='销售发货单';
 						printFormatUrl='./print_proSale_outStock.html?id=';
 					}
 					if($('#move_type').val()=='05'){
 						//	原材料退库
+						title='原材料退库单';
 						printFormatUrl='./print_rawMat_back_inStock.html?id=';
 					}
 					
 					if(!printFormatUrl==''){
-						printWin = $.ligerDialog.open({height:600,width:800,url:printFormatUrl.concat($('#codeS').val()),title:'打印入库单'});
+						printWin = $.ligerDialog.open({height:600,width:800,url:printFormatUrl.concat($('#codeS').val()),title:title});
 						//reloadPage();
 					}	else{
 						$.ligerDialog.error('打印格式未找到','错误');
@@ -400,6 +441,13 @@
 					<div class="line-div">
 						<div class="label-div"><label>入库单号</label></div>
 						<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
+						<div class="label-div"><label>单据类型</label></div>
+						<div class="in-div"><input type="text" id="move_typeS" ltype="text" class="required diff" readonly="readonly" /></div>
+						
+					</div>
+					<div class="line-div">
+						<div class="label-div"><label>单据状态</label></div>
+						<div class="in-div"><input type="text" id="stateS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
 						<div class="label-div"><label>采购订单号</label></div>
 						<div class="in-div"><input type="text" id="originS" ltype="text" class="diff"  readonly="readonly"/></div>
 					</div>
@@ -421,6 +469,12 @@
 						<div class="label-div"><label>收货人</label></div>
 						<div class="in-div"><input type="text" id="moveInS" ltype="combobox" class="diff" /></div>
 						<input type="hidden" id="moveInIdS" />
+					</div>
+					<div class="line-div">
+						<div class="label-div"><label>入库异常</label></div>
+						<div class="in-div"><input type="text" id="qc_anomaly_sate" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
+						<div class="label-div"><label>质检结论</label></div>
+						<div class="in-div"><input type="text" id="qc_note" ltype="text" class="required diff" readonly="readonly" /></div>
 					</div>
 					<div class="line-div" style="height:76px;">
 						<div class="label-div"><label>备注</label></div>
