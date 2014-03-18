@@ -18,16 +18,33 @@
                     columns:[
  						{display:'操作',isSort:false,width:150,render:function(rowdata,rowindex,value) {
  							var h = "";
-							  h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
+							 // h += "<a href='javascript:void(0);' class='opt-link' onclick='toPrint(" + rowindex + ")'>打印</a> ";
 							 var row = defGrid.getRow(rowindex);
-							 if(row.state == '41' || row.state == 'null')
-								 {
-                             h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交收货</a> ";
-                             h += "<a href='javascript:void(0);'  class='opt-link' onclick='deleteRow(" + rowindex + ")'>删除</a> ";
-								 } 
+// 							 if(row.state == '00' || row.state == 'null')
+// 								 {
+//                              h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='submitToPick(" + rowindex + ")'>提交收货</a> ";
+//                              h += "<a href='javascript:void(0);'  class='opt-link' onclick='deleteRow(" + rowindex + ")'>删除</a> ";
+// 								 } 
+							 if(row.state >=10 ) 
+							  	{
+								  h += "已审核  ";
+							  	}
+							  else 
+								{
+								  h += "<a href='javascript:void(0);' id='submitToPick' class='opt-link' onclick='toConfirm(" + rowindex + ")'>审核</a> ";
+								}
+							
+							 if(row.state < 20)
+							  {
+								
+								 h += "<a href='javascript:void(0);' id='to_quality' class='opt-link' onclick='to_quality(" + rowindex + ")'>提交质检</a> ";
+							  }
+							 else{
+								 h += "已提交质检 ";
+							 }
                       	return h; 
                         },frozen:true},
-                        {display:'单据状态',name:'state',width:90,minWidth:60,render:function(item){return paramRender(item,'rollback',item.state);}},
+                        {display:'单据状态',name:'state',width:90,minWidth:60,render:function(item){return paramRender(item,'qcStockState',item.state);}},
                         {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'stockBillType',item.move_type);}},
                         {display:'退库单号',name:'code',width:130,minWidth:60},
 	                    {display:'产品单号',name:'origin',width:130},
@@ -53,6 +70,7 @@
 				});
 				appendAddBtn(openDictDef, "添加退回单");
 				appendModifyBtn(openModify, "修改退回单");
+				appendDeleteBtn(deleteRow, "删除单据信息");
 				appendSearchBtn(searchRow, "查看单据信息");
 				$("#pageloading").hide();
 
@@ -157,10 +175,29 @@
 				printWin = $.ligerDialog.open({height:600,width:800,url:'./print_stock_pocket_picking.html?id='.concat(defGrid.getRow(rowid).code),title:'打印入库单'});
 			}
 			 function deleteRow(rowid) {
+// 		            $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
+// 			            if (!r)
+// 				            return;
+// 		                var row = defGrid.getRow(rowid);
+// 		                if (row['__status'] !== 'add')
+// 		                	toDel(JSON.stringify(row));
+// 		                defGrid.deleteRow(rowid);
+// 		            })
+             var row = defGrid.getSelectedRow();
+				if (!row) {
+						$.ligerDialog.error('请先选择要删除的退库但记录。','错误');
+						return;
+					}
+				 if(row.state >= 10 )
+					{
+					 $.ligerDialog.error('该单据已审核或已提交，不能删除！');
+						return;
+					}
+				  
 		            $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
 			            if (!r)
 				            return;
-		                var row = defGrid.getRow(rowid);
+		                
 		                if (row['__status'] !== 'add')
 		                	toDel(JSON.stringify(row));
 		                defGrid.deleteRow(rowid);
@@ -176,6 +213,7 @@
 						     var param = JSON.stringify(reqObj('d','stock.delete.stock_picking.code',row));
 						      ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
 								if (parseInt(data['status']) > 0) {
+									toQuery();
 								  $.ligerDialog.success('删除成功');
 								}
 								else{
@@ -188,6 +226,75 @@
 						}
 					});
 			}
+			//提交质检
+				function to_quality(rowid) {
+					var row = defGrid.getRow(rowid);
+
+					if(row.state < 10)
+				    {					
+						$.ligerDialog.error('该单据未审核，请先审核！');
+					    return;
+					}
+					
+	 				$.ligerDialog.confirm('您确定要提交该项数据吗？', function(r) {
+	 					
+			            if (!r)
+				            return;
+			            
+						//修改 商品明细表中的 state='10'	
+						var stock_move_param=new Object();
+						stock_move_param.code=row.code;
+						stock_move_param.state='10';
+						 var stock_move_param_J = JSON.stringify(reqObj('u','stock.update.stock_move_state.update',JSON.stringify(stock_move_param)));
+									
+									ajaxSubmit("/cm/rbac/cm.do?m=u", stock_move_param_J, function(data1) {
+										if (data1) {
+											if (parseInt(data1['status']) > 0) {
+												//修改单据的 state ='20'
+												var param1=new Object();
+												param1.id=row.id;
+												// 状态被修改
+												param1.state='20';
+												param1.flow_state='10';
+												upPickingDel(param1,'提交质检成功','提交质检失败');
+											} else {
+												$.ligerDialog.error('提交失败');
+											}
+										}
+									},null,false);
+	 				});						
+				}
+				// 审核确认
+				function toConfirm(rowid) {
+					var row = defGrid.getRow(rowid);
+					var param1=new Object();
+				     	param1.id=row.id;
+						//已审核 20
+						param1.state="10";
+	                    param1.flow_state=row.flow_state;
+	                    
+						upPickingDel(param1,'审核成功','审核失败');
+				
+			     }
+				function upPickingDel(param1,successInfo,errorInfo){
+					
+					 var param = JSON.stringify(reqObj('u','stock.update.picking_state.update',JSON.stringify(param1)));
+						
+						ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+							if (data) {
+								if (parseInt(data['status']) > 0) {	
+									
+									$.ligerDialog.success(successInfo);
+									//自动刷新
+									toQuery();
+								} else {								
+									$.ligerDialog.error(errorInfo);
+								}
+							}
+						});
+					
+					
+				}
 	    </script>
 		<style type="text/css">
 			label{margin: 5px 20px 5px 15px;}

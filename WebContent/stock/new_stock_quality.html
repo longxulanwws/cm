@@ -13,7 +13,7 @@
 		<script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
 		<script src="../js/common.js" type="text/javascript"></script>
 		<script type="text/javascript">
-		var pGrid, c_row, opt, c_code;
+		var pGrid, c_row, opt, c_code,th;
 		var udata;
 		$(function(){
 			udata = getData('user',{orgid:$("#deptCodeS").val()},false);
@@ -38,7 +38,46 @@
 				    {line:true}
 
 				]});
+				var query = getQueryString(window.location.toString());
+				opt = query.o;
+				th = query.t;
+				
+				if(th){
+					$("#originN").text('退回订单号');
+					pGrid = $("#p-div").ligerGrid({
+	               		
+	                    columns:[
+	     						{display:'商品编号',name:'code',width:90,textField:'code',valueField:'categ_id'},
+	    	                    {display:'品名',name:'name',width:150},
+	    	                    {display:'规格/型号',name:'specs',width:150},
+	    			            {display:'单位',name:'product_uom',width:90,render:function(item){return paramRender(item,'uom',item.product_uom);}},
+	    			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}},
+	    			            //{display:'采购数量',name:'tar_product_qty',align:'right',render:function(item){return item.tar_product_qty ? parseFloat(item.tar_product_qty).toFixed(2) : '0.00';}},
+	    			            {display:'退回数量',name:'product_qty',id:'num',width:150,align:'right',render:function(item){return item.product_qty ? parseFloat(item.product_qty).toFixed(2) : '0.00';}},
+	    			            {display:'质检方式',name:'qc_type',width:150,render:function(item){return paramRender(item,'QCType',item.qc_type);}
+				            	,editor:{type:'select',data:getData('QCType'),valueField:'value',textField:'name'}},
+				            	{display:'质检结果',name:'qc_flag',width:150,render:function(item){return paramRender(item,'QCResult',item.qc_flag);}
+				            	,editor:{type:'select',data:getData('QCResult'),valueField:'value',textField:'name'}}
+	                    ],
+	               		
+	                    pageSize:20,
+	                    usePager: true,
+	                    width:'100%',
+	                    height:'100%',
+	                    dataAction:'server',
+	                    checkbox:false,
+	                    rownumbers:false,
+	                    fixedCellHeight:false,
+	                    colDraggable:false,
+	                    enabledEdit:true,
+	                    clickToEdit:true,
+	                    onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
+	                    onReload: queryProd
+					});
+              		}
+              		else{
                	pGrid = $("#p-div").ligerGrid({
+               		
                     columns:[
      						{display:'商品编号',name:'code',width:90,textField:'code',valueField:'categ_id'},
     	                    {display:'品名',name:'name',width:150},
@@ -52,6 +91,7 @@
 			            	{display:'质检结果',name:'qc_flag',width:150,render:function(item){return paramRender(item,'QCResult',item.qc_flag);}
 			            	,editor:{type:'select',data:getData('QCResult'),valueField:'value',textField:'name'}}
                     ],
+               		
                     pageSize:20,
                     usePager: true,
                     width:'100%',
@@ -66,6 +106,7 @@
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: queryProd
 				});
+              		}
 // 				appendAddBtn(function(){
 // 					pGrid.addEditRow();
 // 					c_row = pGrid.getRow(pGrid.rows.length - 1);
@@ -73,8 +114,7 @@
 // 				}, "添加商品明细");
 				//appendModifyBtn(function(){}, "修改商品明细");
 // 				appendDeleteBtn(deleteRow, "删除商品明细");
-				var query = getQueryString(window.location.toString());
-				opt = query.o;
+				
 				if (opt) {
 					c_code = query.code;
 					if (opt === 'm') {
@@ -171,6 +211,8 @@
 					$("#stateS").val(data.state);
 					$("#flow_state").val(data.flow_state);
 					$('#codeS').val(data.code);
+					$('#move_type').val(data.move_type);
+					$('#move_typeS').val(changeType(data.move_type));
 					$('#originS').val(data.origin);
 					$('#partnerInS').val(paramRender(null,'partner_list',data.partner_id));
 					$('#partnerS').val(data.partner_id);
@@ -468,6 +510,18 @@
 						}
 					});
 			}
+			function changeType(param){
+				var str="";
+				if(param==01){
+					str+="原材料入库";
+				}else if(param==02){
+					str+="产成品入库";
+				}
+				else if(param==05){
+					str+="原材料退库";
+				}
+				return str;
+			}
 	    </script>
 		<style type="text/css">
 			.center-height{height: 100%;}
@@ -478,6 +532,7 @@
 		<input  type="hidden" id="idS"/>
 	<input  type="hidden" id="stateS"/>
 	<input  type="hidden" id="flow_state"/>
+	<input type="hidden" id="move_type" />
 		<div id="layout_main">
 			<div position="center" id="a_center" title="基本信息" style="overflow:auto;">
 				<div id="d-menu" class="toolbar"></div>
@@ -486,8 +541,9 @@
 					<div class="line-div">
 						<div class="label-div"><label>入库单号</label></div>
 						<div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
-						<div class="label-div"><label>采购订单号</label></div>
-						<div class="in-div"><input type="text" id="originS" ltype="text" class="diff"  readonly="readonly"/></div>
+						<div class="label-div"><label>单据类型</label></div>
+						<div class="in-div"><input type="text" id="move_typeS" ltype="text" class="required diff" readonly="readonly" /></div>
+			
 					</div>
                 	<div class="line-div">
 						<div class="label-div"><label>供应商</label></div>
@@ -495,8 +551,9 @@
 						<input type="text" id="partnerInS" ltype="text" class="diff" readonly="readonly" />
 						<input type="hidden" id="partnerS" />
 						</div>
-						<div class="label-div"> <label>预计到货日期</label></div>
-						<div class="in-div"><input type="text" id="predDateS" ltype="text" class="diff" readonly="readonly" /></div>
+						<div class="label-div"><label id="originN">采购订单号</label></div>
+						<div class="in-div"><input type="text" id="originS" ltype="text" class="diff"  readonly="readonly"/></div>
+						
 					</div>
                 	<div class="line-div">
 						<div class="label-div"><label>入库仓库</label></div>
@@ -504,14 +561,17 @@
 						<input type="text" id="warehouseInS" ltype="text" class="diff" readonly="readonly"  />
 						<input type="hidden" id="warehouseS" />
 						</div>
-						<div class="label-div"><label>收货人</label></div>
-						<div class="in-div"><input type="text" id="moveInS" ltype="text" class="diff" readonly="readonly"/></div>
-						<input type="hidden" id="moveInIdS" />
+						<div class="label-div"> <label>预计到货日期</label></div>
+						<div class="in-div"><input type="text" id="predDateS" ltype="text" class="diff" readonly="readonly" /></div>
+						
 					</div>
 					<div class="line-div">
 						<div class="label-div"><label>质检异常状态</label></div>
 						<div class="in-div" ><input type="text" id="QC_Anomaly_SateInS" ltype="combobox" class="required diff" /></div>
 						<input type="hidden" id="QC_Anomaly_SateS" />
+						<div class="label-div"><label>收货人</label></div>
+						<div class="in-div"><input type="text" id="moveInS" ltype="text" class="diff" readonly="readonly"/></div>
+						<input type="hidden" id="moveInIdS" />
 					</div>
 					<div class="line-div" style="height:76px;">
 						<div class="label-div"><label>质检结论：</label></div>
