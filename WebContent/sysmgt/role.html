@@ -12,6 +12,9 @@
 		<script src="../js/common.js" type="text/javascript"></script>
 		<script src="../js/json2.js" type="text/javascript"></script>
 		<script type="text/javascript" src="../js/md5.js"></script>
+			<script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
+		<script src="../js/validate/messages_zh.js" type="text/javascript"></script>
 		<script type="text/javascript">
 			var defGrid;
 			var userid;
@@ -192,10 +195,29 @@
 					height:400
 				});
 			}
+			function validate() {
+				var valid = true;
+				
+				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+					
+					if (!$(this).rules()) return;
+					if (!$(element).valid()) {
+						valid = false;
+						return;
+					}
+				});
+				if (!valid) return false;
+				
+				return true
+			}
 			function toAdd() {
+				if (!validate())
+				{
+				return;
+				}
 				var param = new Object();
-				param.code=$("#newCode").val();
-				param.name = $("#newName").val();
+				param.code=$("#newCodeS").val();
+				param.name = $("#newNameS").val();
 				param.isext = $("#newIsext").val();
 				param.status = $("#newStatus").val();
 				param.desc=$("#newDesc").val();
@@ -281,15 +303,16 @@
 			<div class="lineD" style="margin-bottom:10px;">
 				<span class="title l-icon-add">添加角色</span>
 			</div>
+			<form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
 			<div class="lineD">
 				<div class="labelD"><label>编号</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newCode" /></div>
+				<div class="dplD"><input type="text" ltype="text" class="required s-text txt-def" id="newCodeS" /></div>
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>名称</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newName" /></div>
+				<div class="dplD"><input type="text" ltype="text" class="required s-text txt-def" id="newNameS" /></div>
 			</div>
- 
+ </form>
 			  <div class="lineD">
 				<div class="labelD"><label>是否继承</label></div>
 				<div class="dplD"><select class="txt-def" id="newIsext" param="yesOrNo" default="1" style="margin-right: 30px;"></select></div>

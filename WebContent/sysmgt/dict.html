@@ -8,11 +8,13 @@
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
 		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
 		<script src="../js/jquery.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
+		<script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
+		<script src="../js/validate/messages_zh.js" type="text/javascript"></script>
 		<script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
 		<script src="../js/common.js" type="text/javascript"></script>
-		<script src="../js/json2.js" type="text/javascript"></script>
 		<script type="text/javascript">
-			var defGrid;
+			var defGrid; 
 			var defid;
 			$(function(){
                	defGrid = $("#query_list").ligerGrid({
@@ -88,9 +90,22 @@
 				defGrid.options.dataAction = 'server';
 				appendAddBtn(openDictDef, "添加字典字义");
 				$("#pageloading").hide();
+				
+				var moveInBox = $("#newStatuNameS").ligerComboBox({
+					autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:getStatus,
+                    onSelected:function(v,t) {
+                        $("#newStatuS").val(v);
+                    }
+				});
 				//默认查询全部数据 
 				toQuery();
 			});
+			var get_warehose_list=new function () {
+				return getData('base_point');
+			}
 	        function beginEdit(rowid) { 
 	        	defGrid.beginEdit(rowid);
 	        }
@@ -183,13 +198,34 @@
 		       parent.f_addTab('dictitem'+defName+'','管理字典数据项('+defName+')','./sysmgt/dictitem.html?defid='+defid+'');
 		            
 			}
+			function validate() {
+				var valid = true;
+				
+				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+					
+					if (!$(this).rules()) return;
+					if (!$(element).valid()) {
+						valid = false;
+						return;
+					}
+				});
+				if (!valid) return false;
+				
+				return true
+			}
 			function toAdd() {
+				
+				if (!validate())
+					{
+					return;
+					}
+				
 				var param = new Object();
-				param.name = $("#newName").val();
-				param.code =  $("#newCode").val();
-				param.status =  $("#newStatus").val();
-				param.desc=$("#newDesc").val();
-				param.type=$("#newType").val();
+				param.name = $("#newNameS").val();
+				param.code =  $("#newCodeS").val();
+				param.status =  $("#newStatuS").val();
+				param.desc=$("#newDescS").val();
+				param.type=$("#newTypeS").val();
 				
 				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.add',JSON.stringify(param)));
 				
@@ -260,34 +296,41 @@
 				<div id="query_list"></div>
 			</div>
 		</div>
+		
 		<div id="new_dict_def" style="display:none;overflow:hidden;">
 			<div class="lineD" style="margin-bottom:10px;">
 				<span class="title l-icon-add">添加参数字典定义</span>
 			</div>
+			<form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
 			<div class="lineD">
 				<div class="labelD"><label>字典名称</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newName" /></div>
+				<div class="dplD"><input type="text" ltype="text" class="required s-text txt-def" id="newNameS" /></div>
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>字典代码</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newCode" /></div>
+				<div class="dplD"><input type="text" ltype="text" class="required s-text txt-def"  id="newCodeS" /></div>
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>类型</label></div>
-				<div class="dplD"><input type="text" class="s-text txt-def" id="newType" /></div>
+				<div class="dplD"><input type="text" ltype="text" class="required s-text txt-def" id="newTypeS" /></div>
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>状态</label></div>
-				<div class="dplD"><select class="txt-def" id="newStatus" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
+				<div class="dplD">
+				
+				<input type="text" id="newStatuNameS" ltype="combobox" class="required s-text txt-def" /></div>
+						<input type="hidden" id="newStatuS" />
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>说明</label></div>
-				<div class="dplD"><textarea cols="24" rows="5" id="newDesc"></textarea></div>
+				<div class="dplD"><textarea cols="24" rows="5" id="newDescS"  ></textarea></div>
 			</div>
 			<div class="lineD" style="margin-top:15px;padding-left:30%;">
 				<input type="button" value="保存" onclick="toAdd();" />
 				<input type="button" value="清空" onclick="toReset('#new_dict_def input,select,textarea')" />
 			</div>
+		</form>
 		</div>
+	
 	</body>
 </html>
