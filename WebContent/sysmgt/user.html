@@ -106,7 +106,7 @@
 				$("#pageloading").hide();
 			
 				//var org_data = getData('org_list');
-				$("#org_combobox").ligerComboBox({
+				$("#org_comboboxS").ligerComboBox({
 					autocomplete: true,
                 	valueField:'value',
                 	textField:'name',
@@ -389,7 +389,7 @@
 			<div class="lineD">
 				<div class="labelD"><label>机构</label></div>
 			<div class="dplD">
-			<input type="text" id="org_combobox" ltype="combobox" class="diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+			<input type="text" id="org_comboboxS" ltype="combobox" class="required diff" /></div>
 						<input type="hidden" id="orgid" />
 			<!--  <select class="txt-def" id="orgid" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
 			-->

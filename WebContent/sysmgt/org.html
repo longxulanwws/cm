@@ -108,7 +108,7 @@
 				appendAddBtn(openDictDef, "添加机构字义");
 				$("#pageloading").hide();
 				//var org_data = getData('org_list');
-				$("#org_combobox").ligerComboBox({
+				$("#org_comboboxS").ligerComboBox({
 					autocomplete: true,
 	            	valueField:'value',
 	            	textField:'name',
@@ -117,7 +117,7 @@
 	                	$("#Higher_ID").val(v);
 	            		}
 				});
-				$("#orgType_combobox").ligerComboBox({
+				$("#orgType_comboboxS").ligerComboBox({
 					autocomplete: true,
 	            	valueField:'value',
 	            	textField:'name',
@@ -126,9 +126,22 @@
 	                	$("#newOrgType").val(v);
 	            		}
 				});
+				
+				var moveInBox = $("#newStatuNameS").ligerComboBox({
+					autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:getStatus,
+                    onSelected:function(v,t) {
+                        $("#newStatus").val(v);
+                    }
+				});
 				//默认查询全部数据 
 				toQuery();
 			});
+			var getStatus = new function () {
+				return getData('rbac.status');
+			}
 	        function beginEdit(rowid) { 
 	        	defGrid.beginEdit(rowid);
 	        }
@@ -227,17 +240,35 @@
 				addDialog = $.ligerDialog.open({
 					target:$("#new_dict_def"),
 					title:"新增机构",
-					width:500,
+					width:600,
 					height:400
 				});
 			}
+			function validate() {
+				var valid = true;
+				
+				$('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+					
+					if (!$(this).rules()) return;
+					if (!$(element).valid()) {
+						valid = false;
+						return;
+					}
+				});
+				if (!valid) return false;
+				
+				return true
+			}
 			function toAdd() {
+				if (!validate())
+				{
+				return;
+				}
 				var param = new Object();
-				param.name = $("#newName").val();
-				param.code = $("#newCode").val();
-				param.shortfor = $("#newShortfor").val();
+				param.name = $("#newNameS").val();
+				param.code = $("#newCodeS").val();
+				param.shortfor = $("#newShortforS").val();
 				param.org_type = $("#newOrgType").val();
-				param.name = $("#newName").val();
 				param.Higher_ID=$("#Higher_ID").val();
 				param.address=$("#newAddress").val();
 				param.tel = $("#newTel").val();
@@ -245,6 +276,7 @@
 				param.zipcode = $("#newZipcdoe").val();
 				param.status = $("#newStatus").val();
 				param.desc=$("#newDesc").val();
+				alert(JSON.stringify(param));
 				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addOrg',JSON.stringify(param)));
 				
 				ajaxSubmit("/cm/rbac/cm.do?m=a", data, function(data) {
@@ -321,54 +353,60 @@
 			<div class="lineD" style="margin-bottom:10px;">
 				<span class="title l-icon-add">添加机构</span>
 			</div>
+			<form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
 			<div class="line-div">
 				<div class="label-div"><label>编号</label></div>
-				<div class="in-div"><input type="text" class="diff required" id="newCode" /></div>
+				<div class="in-div"><input type="text" ltype="text" class="required s-text txt-def" id="newCodeS" /></div>
 
 				<div class="label-div"><label>名称</label></div>
-				<div class="in-div"><input type="text" class="diff  required" id="newName" /></div>
+				<div class="in-div"><input type="text" ltype="text" class="required s-text txt-def" id="newNameS" /></div>
 			</div>
 			<div class="line-div">
 				<div class="label-div"><label>简称</label></div>
-				<div class="in-div"><input type="text" class="diff required" id="newShortfor" /></div>
+				<div class="in-div"><input type="text" ltype="text" class="required s-text txt-def" id="newShortforS" /></div>
 
 				<div class="label-div"><label>机构类型</label></div>
 				<!--  <div class="in-div"><select class="txt-def" id="newOrgType" param="rbac.org_type" default="0" style="margin-right: 30px;"></select></div>
 				-->
-				<div class="in-div"><input type="text" id="orgType_combobox" ltype="combobox" class="required diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+				<div class="in-div"><input type="text" id="orgType_comboboxS" ltype="combobox" class="required diff" /></div>
 				<input type="hidden" id="newOrgType" />			
 			</div>
 			<div class="line-div">
 				<div class="label-div"><label>所属机构</label></div>
-				<div class="in-div"><input type="text" id="org_combobox" ltype="combobox" class="required diff" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+				<div class="in-div"><input type="text" id="org_comboboxS" ltype="combobox" class="required s-text txt-def"  /></div>
 				<input type="hidden" id="Higher_ID" />
 			 
 
 				<div class="label-div"><label>地址</label></div>
-				<div class="in-div"><input type="text" class="diff required" id="newAddress" /></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newAddress" /></div>
 			</div>
 			<div class="line-div">
 				<div class="label-div"><label>电话</label></div>
-				<div class="in-div"><input type="text" class="diff" id="newTel" /></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newTel" /></div>
 
 				<div class="label-div"><label>传真</label></div>
-				<div class="in-div"><input type="text" class="diff" id="newFax" /></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newFax" /></div>
 			</div>
+			
 			<div class="line-div">
 				<div class="label-div"><label>邮编</label></div>
-				<div class="in-div"><input type="text" class="diff" id="newZipcdoe" /></div>
+				<div class="in-div"><input type="text" class="s-text txt-def" id="newZipcdoe" /></div>
 	
 				<div class="label-div"><label>状态</label></div>
-				<div class="in-div"><select class="txt-def" id="newStatus" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
+				<div class="in-div">
+				<input type="text" id="newStatuNameS" ltype="combobox" class="required s-text txt-def" /></div>
+						<input type="hidden" id="newStatus" />
 			</div>
 			<div class="line-div">
 				<div class="label-div"><label>说明</label></div>
 				<div class="in-div"><textarea cols="30" rows="3" id="newDesc"></textarea></div>
 			</div>
+			
 			<div class="line-div" style="margin-top:45px;padding-left:40%;">
 				<input type="button" value="保存" onclick="toAdd();" />
 				<input type="button" value="清空" onclick="toReset('#new_dict_def input,select,textarea')" />
 			</div>
+			</form>
 		</div>
 		
 	</body>
