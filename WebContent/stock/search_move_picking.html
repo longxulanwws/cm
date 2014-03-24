@@ -191,7 +191,7 @@
 			//界面的返回处理，实际是关闭标签处理。
 		    function toBack()  {
 		       	//关闭查詢界面
-		    	parent.tabManager.removeTabItem("new_search_stockS");
+		    	parent.tabManager.removeTabItem("new_search_stockS"+$('#codeS').val());
 			}
 			
 	        function toEdit(rowid) {

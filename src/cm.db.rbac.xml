@@ -203,6 +203,8 @@ WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID AND m.RESOURCE_ID=c
 								<entry key="status" value="int" />
 							</map>
 						</property>
+						<property name="order" value="code"/>
+						
 					</bean>
 				</entry>				
 				<entry key="dict.def.queryPartner">

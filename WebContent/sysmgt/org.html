@@ -279,13 +279,16 @@
 				alert(JSON.stringify(param));
 				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addOrg',JSON.stringify(param)));
 				
+				$("#save").attr({"disabled":"disabled"});
+				
 				ajaxSubmit("/cm/rbac/cm.do?m=a", data, function(data) {
 					if (data) {
 						//alert(parseInt(data['status']));
 						if (parseInt(data['status']) > 0) {
-							$.ligerDialog.success('保存成功', '操作完成', function() {
-							addDialog.hide();
-							toQuery();
+							 
+							$.ligerDialog.success('保存成功', '操作完成', function() { 
+								$("#save").removeAttr("disabled"); 
+								toQuery();
 						});
 						} else if (parseInt(data['status']) == -1) {
 							$.ligerDialog.error('机构[' + $("#newName").val() + ']已存在<br>不能重复添加','错误');
@@ -403,7 +406,7 @@
 			</div>
 			
 			<div class="line-div" style="margin-top:45px;padding-left:40%;">
-				<input type="button" value="保存" onclick="toAdd();" />
+				<input type="button" id ="save" value="保存" onclick="toAdd();" />
 				<input type="button" value="清空" onclick="toReset('#new_dict_def input,select,textarea')" />
 			</div>
 			</form>
