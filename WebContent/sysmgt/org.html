@@ -210,7 +210,7 @@
 					defGrid.data = data['data'];
 					 //wws 2014-2-23 增加分页信息  end 
 					defGrid.set({data: data['data']});
-				});
+				},null,false);
 			}
 			function toFirst() {
 				toQuery(null, 1);
@@ -276,7 +276,7 @@
 				param.zipcode = $("#newZipcdoe").val();
 				param.status = $("#newStatus").val();
 				param.desc=$("#newDesc").val();
-				alert(JSON.stringify(param));
+				//alert(JSON.stringify(param));
 				var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addOrg',JSON.stringify(param)));
 				
 				$("#save").attr({"disabled":"disabled"});
@@ -296,7 +296,7 @@
 							$.ligerDialog.error('保存失败');
 						}
 					}
-				});
+				},null,false);
 			}
 			function toModify(row) {
 				
