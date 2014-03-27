@@ -33,6 +33,7 @@
 					parentIDFieldName:'pid',
 	                isExpand:false,
 	                checkbox:false,
+	                btnClickToToggleOnly: false,//是否点击展开/收缩 按钮时才有效
 	                onSelect:function(data) {
 		                if (data.data && data.data.leaf == '1') {
 		                	pNode = data.data.code;

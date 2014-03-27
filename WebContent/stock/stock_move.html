@@ -77,23 +77,23 @@
 				});
 				defGrid.options.dataAction = 'server';
 // 				appendAddBtn(openDictDef, "添加字典字义");
-				appendSearchBtn(searchRow, "查看单据信息");
+// 				appendSearchBtn(searchRow, "查看单据信息");
 				$("#pageloading").hide();
 
 				toQuery();
 			});
 			
 			//通用单据查询 界面
-			function searchRow(){
-				var row = defGrid.getSelectedRow();
+// 			function searchRow(){
+// 				var row = defGrid.getSelectedRow();
 
-				if (!row) {
-					$.ligerDialog.error('请先选择要查看的单据！','错误');
-					return;
-				}
-				
-				parent.f_addTab('new_search_stockS','单据明细信息','./stock/search_stock_picking.html?o=m&code='.concat(row.code));
-			}
+// 				if (!row) {
+// 					$.ligerDialog.error('请先选择要查看的单据！','错误');
+// 					return;
+// 				}
+// 				var stockDelID=row.code;
+// 				parent.f_addTab('new_search_stockS'+stockDelID,'单据明细信息('+stockDelID+')','./stock/search_stock_picking.html?o=m&code='.concat(row.code));
+// 			}
 
 	        function beginEdit(rowid) { 
 	        	defGrid.beginEdit(rowid);

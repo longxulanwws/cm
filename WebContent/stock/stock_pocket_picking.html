@@ -72,6 +72,7 @@
                     colDraggable:true,
                     enabledEdit:true,
                     clickToEdit:false,
+                    onDblClickRow:searchRow,  //双击查询
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     onReload: toQuery,
                   //wws 2014-2-23 增加分页信息 start
@@ -128,8 +129,8 @@
 					$.ligerDialog.error('请先选择要查看的单据！','错误');
 					return;
 				}
-				
-				parent.f_addTab('new_search_stockS','单据明细信息','./stock/search_move_picking.html?o=m&code='.concat(row.code));
+				var stockDelID=row.code;
+				parent.f_addTab('new_search_stockS'+stockDelID,'单据明细信息('+stockDelID+')','./stock/search_move_picking.html?o=m&code='.concat(row.code));
 			}
 
 			
