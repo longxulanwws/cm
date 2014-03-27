@@ -305,7 +305,18 @@ VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.ccp.rk.code},{name},{t
 							</value>
 						</property>
 					</bean>
-				</entry>				
+				</entry>
+				<!-- 库存盘点单 新增数据SQL 配置 stock.add.kc.pd.picking.add -->
+				<entry key="kc.pd.picking.add">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+<![CDATA[INSERT INTO Stock_Picking(ID,Company_ID,Dept_ID,BusiOrg_ID,Code,Name,Type,Move_Type,Send_Type,Origin,Purchase_ID,Sale_ID,Project_ID,Partner_ID,Warehose_ID,Pred_Date,Recpt_IN_Date,QC_Date,Recpt_Out_Date,Deal_End_Date,State,Invoice_State,Auto_Picking,Back_Order_ID,Account_Date,Stock_Journal_ID,Move_IN_User,Move_Out_User,Move_Destined,Note,CreateUser,CreateDate,WriteDate,WriteUser,Flow_State)
+VALUES({#uuid},{company},{dept},{busiorg},{#stock.picking.kc.pd.code},{name},{type},{movetype},{sendtype},{origin},{purchase},{sale},{project},{partner},{warehose},{preddate},{recptindate},{qcdate},{recptoutdate},{dealenddate},{state},{invoicestate},{autopicking},{backorder},{accountdate},{stockjournal},{moveinuser},{moveoutuser},{movedestined},{note},{createuser},{createdate},{writedate},{writeuser},{flow_state})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>								
 					<entry key="picking_product.add">
 					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
 						<property name="sql">
@@ -459,6 +470,16 @@ Warehose_ID={warehose_id},Move_IN_User={move_in_user},Note={note},WriteUser={wri
 						<property name="sql">
 							<value>
 <![CDATA[UPDATE Stock_move SET State={state} WHERE Picking_ID={code}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<!-- 库存盘点 审核单据状态 -->
+				<entry key="stock_taking.update">
+					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+						<property name="sql">
+							<value>
+<![CDATA[UPDATE Stock_Picking SET State={state} WHERE ID={id}]]>
 							</value>
 						</property>
 					</bean>
