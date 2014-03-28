@@ -275,6 +275,8 @@ public class CommonAction extends BaseAction {
 				if (r < 1) {
 					r = -3;
 					returnJson.put("msg", "未能成功删除数据");
+				}else if (r > 1) {
+					r = 1;
 				}
 				returnJson.put("status", r);
 			}
