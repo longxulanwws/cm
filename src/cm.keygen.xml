@@ -121,6 +121,12 @@
 						<property name="init" value="10" />
 					</bean>
 				</entry>
+				<entry key="product_maintain.id">
+					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+						<property name="rule" value="{seq(6)}" />
+						<property name="init" value="10" />
+					</bean>
+				</entry>
 			</map>
 		</property>
 	</bean>

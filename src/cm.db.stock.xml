@@ -192,6 +192,25 @@
 						<property name="order" value="code"/>
 					</bean>
 				</entry>
+				<entry key="product_maintain.query">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="dmlType" value="cond" />
+						<property name="sql">
+							<value>
+<![CDATA[SELECT ID,CODE,NAME,STATUS,NOTE,CATEG_ID FROM Product_maintain]]>
+							</value>
+						</property>
+						<property name="conditions">
+							<map>
+								<entry key="code" value=":like(lr)" />
+								<entry key="name" value=":like(lr)" />
+								<entry key="State" value=""/>
+								<entry key="categ_id" value=""/>
+							</map>
+						</property>
+						<property name="order" value="code"/>
+					</bean>
+				</entry>
 				<entry key="product.stock.qty.query">
 					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
 						<property name="dmlType" value="cond" />
@@ -431,6 +450,16 @@ VALUES({id},{#session.USER_INFO.oid},{dept_id},{busiorg_id},{type},{categ_id},{c
 						</property>
 					</bean>
 				</entry>
+				<entry key="product_maintain">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+<![CDATA[INSERT INTO Product_Maintain(ID,NAME,CODE,STATUS,NOTE,CATEG_ID)
+VALUES({#product_maintain.id},{name},{code},{state},{note},{categ_id})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
 			</map>	
 		</property>
 		<property name="update">
@@ -440,6 +469,15 @@ VALUES({id},{#session.USER_INFO.oid},{dept_id},{busiorg_id},{type},{categ_id},{c
 						<property name="sql">
 							<value>
 <![CDATA[UPDATE PRODUCT_PRODUCT SET NAME={name},BRAND={brand},SPECS={specs},UOM_ID={uom_id},UOM_PRECISION={uom_precision},TYPE={type},NOTE={note} WHERE CODE={code}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="product_maintain">
+					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+						<property name="sql">
+							<value>
+<![CDATA[UPDATE Product_Maintain SET NAME={name},CODE={code},NOTE={note} WHERE ID={id}]]>
 							</value>
 						</property>
 					</bean>
@@ -553,6 +591,15 @@ Warehose_ID={warehose_id},Move_IN_User={move_in_user},Note={note},WriteUser={wri
 						<property name="sql">
 							<value>
 <![CDATA[DELETE FROM stock_picking WHERE code={code}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="product_maintain">
+					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+						<property name="sql">
+							<value>
+<![CDATA[DELETE FROM product_maintain WHERE id={id}]]>
 							</value>
 						</property>
 					</bean>
