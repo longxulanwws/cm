@@ -109,6 +109,8 @@ public class KeyGenerator {
 			return getDate("MM");
 		} else if ("day".equals(arg)) {
 			return getDate("dd");
+		} else if ("date".equals(arg)) {
+			return getDate("yyyyMMdd");		
 		} else if ("org".equals(arg)) {
 			return getOrg();
 		} else if (arg.startsWith("seq")) {
@@ -175,7 +177,7 @@ public class KeyGenerator {
 					// 判断是否需要重新计数
 					boolean isReset = false;
 					if (("year".equals(circle) || "month".equals(circle) || "day"
-							.equals(circle)) && !c.equals(cCircle)) {
+							.equals(circle)||"date".equals(circle)) && !c.equals(cCircle)) {
 						isReset = true;
 					} else if ("def".equals(circle)) {
 						// 自定义计数
@@ -205,6 +207,8 @@ public class KeyGenerator {
 			return getDate("MM");
 		else if ("day".equals(circle))
 			return getDate("dd");
+		else if ("date".equals(circle))
+			return getDate("yyyyMMdd");
 		return "";
 	}
 	
