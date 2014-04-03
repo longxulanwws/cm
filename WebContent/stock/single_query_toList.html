@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<title>入库单查询</title>
+		
+		<link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
+		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
+		<link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
+		<script src="../js/jquery.js" type="text/javascript"></script>
+		<script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
+		<script src="../js/common.js" type="text/javascript"></script>
+		<script src="../js/json2.js" type="text/javascript"></script>
+		<script src="../js/ligerUI/js/plugins/ligerToolBar.js" type="text/javascript"></script>
+		 <script src="../js/ligerUI/js/plugins/ligerDialog.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			var defGrid;
+			var query = getQueryString(window.location.toString());
+			opt = query.m;
+			$(function(){
+				  $("#toptoolbar").ligerToolBar({ items: [  
+	                 {text: '导出Excel',id:'excel',icon:'print',click:itemclick},  
+	                  {text: '导出Word' ,id:'word',icon:'print',click:itemclick}                                                     
+	                                                   ]  
+	                                          });          
+               	defGrid = $("#query_list").ligerGrid({
+                    columns:[
+                        {display:'单据状态',name:'state',width:90,minWidth:60,render:function(item){return paramRender(item,'inStockState',item.state);}},
+                        {display:'修改时间',name:'writedate',width:130},
+                        {display:'入库单号',name:'code',width:130,minWidth:60},
+                        {display:'单据类型',name:'move_type',width:90,minWidth:60,render:function(item){return paramRender(item,'move_type',item.move_type);}},
+	                    {display:'来源单号',name:'origin',width:130},
+			            {display:'供应商',name:'partner_id',render:sw_partner,width:190,align:'left'},
+			            {display:'预计到货日期',name:'pred_date',width:80},
+			            {display:'入库仓库',name:'warehose_id',render:sw_warehose,width:80},
+			            {display:'收货人',name:'move_in_user',render:sw_opt,width:80},
+			           
+			          
+			            {display:'商品编号',name:'codes',width:130,textField:'code',valueField:'code'},
+	                    {display:'品名',name:'names',width:70},
+			            {display:'规格/型号',name:'specs',width:100},
+			            {display:'单位',name:'product_uom',width:90,render:function(item){return paramRender(item,'uom',item.product_uom);}},
+			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}},
+			            ///{display:'采购数量',name:'tar_product_qty',width:60,align:'right',render:function(item){return item.tar_product_qty ? parseFloat(item.tar_product_qty).toFixed(2) : '';}},
+			            {display:'入库数量',name:'product_qty',width:60,id:'num',align:'right',render:function(item){return item.product_qty ? parseFloat(item.product_qty).toFixed(2) : '';}},
+			           // {display:'采购单价',name:'source_price_unit',width:60,align:'right',render:function(item){return item.source_price_unit ? parseFloat(item.source_price_unit).toFixed(2) : '';}},
+			           // {display:'入库单价',name:'price_unit',width:60,id:'price',align:'right',render:function(item){return item.price_unit ? parseFloat(item.price_unit).toFixed(2) : '';}},
+			           // {display:'金额',name:'total',id:'total',width:60,align:'right',render:calcTotal},
+			             {display:'入库异常',name:'qc_anomaly_sate',width:80,render:function(item){return paramRender(item,'QCAnomalySate',item.move_type);}},
+			            {display:'质检结论',name:'qc_note',width:100},
+			            {display:'备注',width:200,name:'note',align:'left'}
+                    ],
+                    pageSize:20,
+                    usePager: true,
+                    width:'100%',
+                    height:'99%',
+                    dataAction:'server',
+                    checkbox:false,
+                    rownumbers:false,
+                    fixedCellHeight:false,
+                    colDraggable:true,
+                    enabledEdit:true,
+                    clickToEdit:false,
+                    onDblClickRow:searchRow,  //双击查询
+                    onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
+                    onReload: toQuery,
+                    url: '../common/q.jsp', 
+                    //wws 2014-2-23 增加分页信息 start
+                      onToFirst: function(item) {
+                          toQuery(item, 1);
+                      },
+                      onToLast: function(item) {
+          				var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+          				if (defGrid.options.total % defGrid.options.pageSize > 0)
+          					p += 1;
+          				toQuery(item, p);
+                      },
+                      onToPrev: function(item) {
+          				var p = parseInt(defGrid.options.page);
+          				if (p > 1)
+          					p -= 1;
+          				else
+              				return;
+          				toQuery(item, p);
+                      },
+                      onToNext: function(item) {
+                      	var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+          				if (defGrid.options.total % defGrid.options.pageSize > 0)
+          					p += 1;
+      					var cp = parseInt(defGrid.options.page); 
+      					if (cp < p)
+          					cp += 1;
+          				toQuery(item, cp);
+                      },
+                      //wws 2014-2-23 增加分页信息 end 
+                    param_movein:'user',
+                    param_warehose:'base_point',
+                    param_partner:'partner_list'
+                   
+				});
+				appendSearchBtn(searchRow, "查看单据信息");
+				$("#pageloading").hide();
+				
+				ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
+					$('#createUserCodeS').val(data['uid']);
+				}, null, false);
+				//默认查询全部数据 
+				toQuery();
+			});
+			
+			//通用单据查询 界面
+			function searchRow(){
+				var row = defGrid.getSelectedRow();
+				if (!row) {
+					$.ligerDialog.error('请先选择要查看的单据！','错误');
+					return;
+				}
+				var stockDelID=row.code;
+				parent.f_addTab('new_search_stockS'+stockDelID,'单据明细信息('+stockDelID+')','./stock/search_stock_picking.html?o=m&code='.concat(row.code));
+			}
+
+			function calcTotal(item) {
+				if (item.product_qty && item.price_unit) {
+					return (parseFloat(item.product_qty) * parseFloat(item.price_unit)).toFixed(2);
+				}
+				return '0.00';
+			}
+			function sw_opt(item) {
+				var swd = paramRender(item, defGrid.options.param_movein, item.move_in_user);
+				if (!swd)
+					swd = item.move_in_user;
+				return swd;
+			}
+			function sw_warehose(item) {
+				var swd = paramRender(item, defGrid.options.param_warehose, item.warehose_id);
+				if (!swd)
+					swd = item.warehose_id;
+				return swd;
+			}
+			function sw_partner(item) {
+				var swd = paramRender(item, defGrid.options.param_partner, item.partner_id);
+				if (!swd)
+					swd = item.partner_id;
+				return swd;
+			}
+			//
+			function toQuery(item, page, pageSize) {
+				if (!page)
+					page = defGrid.options.page;
+				if (!pageSize)
+					pageSize = defGrid.options.pageSize;
+				
+				var param = new Object();
+				param.code = $("#codeQ").val();
+				param.origin = $("#originQ").val();
+				param.move_type=$("#codeType").val();
+				param.partner_id = $("#partnerQ").val();
+				param.type='0';
+				param.move_type=$("#move_typeS").val();
+				var state=$("#stateS").val();
+				if(state=='')
+				{
+					state='50';
+				}
+				param.state=state;
+
+				var data = JSON.stringify(reqObj('q','stock.select.Stock_PickingCX.query',JSON.stringify(param),'l',true,page,pageSize));
+				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+					var d = data['data'].Rows;
+					var ps = defGrid.options.pageSize, p = defGrid.options.page, t = parseInt(data['data'].Total);
+					if (t > ps) {
+						for (var i = 0; i < (p - 1) * ps; i++) {
+							d.unshift(null);
+						}
+					}
+					defGrid.data = data['data'];
+					defGrid.set({data:data['data']});
+				});
+			}
+
+			function method1() {//整个表格拷贝到EXCEL中     
+				   //检索浏览器    
+// 				   if(navigator.userAgent.indexOf("MSIE")<0){    
+// 				       alert('请用ie浏览器进行表格导出');    
+// 				       return ;    
+// 				   }    
+				  
+				   var tableid="query_list";    
+				   var curTbl = document.getElementById(tableid);     
+				   var oXL = null;     
+				   try {    
+				       oXL = GetObject("", "Excel.Application");    
+				   }    
+				   catch (E) {    
+				       try {    
+				           oXL = new ActiveXObject("Excel.Application");    
+				       }    
+				       catch (E2) {    
+				           alert("Please confirm:\n1.Microsoft Excel has been installed.\n2.Internet Options=>Security=>Setting \"Enable unsafe ActiveX\"");    
+				           return;    
+				       }    
+				   }    
+				  
+				   //创建AX对象excel     
+				   var oWB = oXL.Workbooks.Add();     
+				    //获取workbook对象     
+				   var oSheet = oWB.ActiveSheet;     
+				           
+				   //在此进行样式控制    
+				   oSheet.Rows(1+":"+1).RowHeight =20;//定义行高    
+				   oSheet.Rows(2+":"+2).RowHeight =30;    
+				  
+				   oSheet.Rows(1).HorizontalAlignment=3;       
+				  
+				   var sel = document.body.createTextRange(); //激活当前sheet     
+				   sel.moveToElementText(curTbl); //把表格中的内容移到TextRange中    
+				   sel.select();  //全选TextRange中内容     
+				   sel.execCommand("Copy"); //复制TextRange中内容     
+				   oSheet.Paste(); //粘贴到活动的EXCEL中     
+				   oXL.Visible = true; //设置excel可见属性    
+				       
+				   oSheet.Application.Quit();   //结束当前进程    
+				  
+				   window.opener=null;    
+				   window.close();//关闭当前窗口    
+				       
+				}   
+			function method2(tableid) //读取表格中每个单元到EXCEL中 
+			{ 
+				
+			    var curTbl = document.getElementById(tableid); 
+			     var oXL = new ActiveXObject("Excel.Application"); 
+			     //创建AX对象excel 
+			     var oWB = oXL.Workbooks.Add(); 
+			     //获取workbook对象 
+			    var oSheet = oWB.ActiveSheet; 
+			    //激活当前sheet 
+			     var Lenr = curTbl.rows.length; 
+			     //取得表格行数 
+			     for (i = 0; i < Lenr; i++) 
+			     { 
+			         var Lenc = curTbl.rows(i).cells.length; 
+			         //取得每行的列数 
+			         for (j = 0; j < Lenc; j++) 
+			         { 
+			             oSheet.Cells(i + 1, j + 1).value = curTbl.rows(i).cells(j).innerText; 
+			             //赋值 
+			         } 
+			     } 
+			     oXL.Visible = true; 
+			     //设置excel可见属性 
+			}
+		       function exportToExcel(tableid){
+		           var curTbl = document.getElementById(tableid);
+		           var oXL;
+		           try{
+		                    oXL = new ActiveXObject("Excel.Application"); //创建AX对象excel 
+		           }catch(e){
+		                    alert("无法启动Excel!\n\n如果您确信您的电脑中已经安装了Excel，"+"那么请调整IE的安全级别。\n\n具体操作：\n\n"+"工具 → Internet选项 → 安全 → 自定义级别 → 对没有标记为安全的ActiveX进行初始化和脚本运行 → 启用");
+		                    return false;
+		           }
+		           var oWB = oXL.Workbooks.Add(); //获取workbook对象
+		           var oSheet = oWB.ActiveSheet;//激活当前sheet 
+		           var sel = document.body.createTextRange();
+		           sel.moveToElementText(curTbl); //把表格中的内容移到TextRange中
+		           sel.select(); //全选TextRange中内容 
+		           sel.execCommand("Copy");//复制TextRange中内容 
+		           oSheet.Paste();//粘贴到活动的EXCEL中
+		           oXL.Visible = true; //设置excel可见属性
+		           var fname = oXL.Application.GetSaveAsFilename("将table导出到excel.xls", "Excel Spreadsheets (*.xls), *.xls");
+		           oWB.SaveAs(fname);
+		           oWB.Close();
+		           oXL.Quit();
+		            }
+		    function itemclick(item)  
+	        {     
+	            grid = $("#query_list").ligerGetGridManager();   
+	           
+	            if(item.id)  
+	            {  
+	                switch (item.id)  
+	                {     
+	                    case "excel":$.ligerDialog.open({url: "../stock/print.html?exporttype=xls"});return;  
+	                    case "word":$.ligerDialog.open({url: "../service/print.aspx?exporttype=doc"});return;  
+	                }     
+	            }              
+	        }            
+		    //导入验证和处理机制
+		    function OK() { //点击确定按钮的时候
+		    	  var file = ($("#FileUpload").val());
+		    	    if (file == "") {
+		    	    $.messager.alert('系统提示', '请选择将要上传的文件!');
+		    	    document.forms[0].submit();
+		    	    }
+		    	   else {
+		    	   var stuff = file.match(/^(.*)(\.)(.{1,8})$/)[3];
+		    	   if (stuff != 'xls') {
+		    	   alert('文件类型不正确，请选择.xls文件!');
+		    	   document.forms[0].submit();
+		    	   }
+		    	   else {
+			    	  $.ajax({
+			    	   type: "POST",
+			    	   url: "/后台路径/调用方法名",
+			    	   data: "file=" + file + "",
+			    	   success: function (result) {
+			    	   $.messager.alert('系统提示', result + "");
+			    	   }
+			    	 });
+		    	 }
+		     }
+		    }
+	    </script>
+		<style type="text/css">
+			label{margin: 5px 20px 5px 15px;}
+			.fields{height:35px;padding-top:5px;}
+			.dict-info{width: 260px;padding: 10px;}
+			.diff {margin:3px 0;}
+			.lineD {width:99%;float:left;position:relative;overflow:hidden;margin:10px 0 2px 2px}
+			.labelD {width:13%;position:relative;float:left;padding-top:3px;}
+			.dplD {width:36%;position:relative;float:left;}
+			.title{font-size:14px;font-weight:bold;background-position:left;padding-left:18px;}
+			.l-dialog-content-nopadding{padding:0 !important;}
+		</style>
+	</head>
+	<body style="padding:0;">
+	<input type="hidden" id="id" />
+	<input type="hidden" id="state" />
+	<input type="hidden" id="flow_state" />	
+	<input type="hidden" id="createUserCodeS" />
+		<div id="pageloading"></div>  
+		<div id="layout_main">
+			<div position="center" id="a_center" title="原材料入库单列表">
+				<div id="query_cond" class="fields" style="height:50px;">
+					<label>入库单</label><input type="text" class="s-text-qCond txt-def" id="codeQ" />
+					<label>单据类型</label><select id="move_typeSS" param="move_type" first="" ></select>
+					<label>来源单号</label><input type="text" class="s-text-qCond txt-def" id="originQ" />
+					<label>供应商</label>
+					<select id="partnerQ" param="partner_list" first="" ></select>
+					<label>状态</label><select id="stateS" param="inStockState" first="" ></select>
+					<input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
+					<input type="button" value="清空" onclick="toReset('#codeQ,#originQ,#partnerQ');" />
+					<input type="button" value="导出" onclick="exportToExcel('query_list')" />
+					 <input id="FileUpload" type="file" name="upload" style="width: 250px; background: White" class="easyui-validatebox" validtype="length[1,100]" />
+					 <input type="button" value="导入" onclick="OK()" />
+				</div>
+				 <div id="toptoolbar"></div>   
+				<div id="query_list"></div>
+			</div>
+		</div>
+	</body>
+</html>

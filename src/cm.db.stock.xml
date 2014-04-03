@@ -258,6 +258,39 @@ LEFT JOIN product_product ON Stock_Move.Code=product_product.Code]]>
 						</property>
 					</bean>
 				</entry>
+				<entry key="Stock_PickingCX.query">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="dmlType" value="cond" />
+						<property name="sql">
+							<value>
+<![CDATA[ select * from (
+SELECT t.type,t.state,t.writedate,t.code,t.move_type,t.origin,
+t.partner_id,t.pred_date,t.warehose_id,t.move_in_user,t.qc_note,t.qc_anomaly_sate,t.note
+,t2.specs 
+,t1.Code AS codes,t1.Name AS names,t1.product_uom,
+t1.brand,t1.product_qty
+FROM stock_picking t
+LEFT JOIN stock_move t1 ON  t1.Picking_ID=t.Code 
+LEFT JOIN product_product t2 ON t1.Code=t2.Code) t]]>
+							</value>
+						</property>
+						<property name="order" value="WriteDate"/>
+                        <property name="desc" value="true"/>
+						<property name="conditions">
+							<map>
+								<entry key="code" value=":like(lr)" />
+								<entry key="origin" value=":like(lr)" />
+								<entry key="partner_id" value=":like(lr)" />
+								<entry key="state" value="" />
+								<entry key="type" value="" />
+								<entry key="move_type" value="" />
+								<entry key="createuser" value="" />
+								<entry key="move_in_user" value="" />
+								<entry key="flow_state" value=":&gt;=" />
+							</map>
+						</property>
+					</bean>
+				</entry>
 			</map>
 		</property>
 		<property name="add">
