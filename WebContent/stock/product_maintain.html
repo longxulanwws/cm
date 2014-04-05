@@ -176,6 +176,13 @@
 					height:360
 				});
 			}
+			function openDictItem(index) {
+				 defid = pGrid.getRow(index)['id'];
+				 var defName
+				 defName = pGrid.getRow(index)['name'];
+		       parent.f_addTab('dictitem'+defName+'','管理字典数据项('+defName+')','./stock/product_maintain_detailed.html?defid='+defid+'');
+		            
+			}
 			function toDel(rowindex) {
 				 $.ligerDialog.confirm('您确定要删除该商品吗？', function(r) {
 		            if (!r)
@@ -275,7 +282,7 @@
 					type = 'a';
 					entity = 'stock.add.product_maintain';
 				}
-				alert(entity);
+				
 				var data = JSON.stringify(reqObj(type,entity,JSON.stringify(param)));
 				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
 					$.ligerDialog.success('保存成功。');
