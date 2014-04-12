@@ -245,7 +245,6 @@
 				 var param = JSON.stringify(reqObj('d','stock.delete.stock_move.prckingid',row));
 					ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
 						if (data) {
-							alert(data['status']);
 							if (parseInt(data['status']) > 0) {
 						     var param = JSON.stringify(reqObj('d','stock.delete.stock_picking.code',row));
 						      ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {

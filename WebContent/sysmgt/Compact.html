@@ -1,0 +1,369 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>合同维护</title>
+        
+        <link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
+        <script src="../js/jquery.js" type="text/javascript"></script>
+        <script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
+        <script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
+        <script src="../js/validate/messages_zh.js" type="text/javascript"></script>
+        <script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
+        <script src="../js/common.js" type="text/javascript"></script>
+        <script src="../js/json2.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var defGrid;
+            var userid;
+            var partner,uom;
+            $(function(){
+                $("#layout_main").ligerLayout({
+                });
+
+                defGrid = $("#query_list").ligerGrid({
+                    columns:[
+                        {display:'操作',isSort:false,width:60,render:function(rowdata,rowindex,value) {
+                            var h = "";
+                            if (!rowdata._editing) {
+                                h += "<a href='javascript:beginEdit(" + rowindex + ")'>修改</a> ";
+                                h += "<a href='javascript:deleteRow(" + rowindex + ")'>删除</a> "; 
+                            } else {
+                                h += "<a href='javascript:endEdit(" + rowindex + ")'>提交</a> ";
+                                h += "<a href='javascript:cancelEdit(" + rowindex + ")'>取消</a> "; 
+                            }
+                            return h;
+                        },frozen:true},
+                        {display:'合同编号',name:'code',width:40,minWidth:60,align:'left',editor:{type:'text'}},
+                        {display:'合同名称',name:'name',width:150,minWidth:60,align:'left',editor:{type:'text'}},
+                        {display:'客户名称',name:'partner_id',width:150,minWidth:60,data:getData('partner_list'),render:function(item){return paramRender(item,'partner_list',item.partner_id);},
+                        	editor:{type:'select',data:getData('partner_list'),textField:'name',valueField:'value',selectBoxHeight:50}},
+                        {display:'签订日期',name:'signed_date',width:100,minWidth:60,align:'left',type: 'date', format:'yyyy-MM-dd', width: 100, editor: { type: 'date'}},
+                        {display:'产品编号',name:'product_code',width:80,minWidth:60,align:'left',editor:{type:'text'}},
+                        {display:'产品名称',name:'product_name',width:80,minWidth:150,align:'left',editor:{type:'text'}},
+                        {display:'生产数量',name:'product_qty',width:80,minWidth:60,render:function(item){return item.product_qty ? parseFloat(item.product_qty).toFixed(2) : '';},
+                            editor:{type:'int'}},
+                        {display:'计量单位',name:'product_uom',width:80,minWidth:60,align:'left',data:getData('uom'),render:function(item){return paramRender(item,'uom',item.product_uom);},
+                        	editor:{type:'select',data:getData('uom'),textField:'name',valueField:'value',selectBoxHeight:50}},
+                        {display:'联系人',name:'link_man',width:80,minWidth:90,align:'left',editor:{type:'text'}},
+                        {display:'联系方式',name:'telephone',width:50,minWidth:90,align:'left',editor:{type:'text'}},
+                        {display:'起始日期',name:'start_date',width:50,minWidth:60,align:'left',type: 'date', format:'yyyy-MM-dd', width: 100, editor: { type: 'date'}},
+                        {display:'终止日期',name:'end_date',width:50,minWidth:60,align:'left',type: 'date', format:'yyyy-MM-dd', width: 100, editor: { type: 'date'}},
+                        {display:'说明',name:'description',width:100,align:'left',editor:{type:'text'}}
+                    ],
+                    pageSize:10,
+                    usePager: true,
+                    sortName:'id',
+                    width:'100%',
+                    height:'100%',
+                    dataAction:'server',
+                    checkbox:false,
+                    rownumbers:false,
+                    fixedCellHeight:false,
+                    colDraggable:true,
+                    enabledEdit:true,
+                    clickToEdit:false,
+                    onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
+                    onReload: toQuery,
+                     url: '../common/q.jsp',                   
+                    onToFirst: function(item) {
+                        toQuery(item, 1);
+                    },
+                    onToLast: function(item) {
+                        var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+                        if (defGrid.options.total % defGrid.options.pageSize > 0)
+                            p += 1;
+                        toQuery(item, p);
+                    },
+                    onToPrev: function(item) {
+                        var p = parseInt(defGrid.options.page);
+                        if (p > 1)
+                            p -= 1;
+                        else
+                            return;
+                        toQuery(item, p);
+                    },
+                    onToNext: function(item) {
+                        var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+                        if (defGrid.options.total % defGrid.options.pageSize > 0)
+                            p += 1;
+                        var cp = parseInt(defGrid.options.page); 
+                        if (cp < p)
+                            cp += 1;
+                        toQuery(item, cp);
+                    },
+                    param_partner:'partner_list',
+                    param_unom:'uom',
+                });
+                appendAddBtn(openUserDef, "添加合同信息");
+                $("#pageloading").hide();
+            
+                 uom=$("#newproduct_uom").ligerComboBox({
+                    autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:getData('uom'),
+                    onSelected:function(v,t) {
+                        $("#newproduct_uomid").val(v);
+                }
+               });  
+                 partner=$("#partner_nameS").ligerComboBox({
+                    autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:getData('partner_list'),
+                    onSelected:function(v,t) {
+                        $("#partner_idS").val(v);
+                }
+            });
+
+               //默认查询全部数据 
+                toQuery();
+            });
+            function beginEdit(rowid) { 
+                defGrid.beginEdit(rowid);
+            }
+            function cancelEdit(rowid) { 
+                defGrid.cancelEdit(rowid);
+            }
+            function endEdit(rowid) {
+                defGrid.endEdit(rowid);
+                var row = defGrid.getRow(rowid);
+                toModify(JSON.stringify(row));
+            }
+            function deleteRow(rowid) {
+                $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
+                    if (!r)
+                        return;
+                    var row = defGrid.getRow(rowid);
+                    if (row['__status'] !== 'add')
+                        toDel(JSON.stringify(row));
+                    defGrid.deleteRow(rowid);
+                })
+            }
+    
+            function toQuery(item, page, pageSize) {
+                if (!page)
+                    page = defGrid.options.page;
+                if (!pageSize)
+                    pageSize = defGrid.options.pageSize;
+                
+                var param = new Object();
+                param.code = $("#CompactCode").val();
+                param.name = $("#CompactName").val();
+                var data = JSON.stringify(reqObj('q','rbac.select.dict.def.queryCompact',JSON.stringify(param),'l',true,page,pageSize));
+                ajaxSubmit("/cm/rbac/cm.do?m=q", data, function(data) {
+                    var d = data['data'].Rows;
+                    var ps = defGrid.options.pageSize, p = defGrid.options.page, t = parseInt(data['data'].Total);
+                    if (t > ps) {
+                        for (var i = 0; i < (p - 1) * ps; i++) {
+                            d.unshift(null);
+                        }
+                    }
+                    defGrid.data = data['data'];
+                    defGrid.set({data: data['data']});
+                });
+            }
+            function toFirst() {
+                toQuery(null, 1);
+            }
+            function toLast() {
+                var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+                if (defGrid.options.total % defGrid.options.pageSize > 0)
+                    p += 1;
+                toQuery(null, p);
+            }
+            function toNext() {
+                var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+                if (defGrid.options.total % defGrid.options.pageSize > 0)
+                    p += 1;
+                if (defGrid.options.page == p)
+                    return;
+                toQuery(null, defGrid.options.page + 1);
+            }
+            function toPrev() {
+                if (defGrid.options.page == 1)
+                    return;
+                toQuery(null, defGrid.options.page - 1);
+            }
+            //新增用户弹出窗口
+            var addDialog;
+            function openUserDef() {
+                toReset('#new_user_def input,select,textarea,date');
+                partner.setValue('');
+                uom.setValue('');
+                
+                addDialog = $.ligerDialog.open({
+                    target:$("#new_user_def"),
+                    title:"新增合同信息",
+                    width:850,
+                    height:550
+                });
+            }
+            
+            // 新增保存处理
+            function toAdd() {
+                var valid = true;
+                $('*[id$="S"],*[id$="_combobox"]').each(function(index, element) {
+                    if (!$(this).rules()) return;
+                    if (!$(element).valid()) {
+                        valid = false;
+                        return;
+                    }
+                });
+                if (!valid) return;
+                var param = new Object();
+                param.code = $("#codeS").val();
+                param.name = $("#newName").val();
+                param.partner_id = $("#partner_idS").val();
+                param.product_code = $("#newproduct_code").val();
+                param.product_name = $("#newproduct_name").val();
+                param.product_qty = $("#newproduct_qty").val();
+                param.product_uom = $("#newproduct_uomid").val();
+                param.link_man = $("#newLink_man").val();
+                param.telephone = $("#newtelephone").val();
+                param.signed_date = $("#newsigned_date").val();
+                param.start_date = $("#newstart_date").val();
+                param.end_date = $("#newend_date").val();
+                param.description = $("#newDesc").val();
+                param.companyid='0001';
+                param.deptid='0001';
+                param.busiorgid='0001';
+                var data = JSON.stringify(reqObj('a','rbac.add.dict.def.addCompact',JSON.stringify(param)));
+                ajaxSubmit("/cm/rbac/cm.do?m=a", data, function(data) {
+                    if (data) {
+                        if (parseInt(data['status']) > 0) {
+                            $.ligerDialog.success('保存成功', '操作完成', function() {
+                            addDialog.hide();
+                            toQuery();
+                        });
+                        }  else {
+                            $.ligerDialog.error('保存失败');
+                        }
+                    }
+                });
+            }
+            
+           function toModify(row) {
+        	    row.signed_date = getFormatDate(new Date(row.signed_date),'yyyy-MM-dd');
+                row.start_date = getFormatDate(new Date(row.start_date),'yyyy-MM-dd');
+                row.end_date = getFormatDate(new Date(row.end_date),'yyyy-MM-dd');
+                 var param = JSON.stringify(reqObj('u','rbac.update.dict.def.updateCompact',row));
+                    ajaxSubmit("/cm/rbac/cm.do?m=u", param, function(data) {
+                        if (data) {
+                            if (parseInt(data['status']) > 0) {
+                                $.ligerDialog.success('保存成功');
+                            } else {
+                                $.ligerDialog.error('保存失败');
+                            }
+                        }
+                    });
+            }
+           //删除时，判断此用户下是否已设置角色信息，删除时提示，将删除用户的角色设置信息
+           //确认删除时，将用户下的角色设置信息一并删除。
+            function toDel(row) {
+                 var param = JSON.stringify(reqObj('d','rbac.delete.dict.def.deleteCompact',row));
+                    ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
+                        if (data) {
+                            if (parseInt(data['status']) > 0) {
+                                $.ligerDialog.success('删除成功');
+                            } else {
+                                $.ligerDialog.error('删除失败');
+                            }
+                        }
+                    });
+            }
+                
+            
+        </script>
+        <style type="text/css">
+            label{margin: 5px 20px 5px 15px;}
+            .fields{height:35px;padding-top:5px;}
+            .dict-info{width: 260px;padding: 10px;}
+            .diff {margin:3px 0;}
+            .lineD {width:99%;float:left;position:relative;overflow:hidden;margin:10px 0 2px 2px}
+            .labelD {width:26%;position:relative;float:left;padding-top:3px;}
+            .dplD {width:73%;position:relative;float:left;}
+            .title{font-size:14px;font-weight:bold;background-position:left;padding-left:18px;}
+        </style>
+    </head>
+    <body style="padding:0;">
+        <div id="pageloading"></div>  
+        <div id="layout_main">
+            <div position="center" id="a_center" title="合同列表">
+                <div id="query_cond" class="fields">
+                    <label>合同编号</label><input type="text" class="s-text txt-def" id="CompactCode" />
+                    <label>合同名称</label><input type="text" class="s-text txt-def" id="CompactName" />
+                    <input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
+                    <input type="button" value="清空" onclick="toReset('#query_cond input,textarea');" />
+                </div>
+                <div id="query_list"></div>
+            </div>
+        </div>
+        <div id="new_user_def" style="display:none;overflow:hidden;">
+            <div class="line-div" style="margin-bottom:10px;">
+                <span class="title l-icon-add">添加合同信息</span>
+            </div>
+            <form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
+                <div class="line-div">
+                    <div class="label-div"><label>合同编号</label></div>
+                    <div class="in-div"><input type="text" class="required s-text txt-def" id="codeS" /></div>
+                    <div class="label-div"><label>合同名称</label></div>
+                    <div class="in-div"><input type="text" class="required s-text txt-def" id="newName" /></div>
+                </div>
+                <div class="line-div">
+                    <div class="label-div"><label>客户名称</label></div>
+                    <div class="in-div"><input type="text" id="partner_nameS" ltype="combobox" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+                    <input type="hidden" id="partner_idS" />
+                    
+                    <div class="label-div"><label>签订日期</label></div>
+                    <div class="in-div"><input type="text" id="newsigned_date" ltype="date" class="required" /></div>
+                    <input type="hidden" id="Of_Region" />
+                </div>  
+                <div class="line-div">
+                    <div class="label-div"><label>产品编号</label></div>
+                    <div class="in-div"><input type="text" class="required s-text txt-def" id="newproduct_code" /></div>
+                
+                    <div class="label-div"><label>产品名称</label></div>
+                    <div class="in-div"><input type="text" class="required s-text txt-def" id="newproduct_name" /></div>
+                </div>
+                <div class="line-div">
+                    <div class="label-div"><label>生产数量</label></div>
+                    <div class="in-div"><input type="text" class="required s-text txt-def" id="newproduct_qty" /></div>                
+                    <div class="label-div"><label>计量单位</label></div>
+                    <div class="in-div"><input type="text" id="newproduct_uom" ltype="combobox" class="" validate="{required:true,minlength:3,maxlength:10,notnull:true}" nullText="不能为空!"/></div>
+                    <input type="hidden" id="newproduct_uomid" />
+                </div>
+                <div class="line-div">
+                    
+                    <div class="label-div"><label>联系人</label></div>
+                    <div class="in-div"><input type="text" class="s-text txt-def" id="newLink_man" /></div>
+                    
+                    <div class="label-div"><label>联系方式</label></div>
+                    <div class="in-div"><input type="text" class="s-text txt-def" id="newtelephone" /></div>
+                
+                </div>
+                <div class="line-div">
+                    
+                    <div class="label-div"><label>起始日期</label></div>
+                    <div class="in-div"><input type="text" ltype="date" class="required" id="newstart_date" /></div>
+                    
+                    <div class="label-div"><label>终止日期</label></div>
+                    <div class="in-div"><input type="text" ltype="date" class="required"  id="newend_date" /></div>
+                
+                </div>
+                <div class="line-div">
+                    <div class="label-div"><label>说明</label></div>
+                    <div class="in-div"><textarea cols="80" rows="5" id="newDesc"></textarea></div>
+                </div>
+            </form>
+            <div class="line-div" style="margin-top:95px;padding-left:40%;">
+                <input type="button" value="保存" onclick="toAdd();" />
+                <input type="button" value="清空" onclick="toReset('#new_user_def input,select,textarea,date')" />
+            </div>
+        </div>
+        
+        
+    </body>
+</html>

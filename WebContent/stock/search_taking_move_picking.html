@@ -39,7 +39,7 @@
 			            {display:'单位',name:'product_uom',width:90,render:function(item){return paramRender(item,'uom',item.product_uom);}},
 			            {display:'品牌',name:'brand',width:60,render:function(item){return paramRender(item,'brand',item.brand);}},
 			            {display:'盘点类型',name:'type',width:80,render:function(item){return paramRender(item,'stock.takingtype',item.type);}},
-			            {display:'盘点数量',name:'product_qty',width:100,align:'right',editor:{type:'string'},render:function(item){return item.product_qty ? parseFloat(item.product_qty).toFixed(2) : '';}}
+			            {display:'盘点数量',name:'product_qty',width:100,align:'right',render:function(item){return item.product_qty ? parseFloat(item.product_qty).toFixed(2) : '';}}
 			           ],
                     pageSize:20,
                     usePager: true,
@@ -210,17 +210,17 @@
                 	<div class="line-div">
 						<div class="label-div"><label>盘点仓库</label></div>
 						<div class="in-div"> 
-						<input type="text" id="warehouseInS" ltype="combobox" class="required diff" />
+						<input type="text" id="warehouseInS" ltype="combobox" class="required diff" readonly="readonly/>
 						<input type="hidden" id="warehouseS" />
 						</div>
 						<div class="label-div"><label>盘点人</label></div>
-						<div class="in-div"><input type="text" id="moveInS" ltype="combobox" class="required diff" /></div>
+						<div class="in-div"><input type="text" id="moveInS" ltype="combobox" class="required diff" readonly="readonly/></div>
 						<input type="hidden" id="moveInIdS" />
 					</div>
 					<div class="line-div" style="height:50px;">
 						<div class="label-div"><label>备注</label></div>
 						<div class="in-div" style="width:72%;">
-							<textarea cols="73" rows="2" id="noteS"></textarea>
+							<textarea cols="73" rows="2" id="noteS" readonly="readonly></textarea>
 						</div>
 					</div>
 					<div class="line-div">

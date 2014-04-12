@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>合同信息查询</title>
+        
+        <link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
+        <script src="../js/jquery.js" type="text/javascript"></script>
+        <script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
+        <script src="../js/common.js" type="text/javascript"></script>
+        <script src="../js/json2.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var defGrid;
+            var userid;
+            var partner,uom;
+            $(function(){
+                defGrid = $("#query_list").ligerGrid({
+                    columns:[
+                             {display:'任务编号',name:'code',width:80},
+                             {display:'任务项目',name:'name',width:100},
+                             //{display:'工艺路线',name:'gonyilx',width:160},
+                             {display:'数量',name:'routing_num',width:60,align:'right'},
+                             {display:'外协',name:'waixie',width:60,align:'right'},
+                             {display:'备料',name:'beiliao',width:60,align:'right'},
+                             {display:'激光',name:'jiguang',width:60,align:'right'},
+                             {display:'数冲',name:'shuchong',width:60,align:'right'},
+                             {display:'折弯',name:'zhewan',width:60,align:'right'},
+                             {display:'压铆',name:'yamao',width:60,align:'right'},
+                             {display:'压焊',name:'yahan',width:60,align:'right'},
+                             {display:'切割',name:'qiege',width:60,align:'right'},
+                             {display:'打孔',name:'dakong',width:60,align:'right'},
+                             {display:'攻丝',name:'gongsi',width:60,align:'right'},
+                             {display:'焊接',name:'hanjie',width:60,align:'right'},
+                             {display:'打磨',name:'damo',width:60,align:'right'},
+                             {display:'拉丝',name:'lasi',width:60,align:'right'},
+                             {display:'丝印',name:'siyin',width:60,align:'right'},
+                             {display:'喷涂',name:'peitu',width:60,align:'right'},
+                             {display:'组装',name:'zuzhuang',width:60,align:'right'}
+                    ],
+                    pageSize:10,
+                    usePager: true,
+                    sortName:'id',
+                    width:'100%',
+                    height:'100%',
+                    dataAction:'server',
+                    checkbox:false,
+                    rownumbers:false,
+                    fixedCellHeight:false,
+                    colDraggable:true,
+                    enabledEdit:true,
+                    clickToEdit:false,
+                    onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
+                    onReload: toQuery,
+                     url: '../common/q.jsp',                   
+                    onToFirst: function(item) {
+                        toQuery(item, 1);
+                    },
+                    onToLast: function(item) {
+                        var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+                        if (defGrid.options.total % defGrid.options.pageSize > 0)
+                            p += 1;
+                        toQuery(item, p);
+                    },
+                    onToPrev: function(item) {
+                        var p = parseInt(defGrid.options.page);
+                        if (p > 1)
+                            p -= 1;
+                        else
+                            return;
+                        toQuery(item, p);
+                    },
+                    onToNext: function(item) {
+                        var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+                        if (defGrid.options.total % defGrid.options.pageSize > 0)
+                            p += 1;
+                        var cp = parseInt(defGrid.options.page); 
+                        if (cp < p)
+                            cp += 1;
+                        toQuery(item, cp);
+                    },
+                });
+                appendDeleteBtn(deleteRow, "删除任务项目");
+                $("#pageloading").hide();
+
+               //默认查询全部数据 
+                toQuery();
+            });
+            //删除数据
+            function deleteRow(rowid) {
+                var row = defGrid.getSelectedRow();
+               if (!row) {
+                   $.ligerDialog.error('请先选择要删除的生产订单记录。','错误');
+                   return;
+               }                
+                 $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
+                       if (!r)
+                           return;
+                       
+                       if (row['__status'] !== 'add')
+                           toDel(JSON.stringify(row));
+                       defGrid.deleteRow(rowid);
+                   })
+               }
+            //查询数据
+            function toQuery(item, page, pageSize) {
+                if (!page)
+                    page = defGrid.options.page;
+                if (!pageSize)
+                    pageSize = defGrid.options.pageSize;
+                
+                var param = new Object();
+                param.code = $("#CodeS").val();
+                param.name = $("#NameS").val();
+                var data = JSON.stringify(reqObj('q','stock.select.mrp_task_routing_hour.query',JSON.stringify(param),'l',true,page,pageSize));
+                ajaxSubmit("/cm/rbac/cm.do?m=q", data, function(data) {
+                    var d = data['data'].Rows;
+                    var ps = defGrid.options.pageSize, p = defGrid.options.page, t = parseInt(data['data'].Total);
+                    if (t > ps) {
+                        for (var i = 0; i < (p - 1) * ps; i++) {
+                            d.unshift(null);
+                        }
+                    }
+                    defGrid.data = data['data'];
+                    defGrid.set({data: data['data']});
+                });
+            }
+            //删除业务数据
+             function toDel(row) {
+                 var param = JSON.stringify(reqObj('d','stock.delete.mrp_task_routing.delete',row));
+                    ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
+                        if (data) {
+                            if (parseInt(data['status']) > 0) {
+                             var param = JSON.stringify(reqObj('d','stock.delete.mrp_routing_hour.delete',row));
+                              ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
+                                if (parseInt(data['status']) > 0) {
+                                    toQuery();
+                                  $.ligerDialog.success('删除成功');
+                                }
+                                else{
+                                        $.ligerDialog.error('删除失败');
+                                    }
+                                    },null,false);
+                            } else {
+                                $.ligerDialog.error('删除失败');
+                            }
+                        }
+                    });
+            }
+            function getSelectedRow() {
+                return defGrid.getSelectedRow();
+            }   
+            
+        </script>
+        <style type="text/css">
+            label{margin: 5px 20px 5px 15px;}
+            .fields{height:35px;padding-top:5px;}
+            .dict-info{width: 260px;padding: 10px;}
+            .diff {margin:3px 0;}
+            .lineD {width:99%;float:left;position:relative;overflow:hidden;margin:10px 0 2px 2px}
+            .labelD {width:26%;position:relative;float:left;padding-top:3px;}
+            .dplD {width:73%;position:relative;float:left;}
+            .title{font-size:14px;font-weight:bold;background-position:left;padding-left:18px;}
+        </style>
+    </head>
+    <body style="padding:0;">
+        <div id="pageloading"></div>  
+        <div id="layout_main">
+            <div position="center" id="a_center" title="任务项列表">
+                <div id="query_cond" class="fields">
+                    <label>任务项编号</label><input type="text" class="s-text txt-def" id="CodeS" />
+                    <label>任务项名称</label><input type="text" class="s-text txt-def" id="NameS" />
+                    <input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
+                    <input type="button" value="清空" onclick="toReset('#query_cond input,textarea');" />
+                </div>
+                <div id="query_list"></div>
+            </div>
+        </div>
+      
+    </body>
+</html>

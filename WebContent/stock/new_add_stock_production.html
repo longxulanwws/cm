@@ -1,0 +1,513 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>生产订单维护</title>
+        
+        <link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
+        <script src="../js/jquery.js" type="text/javascript"></script>
+        <script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
+        <script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
+        <script src="../js/validate/messages_zh.js" type="text/javascript"></script>
+        <script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
+        <script src="../js/common.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var pGrid, c_row, opt, c_code;
+            var udata;
+            $(function(){   
+                udata = getData('user',{orgid:$("#deptCodeS").val()},false);
+                $("#layout_main").ligerLayout({
+                    bottomHeight: "35%",
+                    allowBottomResize:false
+                });
+                $("form").ligerForm();
+                $(".l-textarea").each(function(index){
+                    $(this).removeClass("l-textarea");
+                });
+                $("#d-menu").ligerToolBar({items:[
+                    {text:'保存',click:toAdd,icon:'save'},
+                    {line:true},
+                     {text:'返回',click:toBack,icon:'back'},
+                     {line:true},
+                    {text:'清空',click:resetArea,icon:'clear'},
+                    {line:true}
+                ]});
+                pGrid = $("#p-div").ligerGrid({
+                    columns:[
+                        {display:'任务编号',name:'code',width:160},
+                        {display:'计划任务类型',name:'type',type:'string',width:160,render:function(item){return paramRender(item,'task_type',item.type);}
+                        ,editor:{type:'select',data:getData('task_type'),valueField:'value',textField:'name'}},
+                        {display:'任务名称',name:'name',width:160,editor:{type:'string'}},
+                        {display:'任务开始日期',name:'date_start',type: 'date', format:'yyyy-MM-dd', width: 100, editor: { type: 'date'}},
+                        {display:'计划结束日期',name:'date_planned',type: 'date', format:'yyyy-MM-dd', width: 100, editor: { type: 'date'}}
+                    ],
+                    pageSize:20,
+                    usePager: true,
+                    width:'100%',
+                    height:'100%',
+                    dataAction:'server',
+                    url: '../common/q.jsp', 
+                    checkbox:false,
+                    rownumbers:true,
+                    fixedCellHeight:false,
+                    colDraggable:false,
+                    enabledEdit:true,
+                    clickToEdit:true,
+                    onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
+                    onReload: reloadPage,
+                });
+                // 添加任务明细行
+                appendAddBtn(function(){
+                    pGrid.addEditRow();
+                    c_row = pGrid.getRow(pGrid.rows.length - 1);
+                    pGrid.updateRow(c_row,{type:'2',date_start:getToDay(),code:'系统自动生成'});
+                }, "添加任务明细");
+                
+                //删除任务明细行
+                appendDeleteBtn(deleteRow, "删除任务明细");
+                // 下拉框 数据 处理
+                //生产类型
+                var typeins = $("#typeInS").ligerComboBox({
+                    autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:get_production_type,
+                    onSelected:function(v,t) {
+                        $("#typeS").val(v);
+                    }
+                });
+                //初始化生产类型
+                typeins.setValue('0'); 
+                //负责人
+                $("#useridInS").ligerComboBox({
+                    autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:udata,
+                    onSelected:function(v,t) {
+                        $("#userIdS").val(v);
+                    }
+                });
+                var query = getQueryString(window.location.toString());
+                opt = query.o;
+                if (opt) {
+                    c_code = query.code;
+                    if (opt === 'm') {
+                        var param = {code:c_code};
+                        var data = JSON.stringify(reqObj('q','stock.select.production_order.query',JSON.stringify(param)));
+                        ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+                            bindVal(data['data']);
+                        }, null, false);
+                        
+                        param = {production_code:c_code};
+                        data = JSON.stringify(reqObj('q','stock.select.production_line.query',JSON.stringify(param)));
+                        ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+                            pGrid.set({data: data['data']});
+                        }, null, false);
+
+                        ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
+                            $('#WriteUserCodeS').val(data['uid']);
+                            $("#WriteDateS").val(data['date']);
+                        }, null, false);
+                    }
+                } else {
+                    //初始化下单日期
+                    $("#date_startS").val(getToDay());
+                    ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
+                        $('#deptS').val(data['oname']);
+                        $('#deptCodeS').val(data['oid']);
+                        $('#createUserS').val(data['uname']);
+                        $('#createUserCodeS').val(data['uid']);
+                        $("#createDateS").val(data['date']);
+                        //$("#WriteDateS").val(data['date']);                   
+                    }, null, false);
+                }             
+                $("#pageloading").hide();
+            });
+            //生产类型下拉框获取值
+             var get_production_type=new function () {
+                    return getData('pro_type');
+                }
+            //保存处理中值check处理
+            function validate() {
+                var valid = true;
+                var today = getToDay();
+                $('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+                    if (!$(this).rules()) return;
+                    if (!$(element).valid()) {
+                        valid = false;
+                        return;
+                    }
+                });
+                if (!valid) return false;
+                
+                if ($("#date_startS").val() < today) {
+                    $.ligerDialog.error('下单日期不能早于今天！','错误');
+                      return false;
+                }
+                
+                if ($("#date_startS").val() > $("#date_plannedS").val()) {
+                    $.ligerDialog.error('交货日期不能早于下单日期！','错误');
+                      return false;
+                }
+                
+                if (pGrid.rows.length === 0) {
+                    $.ligerDialog.error('请添加任务明细。','错误');
+                    return false;
+                }
+                
+                var r, result;
+                var i = 0;
+                for (; i < pGrid.rows.length; i++) {
+                    r = pGrid.rows[i];
+                    if (!r.code) {
+                        result = '任务编号不能为空';
+                        break;
+                    }
+                    if (!r.type) {
+                        result = '任务类型不能为空';
+                        break;
+                     }
+                    if (!r.date_start) {
+                        result = '任务开始日期不能为空';
+                        break;
+                    }
+                    if (!r.date_planned) {
+                        result = '计划结束日期不能为空';
+                        break;
+                    }
+                    var startTime = new Date(r.date_start);
+                    var stopTime = new Date(r.date_planned);
+                    today = new Date(today);
+                    if (Date.parse(today) > Date.parse(startTime)) {
+                        result = '任务开始日期不能早于今天！';
+                        break;
+                    }
+                    if (Date.parse(startTime) > Date.parse(stopTime)) {
+                        result = '计划结束日期不能早于任务开始日期！';
+                        break;
+                    }
+                }
+
+                if (result) {
+                    $.ligerDialog.error('任务明细列表第[' + (++i) + ']行存在错误<br/>原因：'.concat(result), '数据错误');
+                    return false;
+                }
+                return true;
+            }
+
+            //重置处理
+            function resetArea() {
+                toReset('#a_center input:not(.readonly),select,textarea');
+            }
+            // 选择合同 处理
+            function f_buttonclick() {
+                var pop = $.ligerDialog.open({height:400,width:650,isResize:true,url:'../sysmgt/product_compact.html?o=s',title:'选择合同',
+                    buttons: [
+                        {text:'确定',onclick: function(item, dialog){
+                            var data = dialog.frame.getSelectedRow();
+                            if (!data) {
+                                $.ligerDialog.warn('请选择合同!');
+                                return;
+                            }
+                            $('#OriginS').val(data.code);//合同编号
+                            $('#partner_idS').val(data.partner_id);//客户ID
+                            $('#partner_nameS').val(paramRender(null,'partner_list',data.partner_id));//客户名称
+                            $('#product_codeS').val(data.product_code);//产品ID
+                            $('#product_nameS').val(data.product_name);//产品名称
+                            $('#product_qtyS').val(data.product_qty);//生产数量
+                            $('#product_uomidS').val(data.product_uom);        //计量单位
+                            $('#product_uomS').val(paramRender(null,'uom',data.product_uom));
+                            dialog.close();
+                        }},
+                        {text:'取消',onclick: function(item, dialog){
+                            dialog.close();
+                        }}
+                ]});
+                return false;
+            }
+            
+            // 查询时数据值绑定  应该可以抽象为公共的功能
+            function bindVal(data) {
+                if (data.Rows && data.Rows.length === 1) {
+                    data = data.Rows[0];
+                    $('#codeS').val(data.code);
+                    $('#nameS').val(data.name);
+                    $('#typeInS').val(paramRender(null,'pro_type',data.type));
+                    $('#typeS').val(data.type);
+                    $('#OriginS').val(data.origin);
+                    $('#partner_nameS').val(paramRender(null,'partner_list',data.partner_id));
+                    $('#partner_idS').val(data.partner_id);                 
+                    $('#product_nameS').val(data.product_name);
+                    $('#product_codeS').val(data.product_code);
+                    $('#product_qtyS').val(data.product_qty);
+                    $('#product_uomidS').val(data.product_uom);
+                    $('#product_uomS').val(paramRender(null,'uom',data.product_uom));
+                    $('#date_startS').val(data.date_start);
+                    $('#date_plannedS').val(data.date_planned);
+                    $('#useridInS').val(paramRender(null,'user',data.user_id));
+                    $('#userIdS').val(data.user_id);
+                    $('#hour_total').val(data.hour_total);
+                    $('#Bom_code').val(data.bom_code);
+                    $('#Draw_code').val(data.production_draw_code);
+                    $('#noteS').val(data.note);
+                    $('#deptS').val(paramRender(null,'org_list',data.dept_id));
+                    $('#deptCodeS').val(data.dept_id);
+                    $('#createUserS').val(paramRender(null,'user',data.createuser));
+                    $('#createUserCodeS').val(data.createuser);
+                    $('#createDateS').val(data.createdate);
+                }
+            }
+            
+            //界面的返回处理，实际是关闭标签处理。
+            function toBack()
+            {
+                //关闭修改界面
+                parent.tabManager.removeTabItem("modify_stock_production");
+                //关闭新增界面
+                parent.tabManager.removeTabItem("new_add_stock_production");
+             }
+            // 保存业务处理
+            function toAdd() {
+                pGrid.endEdit();
+                if (!validate())
+                    return;
+                var param = {
+                            name:$("#nameS").val(),
+                            type:$("#typeS").val(),
+                            origin:$("#OriginS").val(),
+                            partner_id:$("#partner_idS").val(),
+                            product_code:$("#product_codeS").val(),
+                            product_name:$("#product_nameS").val(),
+                            product_qty:$("#product_qtyS").val(),
+                            product_uom:$("#product_uomidS").val(),
+                            bom_code:$("#Bom_code").val(),
+                            production_draw_code:$("#Draw_code").val(),
+                            date_planned:$("#date_plannedS").val(),
+                            date_start:$("#date_startS").val(),
+                            user_id:$("#userIdS").val(),
+                            note:$("#noteS").val()
+                };
+                var en = 'stock.add.ly.sc.production.add', optType = 'a';
+                if (opt === 'm') {
+                    param.code = $('#codeS').val();
+                    //修改人
+                    param.writeuser=$('#WriteUserCodeS').val();
+                    //修改日期
+                    param.writedate=$('#WriteDateS').val();
+                    // 进行修改数据库处理
+                    en = 'stock.update.production';
+                    // 操作类型为 update
+                    optType = 'u';
+                } else {
+                    // 新增时 数据处理
+                    param.company_id = "";
+                    param.busiorg_id = "";
+                    param.dept_id = $("#deptCodeS").val();
+                    param.createuser = $("#createUserCodeS").val();
+                    param.createdate = $("#createDateS").val();
+                    param.state="00";
+                    param.flow_state="00";
+                    //param.writedate=$('#WriteDateS').val();
+                }
+                var data = JSON.stringify(reqObj(optType,en,JSON.stringify(param)));
+                ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+                    var rows = pGrid.rows;
+                    if (opt === 'm') {
+                        var addRows = [], updateRows = [];
+                        for (var i = 0; i < rows.length; i++) {
+                            if (rows[i].__status === 'add') {
+                                rows[i].production_code = $('#codeS').val();
+                                rows[i].state="00";
+                                rows[i].date_start=getFormatDate(new Date(rows[i].date_start),'yyyy-MM-dd');
+                                rows[i].date_planned=getFormatDate(new Date(rows[i].date_planned),'yyyy-MM-dd');
+                                rows[i].createuser = $('#createUserCodeS').val();
+                                rows[i].createdate = $('#createDateS').val();
+                                rows[i].dept_id = $('#deptCodeS').val();
+                                rows[i].company_id = "";
+                                rows[i].busiorg_id = "";
+                                addRows.push(rows[i]);
+                            } else if (rows[i].__status === 'update') {
+                                rows[i].date_start=getFormatDate(new Date(rows[i].date_start),'yyyy-MM-dd');
+                                rows[i].date_planned=getFormatDate(new Date(rows[i].date_planned),'yyyy-MM-dd');
+                                //修改人
+                                rows[i].writeuser=$('#WriteUserCodeS').val();
+                                //修改日期
+                                rows[i].writedate=$('#WriteDateS').val();
+                                updateRows.push(rows[i]);
+                            }
+                        }
+                        var ar = 0, br = 0;
+                        if (addRows.length > 0) {
+                            var data_a = JSON.stringify(reqObj('ba','stock.add.ly.sc.production.line.add',addRows));
+                            ajaxSubmit("/cm/rbac/cm.do?m=ba", data_a, function(result) {
+                                ar = result['status'];
+                                if (updateRows.length === 0)
+                                    $.ligerDialog.success('保存成功', '操作完成', reloadPage);
+                            }, null, false);
+                        } else {
+                            ar = 1; 
+                        }
+                        if (ar > 0 && updateRows.length > 0) {
+                            var data_u = JSON.stringify(reqObj('bu','stock.update.production_line.update', updateRows));
+                            ajaxSubmit("/cm/rbac/cm.do?m=bu", data_u, function(result) {
+                                $.ligerDialog.success('保存成功', '操作完成', reloadPage);
+                                br = result['status'];
+                            });
+                        } else {
+                            br = 1;
+                        }
+                        if (ar > 0 && br > 0) {
+                            $.ligerDialog.success('保存成功', '操作完成', reloadPage);
+                        }
+                    } else {
+                        // 新增处理
+                        var picking = data['added'];
+                        c_code = picking['#stock.production.ly.sc.code'];
+                        for (var i = 0; i < rows.length; i++) {
+                            rows[i].production_code = c_code;
+                            rows[i].state="00";
+                            rows[i].date_start=getFormatDate(new Date(rows[i].date_start),'yyyy-MM-dd');
+                            rows[i].date_planned=getFormatDate(new Date(rows[i].date_planned),'yyyy-MM-dd');
+                            rows[i].createuser = $('#createUserCodeS').val();
+                            rows[i].createdate = $('#createDateS').val();
+                            rows[i].dept_id = $('#deptCodeS').val();
+                            rows[i].company_id = "";
+                            rows[i].busiorg_id = "";
+                        }
+                        var data = JSON.stringify(reqObj('ba','stock.add.ly.sc.production.line.add',rows));
+                        ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
+                            $.ligerDialog.success('保存成功', '操作完成', reloadPage);
+                        });
+                    }
+                });
+            }
+            //重新加载页面 ，在保存时调用
+             function reloadPage() {
+                    window.location = './new_add_stock_production.html?o=m&code='.concat(c_code);
+                }
+            //删除商品列数据处理
+            function deleteRow() {
+                var row = pGrid.getSelectedRow();
+                if (!row) {
+                    $.ligerDialog.error('请先选择任务记录。','错误');
+                    return;
+                }
+                $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
+                    if (!r)
+                        return;
+                    if (row.__status === 'add') {
+                        pGrid.deleteRow(row);
+                        if (pGrid.rows.length === 0)
+                            pGrid.data = {};
+                        return;
+                    }
+                    var param = new Object();
+                    param.id = row.id
+                    var data = JSON.stringify(reqObj('d','stock.delete.production_line',JSON.stringify(param)));
+                    ajaxSubmit("/cm/rbac/cm.do?m=d", data, function(data) {
+                        if (data) {
+                            if (parseInt(data['status']) > 0) {
+                                $.ligerDialog.success('删除成功');
+                                pGrid.deleteRow(row);
+                            } else {
+                                $.ligerDialog.error('删除失败');
+                            }
+                        }
+                    });
+                });
+            }
+
+        </script>
+        <style type="text/css">
+            .center-height{height: 100%;}
+        </style>
+    </head>
+    <body style="padding:0;">
+        <div id="pageloading"></div>
+        <div id="layout_main">
+            <div position="center" id="a_center" title="基本信息" style="overflow:auto;">
+                <div id="d-menu" class="toolbar"></div>
+                <div style="height:25px;"></div>
+                <form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
+                    <div class="line-div">
+                        <div class="label-div"><label>订单编号</label></div>
+                        <div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
+                        <div class="label-div"><label>订单名称</label></div>
+                        <div class="in-div"><input type="text" id="nameS" ltype="text" class="required diff" /></div>
+                    </div>
+                    <div class="line-div">
+                        <div class="label-div"><label>生产类型</label></div>
+                        <div class="in-div">
+                        <input type="text" id="typeInS" ltype="combobox" class="required diff" />
+                        <input type="hidden" id="typeS" />
+                        </div>
+                        <div class="label-div"> <label>合同编号</label></div>
+                        <div class="in-div"><input type="text" id="OriginS" ltype="popup" class="liger-popupedit" onbuttonclick="f_buttonclick"/></div>
+                    </div>
+                     <div class="line-div">
+                        <div class="label-div"><label>客户名称</label></div>
+                        <div class="in-div"><input type="text" id="partner_nameS" ltype="text" class="required diff" readonly="readonly"  />
+                        <input type="hidden" id="partner_idS" />
+                        </div>
+                        <div class="label-div"><label>产品名称</label></div>
+                        <div class="in-div"><input type="text" id="product_nameS" ltype="text" class="required diff" readonly="readonly" />
+                        <input type="hidden" id="product_codeS" />
+                        </div>
+                    </div>
+                     <div class="line-div">
+                        <div class="label-div"><label>生产数量</label></div>
+                        <div class="in-div"><input type="text" id="product_qtyS" ltype="text" class="required diff" /></div>
+                        <div class="label-div"><label>计量单位</label></div>
+                        <div class="in-div"><input type="text" id="product_uomS" ltype="text" class="required diff" readonly="readonly" /></div>
+                        <input type="hidden" id="product_uomidS" />
+                    </div>
+                    <div class="line-div">
+                        <div class="label-div"><label>下单日期</label></div>
+                        <div class="in-div"><input type="text" id="date_startS" ltype="date" class="required diff" /></div>
+                        <div class="label-div"><label>交货日期</label></div>
+                        <div class="in-div"><input type="text" id="date_plannedS" ltype="date" class="required diff" /></div>
+                    </div>
+                    <div class="line-div">
+                        <div class="label-div"><label>负责人</label></div>
+                         <div class="in-div"><input type="text" id="useridInS" ltype="combobox" class="required diff" /></div>
+                        <input type="hidden" id="userIdS" />
+                        <div class="label-div"><label>总工时</label></div>
+                        <div class="in-div"><input type="text" id="hour_total" ltype="text" class="required diff" readonly="readonly" /></div>
+                    </div>
+                    <div class="line-div">
+                        <div class="label-div"><label>BOM清单编号</label></div>
+                        <div class="in-div"><input type="text" id="Bom_code" ltype="text" class="required diff" /></div>
+                        <div class="label-div"><label>生产设计图纸编号</label></div>
+                        <div class="in-div"><input type="text" id="Draw_code" ltype="text" class="required diff" /></div>
+                    </div>
+                    <div class="line-div" style="height:76px;">
+                        <div class="label-div"><label>备注</label></div>
+                        <div class="in-div" style="width:72%;">
+                            <textarea cols="80" rows="2" id="noteS"></textarea>
+                        </div>
+                    </div>
+                    <div class="line-div">
+                        <div class="label-div"><label>制单部门</label></div>
+                        <div class="in-div"><input type="text" id="deptS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                        <input type="hidden" id="deptCodeS" />
+                        <div class="label-div"><label>制单人</label></div>
+                        <div class="in-div"><input type="text" id="createUserS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                        <input type="hidden" id="createUserCodeS" />
+                        <input type="hidden" id="WriteUserCodeS" />
+                        <input type="hidden" id="WriteDateS" />
+                    </div>
+                    <div class="line-div">
+                        <div class="label-div"><label>制单时间</label></div>
+                        <div class="in-div"><input type="text" id="createDateS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                    </div>
+                </form>
+            </div>
+            <div position="bottom" id="a_right" title="任务选择列表">
+                <div id="p-div"></div>
+            </div>
+        </div>
+    </body>
+</html>

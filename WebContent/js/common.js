@@ -371,3 +371,52 @@ function validateCon()
 	
 	if (!valid) return;
 }
+//获取今天日期，输出格式为YYYY-MM-DD
+function getToDay(){    
+    var now = new Date();
+    var nowYear = now.getFullYear();
+    var nowMonth = now.getMonth();
+    var nowDate = now.getDate();
+    nowMonth = doHandleMonth(nowMonth + 1);
+    nowDate = doHandleMonth(nowDate);
+    return nowYear+"-"+nowMonth+"-"+nowDate;
+}
+
+//修改日期格式填充零
+function doHandleMonth(month){
+    if(month.toString().length == 1){
+     month = "0" + month;
+    }
+    return month;
+}
+
+//修改日期格式填充零
+function getFormatDate(date, dateformat)
+{
+    var g = this, p = this.options;
+    if (isNaN(date)) return null;
+    var format = dateformat;
+    var o = {
+        "M+": date.getMonth() + 1,
+        "d+": date.getDate(),
+        "h+": date.getHours(),
+        "m+": date.getMinutes(),
+        "s+": date.getSeconds(),
+        "q+": Math.floor((date.getMonth() + 3) / 3),
+        "S": date.getMilliseconds()
+    };
+    if (/(y+)/.test(format))
+    {
+        format = format.replace(RegExp.$1, (date.getFullYear() + "")
+    .substr(4 - RegExp.$1.length));
+    }
+    for (var k in o)
+    {
+        if (new RegExp("(" + k + ")").test(format))
+        {
+            format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k]
+        : ("00" + o[k]).substr(("" + o[k]).length));
+        }
+    }
+    return format;
+}
