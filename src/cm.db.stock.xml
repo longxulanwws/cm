@@ -156,7 +156,7 @@
                         <property name="sql">
                             <value>
 <![CDATA[
-SELECT A.production_line_Code,B.* FROM mrp_production_routing_hour AS A
+SELECT A.production_line_Code,A.id AS mrp_production_routing_hour_id,B.* FROM mrp_production_routing_hour AS A
 RIGHT JOIN (SELECT * FROM mrp_task_routing LEFT JOIN
 (SELECT task_id ,
 max(routing_num) AS routing_num,
@@ -178,7 +178,7 @@ max(CASE code WHEN '015' THEN hour_planned ELSE '' END) AS peitu   ,
 max(CASE code WHEN '016' THEN hour_planned ELSE '' END) AS zuzhuang
 FROM mrp_routing_hour GROUP BY  task_id
 )  AS mrp_routing_hour ON task_id =mrp_task_routing.id ) AS B
-ON A.production_line_no = B.code
+ON A.production_line_no = B.ID
 ]]>
                             </value>
                         </property>
@@ -509,7 +509,7 @@ VALUES ({#uuid}, {type}, {code}, {name}, {hour_planned}, {routing_num}, {task_id
                         <property name="sql">
                             <value>
 <![CDATA[INSERT INTO mrp_production_routing_hour (ID, busi_date, production_line_ID, production_line_Code, production_line_no, Routing_type, Routing_ID, Routing_Code, hour_planned, hour, routing_progress, Note, WriteUser, WriteDate, CreateUser, CreateDate)
-VALUES ({#uuid}, {busi_date}, {production_line_id}, {production_line_code}, {code}, {routing_type}, {routing_id}, {routing_code}, {hour_planned}, {hour}, {routing_progress}, {note}, {writeuser}, {writedate}, {createuser}, {createdate)]]>
+VALUES ({#uuid}, {busi_date}, {production_line_id}, {production_line_code}, {production_line_no}, {routing_type}, {routing_id}, {routing_code}, {hour_planned}, {hour}, {routing_progress}, {note}, {writeuser}, {writedate}, {createuser}, {createdate})]]>
                             </value>
                         </property>
                     </bean>
@@ -676,7 +676,7 @@ VALUES({id},{#session.USER_INFO.oid},{dept_id},{busiorg_id},{type},{categ_id},{c
                     <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
                         <property name="sql">
                             <value>
-<![CDATA[UPDATE mrp_production_routing_hour SET production_line_no = {production_line_no},WriteUser = {writeuser},WriteDate = {writedate} WHERE ID={id}]]>
+<![CDATA[UPDATE mrp_production_routing_hour SET production_line_no = {production_line_no},WriteUser = {writeuser},WriteDate = {writedate} WHERE ID={mrp_production_routing_hour_id}]]>
                             </value>
                         </property>
                     </bean>
