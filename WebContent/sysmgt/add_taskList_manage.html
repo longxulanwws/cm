@@ -137,7 +137,7 @@
             function toBack()
             {
                 //关闭修改界面
-            	dialog.close();
+            	 //parent.$('#task_manage_add').close();
              }
             //重置处理
             function resetArea() {
@@ -240,7 +240,7 @@
             }
             //重新加载页面 ，在保存时调用
              function reloadPage() {
-                    window.location = './add_taskList_manage.html?o=m&code='.concat(c_id);
+                    window.location = './add_taskList_manage.html?o=m&id='.concat(c_id);
                 }
             //删除工艺路线列数据处理
             function deleteRow() {

@@ -133,10 +133,10 @@
             }
             // 选择任务明细 处理
             function f_buttonclick() {
-                var pop = $.ligerDialog.open({height:400,width:1000,isResize:true,url:'../sysmgt/taskList_manage.html?o=s',title:'选择任务项目明细',
+                var pop = $.ligerDialog.open({id:'task_manage',height:400,width:1000,isResize:true,url:'../sysmgt/taskList_manage.html?o=s',title:'选择任务项目明细',
                     buttons: [
                               {text:'新增',onclick: function(item, dialog){
-                              detailDialog = $.ligerDialog.open({height:450,width:800,isResize:true,
+                              detailDialog = $.ligerDialog.open({id:'task_manage_add',height:450,width:800,isResize:true,
                             	  url:'../sysmgt/add_taskList_manage.html',
                                   title:"新增任务项明细"
                               });
@@ -148,7 +148,7 @@
                                   return;
                               }
                               alert(row.id);
-                              detailDialog = $.ligerDialog.open({height:450,width:800,isResize:true,
+                              detailDialog = $.ligerDialog.open({id:'task_manage_modify',height:450,width:800,isResize:true,
                                   url:'../sysmgt/add_taskList_manage.html?o=m&id='.concat(row.id),
                                   title:"编辑任务项明细"
                               });
