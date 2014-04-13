@@ -147,7 +147,6 @@
                                   $.ligerDialog.error('请先选择任务项明细记录。','错误');
                                   return;
                               }
-                              alert(row.id);
                               detailDialog = $.ligerDialog.open({id:'task_manage_modify',height:450,width:800,isResize:true,
                                   url:'../sysmgt/add_taskList_manage.html?o=m&id='.concat(row.id),
                                   title:"编辑任务项明细"
