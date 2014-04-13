@@ -223,6 +223,22 @@ WHERE  cm_user_role_rel.ROLE_ID=cm_role_resource_rel.ROLE_ID AND m.RESOURCE_ID=c
 						</property>
 					</bean>
 				</entry>
+				<entry key="dict.def.queryCompact">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT ID, Code, Name, partner_id, product_code, product_name, product_qty, product_uom, Link_Man, telephone, Signed_Date, Start_Date, End_Date,Description FROM cm_compact]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="name" value="str:like(lr):and" />
+                                <entry key="code" value=":like(lr)" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
 			</map>
 		</property>
 		<property name="add">
@@ -341,6 +357,17 @@ VALUES ({#menu.id},{code},{name},{higher_id},{seq:int},{resource_id},{icon_uri},
 						</property>
 					</bean>
 				</entry>
+				<!-- 合同信息增加 -->
+				<entry key="dict.def.addCompact">
+                    <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[INSERT INTO cm_compact (ID, Company_ID, Dept_ID, BusiOrg_ID, Code, Name, partner_id, product_code, product_name, product_qty, product_uom, Link_Man, telephone, Signed_Date, Start_Date, End_Date, CreateDept, CreateUser, CreateDate, WriteDate, WriteUser, Description)
+VALUES ({#compact.id}, {companyid}, {deptid}, {busiorgid}, {code}, {name}, {partner_id}, {product_code}, {product_name}, {product_qty}, {product_uom}, {link_man}, {telephone}, {signed_date}, {start_date}, {end_date}, {createdept}, {createuser}, {createdate}, {writedate}, {writeuser}, {description})]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
 			</map>	
 		</property>
 		<property name="update">
@@ -449,6 +476,18 @@ LEGAL_BODY={legal_body},BANK={bank},BANK_ACCOUNT={bank_account}
 						</property>
 					</bean>
 				</entry>
+				<entry key="dict.def.updateCompact">
+                    <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[UPDATE cm_compact SET Code = {code}, Name = {name}, partner_id = {partner_id}, product_code = {product_code},
+ product_name = {product_name}, product_qty = {product_qty}, product_uom = {product_uom}, Link_Man = {link_man}, 
+ telephone = {telephone}, Signed_Date = {signed_date}, Start_Date = {start_date}, End_Date = {end_date},
+  Description = {description} WHERE ID = {id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
 			</map>	
 		</property>
 		<property name="delete">
@@ -544,6 +583,15 @@ LEGAL_BODY={legal_body},BANK={bank},BANK_ACCOUNT={bank_account}
 						</property>
 					</bean>
 				</entry>
+			    <entry key="dict.def.deleteCompact">
+                    <bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[DELETE FROM cm_compact WHERE ID={id} ]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
 			</map>	
 		</property>
 	</bean>

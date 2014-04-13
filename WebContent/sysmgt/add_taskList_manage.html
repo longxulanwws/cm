@@ -1,0 +1,307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>生产任务项目维护</title>
+        
+        <link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
+        <script src="../js/jquery.js" type="text/javascript"></script>
+        <script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
+        <script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
+        <script src="../js/validate/messages_zh.js" type="text/javascript"></script>
+        <script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
+        <script src="../js/common.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var pGrid, c_row, opt, c_id;
+            var udata;
+            var createUserCode,WriteUserCode,WriteDate,createDate;
+            $(function(){   
+                $("#layout_main").ligerLayout({
+                    bottomHeight: "70%",
+                    allowBottomResize:false
+                });
+                $("form").ligerForm();
+                $(".l-textarea").each(function(index){
+                    $(this).removeClass("l-textarea");
+                });
+                $("#d-menu").ligerToolBar({items:[
+                    {text:'保存',click:toAdd,icon:'save'},
+                    {line:true},
+                     {text:'返回',click:toBack,icon:'back'},
+                     {line:true},
+                    {text:'清空',click:resetArea,icon:'clear'},
+                    {line:true}
+                ]});
+                pGrid = $("#p-div").ligerGrid({
+                    columns:[
+                        {display:'工艺路线名称',name:'code',type:'string',width:160,render:function(item){return paramRender(item,'gongyi_luxian',item.code);}
+                           ,editor:{type:'select',data:getData('gongyi_luxian'),valueField:'value',textField:'name'}},
+                        {display:'计划数量',name:'routing_num',width:160,editor:{type:'int'}},
+                        {display:'计划工时',name:'hour_planned',width: 100, editor:{type:'string'},render:function(item){return item.hour_planned ? parseFloat(item.hour_planned).toFixed(2) : '';}}
+                    ],
+                    pageSize:20,
+                    usePager: true,
+                    width:'100%',
+                    height:'100%',
+                    dataAction:'server',
+                    url: '../common/q.jsp', 
+                    checkbox:false,
+                    rownumbers:true,
+                    fixedCellHeight:false,
+                    colDraggable:false,
+                    enabledEdit:true,
+                    clickToEdit:true,
+                    onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
+                    onReload: reloadPage,
+                });
+                // 添加任务明细行
+                appendAddBtn(function(){
+                    pGrid.addEditRow();
+                    c_row = pGrid.getRow(pGrid.rows.length - 1);
+                }, "添加任务明细");
+                
+                //删除任务明细行
+                appendDeleteBtn(deleteRow, "删除任务明细");
+                var query = getQueryString(window.location.toString());
+                opt = query.o;
+                if (opt) {
+                    c_id = query.id;
+                    if (opt === 'm') {
+                        var param = {id:c_id};
+                        var data = JSON.stringify(reqObj('q','stock.select.mrp_task_routing.query',JSON.stringify(param)));
+                        ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+                            bindVal(data['data']);
+                        }, null, false);
+                        
+                        param = {task_id:c_id};
+                        data = JSON.stringify(reqObj('q','stock.select.mrp_routing_hour.query',JSON.stringify(param)));
+                        ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+                            pGrid.set({data: data['data']});
+                        }, null, false);
+
+                        ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
+                             $('#WriteUserCodeS').val(data['uid']);
+                             $("#WriteDateS").val(data['date']);
+                        }, null, false);
+                    }
+                } else {
+                    ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
+                             $('#createUserCodeS').val(data['uid']);
+                             $("#createDateS").val(data['date']);
+                    }, null, false);
+                }             
+                $("#pageloading").hide();
+            });
+            //保存处理中值check处理
+            function validate() {
+                var valid = true;
+                var today = getToDay();
+                $('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+                    if (!$(this).rules()) return;
+                    if (!$(element).valid()) {
+                        valid = false;
+                        return;
+                    }
+                });
+                if (!valid) return false;
+                if (pGrid.rows.length === 0) {
+                    $.ligerDialog.error('请添加任务明细。','错误');
+                    return false;
+                }
+                var r, result;
+                var i = 0;
+                for (; i < pGrid.rows.length; i++) {
+                    r = pGrid.rows[i];
+                    if (!r.code) {
+                        result = '任务编号不能为空';
+                        break;
+                    }
+                    if (!r.routing_num || parseInt(r.routing_num) < 1) {
+                        result = '计划数量必须录入大于0的整数';
+                        break;
+                    }
+                    if (!r.hour_planned || parseInt(r.hour_planned) < 0) {
+                        result = '计划工时必须大于0';
+                        break;
+                    }
+                }
+                if (result) {
+                    $.ligerDialog.error('任务明细列表第[' + (++i) + ']行存在错误<br/>原因：'.concat(result), '数据错误');
+                    return false;
+                }
+                return true;
+            }
+            //返回
+            function toBack()
+            {
+                //关闭修改界面
+            	 //parent.$('#task_manage_add').close();
+                $(this).dialog('close');
+             }
+            //重置处理
+            function resetArea() {
+                toReset('#a_center input:not(.readonly),select,textarea');
+            }
+                       
+            // 查询时数据值绑定  应该可以抽象为公共的功能
+            function bindVal(data) {
+                if (data.Rows && data.Rows.length === 1) {
+                    data = data.Rows[0];
+                    $('#codeS').val(data.code);
+                    $('#nameS').val(data.name);
+                }
+            }
+            
+            // 保存业务处理
+            function toAdd() {
+                pGrid.endEdit();
+                if (!validate())
+                    return;
+                var param = {
+                	   code:$('#codeS').val(),
+                       name:$("#nameS").val()
+                };
+                var en = 'stock.add.mrp_task_routing.add', optType = 'a';
+                if (opt === 'm') {
+                	 param.id = c_id;
+                    //修改人
+                    param.writeuser= $('#WriteUserCodeS').val();
+                    //修改日期
+                    param.writedate= $('#WriteDateS').val();
+                    // 进行修改数据库处理
+                    en = 'stock.update.mrp_task_routing.update';
+                    // 操作类型为 update
+                    optType = 'u';
+                } else {
+                    // 新增时 数据处理
+                    param.createuser = $('#createUserCodeS').val();
+                    param.createdate = $('#createDateS').val();
+                }
+                var data = JSON.stringify(reqObj(optType,en,JSON.stringify(param)));
+                ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+                    var rows = pGrid.rows;
+                    if (opt === 'm') {
+                        var addRows = [], updateRows = [];
+                        for (var i = 0; i < rows.length; i++) {
+                            if (rows[i].__status === 'add') {
+                            	rows[i].task_id  = c_id;
+                                rows[i].name = paramRender(null,'gongyi_luxian',rows[i].code);
+                                rows[i].createuser = $('#createUserCodeS').val();
+                                rows[i].createdate = $('#createDateS').val();
+                                addRows.push(rows[i]);
+                            } else if (rows[i].__status === 'update') {
+                                //修改人
+                                rows[i].writeuser= $('#WriteUserCodeS').val();
+                                //修改日期
+                                rows[i].writedate= $('#WriteDateS').val();
+                                updateRows.push(rows[i]);
+                            }
+                        }
+                        var ar = 0, br = 0;
+                        if (addRows.length > 0) {
+                            var data_a = JSON.stringify(reqObj('ba','stock.add.mrp_routing_hour.add',addRows));
+                            ajaxSubmit("/cm/rbac/cm.do?m=ba", data_a, function(result) {
+                                ar = result['status'];
+                                if (updateRows.length === 0)
+                                    $.ligerDialog.success('保存成功', '操作完成', reloadPage);
+                            }, null, false);
+                        } else {
+                            ar = 1; 
+                        }
+                        if (ar > 0 && updateRows.length > 0) {
+                            var data_u = JSON.stringify(reqObj('bu','stock.update.mrp_routing_hour.update', updateRows));
+                            ajaxSubmit("/cm/rbac/cm.do?m=bu", data_u, function(result) {
+                                $.ligerDialog.success('保存成功', '操作完成', reloadPage);
+                                br = result['status'];
+                            });
+                        } else {
+                            br = 1;
+                        }
+                        if (ar > 0 && br > 0) {
+                            $.ligerDialog.success('保存成功', '操作完成', reloadPage);
+                        }
+                    } else {
+                        // 新增处理
+                        var picking = data['added'];
+                        c_id = picking['#stock.mrp_task_routing.id'];
+                        for (var i = 0; i < rows.length; i++) {
+                            rows[i].task_id  = c_id;
+                            rows[i].name = paramRender(null,'gongyi_luxian',rows[i].code);
+                            rows[i].createuser = $('#createUserCodeS').val();
+                            rows[i].createdate = $('#createDateS').val();
+                        }
+                        var data = JSON.stringify(reqObj('ba','stock.add.mrp_routing_hour.add',rows));
+                        ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
+                            $.ligerDialog.success('保存成功', '操作完成', reloadPage);
+                        });
+                    }
+                });
+            }
+            //重新加载页面 ，在保存时调用
+             function reloadPage() {
+                    window.location = './add_taskList_manage.html?o=m&id='.concat(c_id);
+                }
+            //删除工艺路线列数据处理
+            function deleteRow() {
+                var row = pGrid.getSelectedRow();
+                if (!row) {
+                    $.ligerDialog.error('请先选择工艺明细记录。','错误');
+                    return;
+                }
+                $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
+                    if (!r)
+                        return;
+                    if (row.__status === 'add') {
+                        pGrid.deleteRow(row);
+                        if (pGrid.rows.length === 0)
+                            pGrid.data = {};
+                        return;
+                    }
+                    var param = new Object();
+                    param.id = row.id
+                    var data = JSON.stringify(reqObj('d','stock.delete.production_line',JSON.stringify(param)));
+                    ajaxSubmit("/cm/rbac/cm.do?m=d", data, function(data) {
+                        if (data) {
+                            if (parseInt(data['status']) > 0) {
+                                $.ligerDialog.success('删除成功');
+                                pGrid.deleteRow(row);
+                            } else {
+                                $.ligerDialog.error('删除失败');
+                            }
+                        }
+                    });
+                });
+            }
+
+        </script>
+        <style type="text/css">
+            .center-height{height: 100%;}
+        </style>
+    </head>
+    <body style="padding:0;">
+        <div id="pageloading"></div>
+        <div id="layout_main">
+                <div position="center" id="a_center" title="基本信息" style="overflow:auto;">
+                <div id="d-menu" class="toolbar"></div>
+                <div style="height:25px;"></div>
+                <form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
+                    <div class="line-div">
+                        <div class="label-div"><label>任务项编号</label></div>
+                        <div class="in-div"><input type="text" id="codeS" ltype="text" class="required diff" /></div>
+                        <div class="label-div"><label>任务项名称</label></div>
+                        <div class="in-div"><input type="text" id="nameS" ltype="text" class="required diff" /></div>
+                        <input type="hidden" id="createDateS" />
+                        <input type="hidden" id="createUserCodeS" />
+                        <input type="hidden" id="WriteUserCodeS" />
+                        <input type="hidden" id="WriteDateS" />
+                    </div>
+                </form>
+            </div>
+            <div position="bottom" id="a_right" title="任务选择列表">
+                <div id="p-div"></div>
+            </div>
+        </div>
+    </body>
+</html>

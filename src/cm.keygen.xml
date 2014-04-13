@@ -64,6 +64,28 @@
 						<property name="group" value="true" />
 					</bean>
 				</entry>
+				<!-- 生产订单号编码规则   stock.production.ly.sc.code -->
+                <entry key="stock.production.ly.sc.code">
+                    <bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+                        <property name="rule" value="'SCDD'{date}{seq(4)}" />
+                        <property name="circle" value="year" />
+                        <property name="group" value="true" />
+                    </bean>
+                </entry>
+                 <!-- 生产任务号编码规则   stock.production.ly.sc.code -->
+                <entry key="stock.production.line.code">
+                    <bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+                        <property name="rule" value="'SCRW'{date}{seq(4)}" />
+                        <property name="circle" value="year" />
+                        <property name="group" value="true" />
+                    </bean>
+                </entry>
+                 <!-- 产品任务项信息编码规则   -->
+                <entry key="stock.mrp_task_routing.id">
+                    <bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+                        <property name="rule" value="{seq(4)}" />
+                    </bean>
+                </entry>
 				<entry key="stock.product.id">
 					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
 						<property name="rule" value="{seq(6)}" />
@@ -133,6 +155,12 @@
 						<property name="init" value="10" />
 					</bean>
 				</entry>
+				<entry key="compact.id">
+                    <bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+                        <property name="rule" value="{seq(6)}" />
+                        <property name="init" value="10" />
+                    </bean>
+                </entry>
 			</map>
 		</property>
 	</bean>
