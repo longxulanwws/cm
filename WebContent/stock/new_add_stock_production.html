@@ -40,6 +40,8 @@
                         {display:'计划任务类型',name:'type',type:'string',width:160,render:function(item){return paramRender(item,'task_type',item.type);}
                         ,editor:{type:'select',data:getData('task_type'),valueField:'value',textField:'name'}},
                         {display:'任务名称',name:'name',width:160,editor:{type:'string'}},
+                        {display:'执行部门',name:'exec_dept',type:'string',width:160,render:function(item){return paramRender(item,'org_list',item.exec_dept);}
+                        ,editor:{type:'select',data:getData('org_list'),valueField:'value',textField:'name'}},
                         {display:'任务开始日期',name:'date_start',type: 'date', format:'yyyy-MM-dd', width: 100, editor: { type: 'date'}},
                         {display:'计划结束日期',name:'date_planned',type: 'date', format:'yyyy-MM-dd', width: 100, editor: { type: 'date'}}
                     ],
@@ -121,7 +123,6 @@
                         $('#createUserS').val(data['uname']);
                         $('#createUserCodeS').val(data['uid']);
                         $("#createDateS").val(data['date']);
-                        //$("#WriteDateS").val(data['date']);                   
                     }, null, false);
                 }             
                 $("#pageloading").hide();
@@ -245,6 +246,8 @@
                     $('#product_qtyS').val(data.product_qty);
                     $('#product_uomidS').val(data.product_uom);
                     $('#product_uomS').val(paramRender(null,'uom',data.product_uom));
+                    $('#cycle_totalS').val(data.cycle_total);
+                    $('#date_finishedS').val(data.date_finished);                    
                     $('#date_startS').val(data.date_start);
                     $('#date_plannedS').val(data.date_planned);
                     $('#useridInS').val(paramRender(null,'user',data.user_id));
@@ -285,8 +288,9 @@
                             product_uom:$("#product_uomidS").val(),
                             bom_code:$("#Bom_code").val(),
                             production_draw_code:$("#Draw_code").val(),
-                            date_planned:$("#date_plannedS").val(),
+                            cycle_total:$("#cycle_totalS").val(),
                             date_start:$("#date_startS").val(),
+                            date_planned:$("#date_plannedS").val(),
                             user_id:$("#userIdS").val(),
                             note:$("#noteS").val()
                 };
@@ -310,7 +314,6 @@
                     param.createdate = $("#createDateS").val();
                     param.state="00";
                     param.flow_state="00";
-                    //param.writedate=$('#WriteDateS').val();
                 }
                 var data = JSON.stringify(reqObj(optType,en,JSON.stringify(param)));
                 ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
@@ -465,17 +468,23 @@
                         <input type="hidden" id="product_uomidS" />
                     </div>
                     <div class="line-div">
-                        <div class="label-div"><label>下单日期</label></div>
-                        <div class="in-div"><input type="text" id="date_startS" ltype="date" class="required diff" /></div>
                         <div class="label-div"><label>交货日期</label></div>
                         <div class="in-div"><input type="text" id="date_plannedS" ltype="date" class="required diff" /></div>
+                        <div class="label-div"><label>订单周期</label></div>
+                        <div class="in-div"><input type="text" id="cycle_totalS" ltype="text" class="required diff" /></div>
+                    </div>
+                    <div class="line-div">
+                        <div class="label-div"><label>下单日期</label></div>
+                        <div class="in-div"><input type="text" id="date_startS" ltype="date" class="required diff" /></div>
+                        <div class="label-div"><label>完成日期</label></div>
+                        <div class="in-div"><input type="text" id="date_finishedS" ltype="text" class="readonly diff" readonly="readonly"/></div>
                     </div>
                     <div class="line-div">
                         <div class="label-div"><label>负责人</label></div>
                          <div class="in-div"><input type="text" id="useridInS" ltype="combobox" class="required diff" /></div>
                         <input type="hidden" id="userIdS" />
                         <div class="label-div"><label>总工时</label></div>
-                        <div class="in-div"><input type="text" id="hour_total" ltype="text" class="required diff" readonly="readonly" /></div>
+                        <div class="in-div"><input type="text" id="hour_total" ltype="text" class="readonly diff" readonly="readonly" /></div>
                     </div>
                     <div class="line-div">
                         <div class="label-div"><label>BOM清单编号</label></div>
@@ -484,7 +493,7 @@
                         <div class="in-div"><input type="text" id="Draw_code" ltype="text" class="required diff" /></div>
                     </div>
                     <div class="line-div" style="height:76px;">
-                        <div class="label-div"><label>备注</label></div>
+                        <div class="label-div"><label>订单说明</label></div>
                         <div class="in-div" style="width:72%;">
                             <textarea cols="80" rows="2" id="noteS"></textarea>
                         </div>
