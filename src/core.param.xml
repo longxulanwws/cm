@@ -86,7 +86,20 @@
 							</bean>
 						</property>
 					</bean>
-				</entry>								
+				</entry>
+				<!-- 产品任务项树 -->
+                 <entry key="prodctive_tree">
+                    <bean class="com.ruisoft.core.param.SQLParamEntity">
+                        <property name="sql">
+                            <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                                <property name="sql">
+                                    <value><![CDATA[SELECT task_routing_id,task_routing_code AS value, task_routing_name AS name, up_task_routing_code AS pid, Product_ID, Product_Name,task_routing_type  FROM mrp_task_routing WHERE task_routing_type <> '3']]></value>
+                                </property>
+                            </bean>
+                        </property>
+                        <property name="treeAttr" value="pid" />
+                    </bean>
+                </entry>  								
 			</map>
 		</property>
 	</bean>

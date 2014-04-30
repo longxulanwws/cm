@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>产品树信息查询</title>
+        
+        <link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
+        <script src="../js/jquery.js" type="text/javascript"></script>
+        <script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
+        <script src="../js/common.js" type="text/javascript"></script>
+        <script src="../js/json2.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var pTree;
+            var pType = getData('prodctive_tree');
+            $(function(){
+                pTree = $("#tree_div").ligerTree({
+                    nodeWidth:142,
+                    textFieldName:'name',
+                    idFieldName:'value',
+                    parentIDFieldName:'pid',
+                    isExpand:false,
+                    checkbox:false,
+                    single:true,
+                    btnClickToToggleOnly: false,
+                    onSelect:function(data) {
+                        if (data.data && data.data.leaf == '1') {
+                            pNode = data.data.code;
+                        }
+                    },
+                    data:pType
+                });
+                $("#pageloading").hide();
+            });
+            function getSelected()
+            {
+                var note = pTree.getSelected(); 
+                return note;
+            }
+
+        </script>
+        <style type="text/css">
+            label{margin: 5px 20px 5px 15px;}
+            .fields{height:35px;padding-top:5px;}
+            .dict-info{width: 260px;padding: 10px;}
+            .diff {margin:3px 0;}
+            .lineD {width:99%;float:left;position:relative;overflow:hidden;margin:10px 0 2px 2px}
+            .labelD {width:13%;position:relative;float:left;padding-top:3px;}
+            .dplD {width:36%;position:relative;float:left;}
+            .title{font-size:14px;font-weight:bold;background-position:left;padding-left:18px;}
+            .l-dialog-content-nopadding{padding:0 !important;}
+        </style>
+    </head>
+    <body style="padding:0;">
+        <div id="pageloading"></div>  
+        <div id="layout_main">
+           <div id="tree_div"></div>
+            </div>
+        </div>
+    </body>
+</html>

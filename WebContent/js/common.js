@@ -321,6 +321,17 @@ function appendDeleteBtn(action, title) {
 	appendBtnForGridToolbar("l-bar-btndel", "l-icon-delete", action, title);
 }
 /**
+ * 向Grid组件中的Toolbar中添加“管理”按钮
+ * 
+ * @param action Function 按钮的onclick事件
+ * @param title String 鼠标指向该按钮时的提示信息
+ */
+function appendManageBtn(action, title) {
+	if (!title)
+		title = "维护";
+	appendBtnForGridToolbar("l-bar-btnman", "l-icon-config", action, title);
+}
+/**
  * 解析URL中的Query String部分传递的参数
  * 
  * @param url 请求url
@@ -390,7 +401,12 @@ function doHandleMonth(month){
     return month;
 }
 
-//修改日期格式填充零
+/**
+ * 修改日期格式填充零
+ * @param date  被修改的时间数据
+ * @param dateformat  修改的格式
+ * @returns   修改后的时间格式
+ */
 function getFormatDate(date, dateformat)
 {
     var g = this, p = this.options;
@@ -420,3 +436,18 @@ function getFormatDate(date, dateformat)
     }
     return format;
 }
+/**
+ * 计算两个日期之间的天数之差
+ * @param beginDate  开始日期 YYYY-MM-DD
+ * @param endDate  结束日期 YYYY-MM-DD
+ * @returns {Number}  日期之差
+ */
+function getdiffDate(beginDate,endDate){
+	var strDateArrayStart = beginDate.split("-");
+	var strDateArrayEnd = endDate.split("-");
+	var strDateS = new Date(strDateArrayStart[0] + "/" + strDateArrayStart[1] + "/" + strDateArrayStart[2]);
+	var strDateE = new Date(strDateArrayEnd[0] + "/" + strDateArrayEnd[1] + "/" + strDateArrayEnd[2]);
+	var intDay = Math.floor((strDateE.getTime()-strDateS.getTime())/(1000*3600*24));
+	return intDay;
+}
+

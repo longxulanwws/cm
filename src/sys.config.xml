@@ -12,6 +12,7 @@
 			<map>
 				<entry key="rbac" value-ref="rbac" />
 				<entry key="stock" value-ref="stock" />
+				<entry key="production" value-ref="production" />
 				<entry key="param" value-ref="paramGenerator" />
 			</map>
 		</property>

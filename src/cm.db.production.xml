@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+    <bean id="production" class="com.ruisoft.cm.rbac.util.DMLConfig">
+        <property name="select">
+            <map>
+             <!-- 查询任务项清单信息用SQL -->
+              <entry key="mrp_task_routing.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT task_routing_id, task_routing_code, task_routing_name, task_routing_type, up_task_routing_code, 
+Product_ID, Product_Name, CASE WHEN task_routing_qty IS NULL  THEN '' ELSE task_routing_qty END AS task_routing_qty,
+CASE WHEN task_routing_standard_hour IS NULL THEN '' ELSE task_routing_standard_hour END AS task_routing_standard_hour, 
+task_routing_level, Note, WriteUser, WriteDate, CreateUser, CreateDate FROM mrp_task_routing]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="task_routing_name" value=":like(lr)" />
+                                <entry key="task_routing_code" value=":like(r)" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+               <entry key="mrp_task_routing.select">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT task_routing_id, task_routing_code, task_routing_name, task_routing_type, up_task_routing_code, 
+Product_ID, Product_Name,task_routing_qty,task_routing_standard_hour, task_routing_level, Note, WriteUser, WriteDate, 
+CreateUser, CreateDate FROM mrp_task_routing]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="task_routing_code" value="" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+              <!-- 查询生产任务单明细信息用SQL -->
+              <entry key="mrp_production_task.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT production_task_id, Company_ID, Dept_ID, BusiOrg_ID, production_task_code, production_task_name,
+ production_task_type, production_plan_id, production_plan_code, production_task_Origin_id, Partner_ID, task_cycle, 
+ task_plan_start_date, task_plan_finish_date, task_start_date, task_finish_date, task_track_state, task_track_note, 
+ task_note, bom_id, bom_code, drawing_id, drawing_code, State, Flow_State, CreateUser, CreateDate, WriteDate, WriteUser FROM mrp_production_task]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="production_task_code" value=":like(lr)" />
+                                <entry key="production_plan_code" value=":like(lr)" />
+                                <entry key="state" value="" />
+                                <entry key="task_start_date" value=":&gt;=" />
+                                <entry key="task_finish_date" value=":&lt;=" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+               <!-- 查询生产任务与工艺路线对照关系表信息用SQL -->
+              <entry key="mrp_production_task_rel.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT production_task_rel_id, production_task_code, task_routing_id, Product_ID,Product_name, Product_Uom, production_product_qty FROM mrp_production_task_rel]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="production_task_code" value=":like(lr)" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+               <!-- 订单计划信息主表部分查询用SQL -->
+              <entry key="mrp_production_plan.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT pdc_plan_id, Company_ID, Dept_ID, BusiOrg_ID, pdc_plan_code, pdc_plan_Name, pdc_plan_type, pdc_plan_origin_id,
+ Sale_ID, Project_ID, Partner_ID, Product_ID, Product_Qty, Product_Uom, Bom_ID, Bom_Code, draw_id, draw_code, 
+ date_start, date_planned, date_finished, cycle_total, cycle_uom, user_id, State, Flow_State, Note, CreateUser, 
+ CreateDate, WriteDate, WriteUser FROM mrp_production_plan]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="pdc_plan_code" value=":like(lr)" />
+                                <entry key="pdc_plan_origin_id" value=":like(lr)" />
+                                <entry key="state" value="" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+               <!-- 订单计划信息从表部分查询用SQL -->
+              <entry key="mrp_plan_task.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT task_plan_id, Company_ID, Dept_ID, BusiOrg_ID, pdc_plan_code, plan_type, exec_dept, plan_dateStart, 
+plan_dateEnd, plan_cycle, plan_trackState, plan_note, State, Flow_State, CreateUser, CreateDate, WriteDate, WriteUser FROM mrp_plan_task]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="pdc_plan_code" value="" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+               <!-- 订单计划信息帮助查询用SQL -->
+              <entry key="mrp_pdctask_plan.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT A.pdc_plan_code,A.pdc_plan_origin_id,A.Bom_Code,A.draw_code,A.Partner_ID,A.date_start,A.date_planned,A.user_id,
+B.plan_type,B.plan_dateStart,B.plan_dateEnd,B.plan_cycle,B.plan_trackState,B.plan_note 
+ FROM mrp_production_plan AS A LEFT JOIN mrp_plan_task AS B
+ ON A.pdc_plan_code = B.pdc_plan_code]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="pdc_plan_code" value=":like(lr)" />
+                                <entry key="pdc_plan_origin_id" value=":like(lr)" />
+                                <entry key="plan_type" value="" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+               <!-- 生产任务单维护信息查询用SQL -->
+              <entry key="mrp_production_task.manageQuery">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT A.production_plan_code,A.production_task_code,A.Partner_ID,A.task_start_date,
+A.task_finish_date,A.task_cycle,A.task_plan_start_date,A.task_plan_finish_date,
+B.task_routing_id,B.Product_ID,B.Product_name,B.Product_Uom,B.production_product_qty 
+FROM mrp_production_task AS A,mrp_production_task_rel AS B 
+WHERE A.production_task_code = B.production_task_code 
+AND B.task_routing_id ={task_routing_id} AND A.production_task_code = {production_task_code}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+              <!-- 生产任务单明细维护信息查询用SQL -->
+              <entry key="mrp_production_task_rel.manageQuery">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT * FROM(
+select task_routing_id, task_routing_code, task_routing_name, task_routing_type, up_task_routing_code, Product_ID, Product_Name, task_routing_qty AS task_routingQty, task_routing_standard_hour, 
+task_routing_level, Note, WriteUser, WriteDate, CreateUser, CreateDate from mrp_task_routing where FIND_IN_SET(task_routing_code, getChildLst({product_id}))) AS A 
+LEFT JOIN mrp_production_task_track AS B
+ON A.task_routing_id =B.task_routing_id
+WHERE B.production_task_track_date = 
+(SELECT max(production_task_track_date) FROM mrp_production_task_track AS c 
+WHERE C.production_task_id={production_task_code} AND c.task_routing_id={task_routing_id}) 
+OR production_task_track_date IS NULL]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+              <!-- 获取上级生产数量查询用SQL -->
+              <entry key="plan_hours.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT task_routing_qty FROM mrp_task_routing WHERE task_routing_code = (
+SELECT up_task_routing_code FROM mrp_task_routing WHERE task_routing_id = {task_routing_id})]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="add">
+             <map>
+                <!-- 生产任务跟踪表 新增 数据SQL配置 -->
+                <entry key="mrp_production_task_track.add">
+                    <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[INSERT INTO mrp_production_task_track (production_task_track_id, production_task_track_date, production_task_id, task_routing_id, 
+Product_ID, Product_Uom, production_product_qty, task_routing_qty, task_routing_standard_hour, plan_hours, day_finish_hours, finish_hours,
+ finish_percent, day_real_hours, real_hours, Note, WriteUser, WriteDate, CreateUser, CreateDate)
+VALUES ({#uuid}, {production_task_track_date}, {production_task_id}, {task_routing_id}, {product_id}, {product_uom}, {production_product_qty}, 
+{task_routing_qty}, {task_routing_standard_hour}, {plan_hours}, {day_finish_hours}, {finish_hours}, {finish_percent}, {day_real_hours}, 
+{real_hours}, {note}, {writeuser}, {writedate}, {createuser}, {createdate})]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                <!-- 订单计划 新增 数据SQL配置 -->
+                <entry key="mrp_production_plan.add">
+                    <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[INSERT INTO mrp_production_plan (pdc_plan_id, Company_ID, Dept_ID, BusiOrg_ID, pdc_plan_code, pdc_plan_Name, 
+pdc_plan_type, pdc_plan_origin_id, Sale_ID, Project_ID, Partner_ID, Product_ID, Product_Qty, Product_Uom, Bom_ID, Bom_Code, 
+draw_id, draw_code, date_start, date_planned, date_finished, cycle_total, cycle_uom, user_id, State, Flow_State, Note, 
+CreateUser, CreateDate, WriteDate, WriteUser)
+VALUES ({#uuid}, {company_id}, {dept_id}, {busiorg_id}, {#production.pdc_plan_code}, {pdc_plan_name}, {pdc_plan_type}, 
+{pdc_plan_origin_id}, {sale_id}, {project_id}, {partner_id}, {product_id}, {product_qty}, {product_uom}, {bom_id}, {bom_code},
+{draw_id}, {draw_code}, {date_start}, {date_planned}, {date_finished}, {cycle_total}, {cycle_uom}, {user_id}, {state}, {flow_state}, {note},
+{createuser}, {createdate}, {writedate}, {writeuser})]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+               <!-- 订单计划安排表 新增 数据SQL配置 -->
+                <entry key="mrp_plan_task.add">
+                    <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[INSERT INTO mrp_plan_task (task_plan_id, Company_ID, Dept_ID, BusiOrg_ID, pdc_plan_code, plan_type, exec_dept, plan_dateStart, 
+plan_dateEnd, plan_cycle, plan_trackState, plan_note, State, Flow_State, CreateUser, CreateDate, WriteDate, WriteUser)
+VALUES ({#uuid}, {company_id}, {dept_id}, {busiorg_id}, {pdc_plan_code}, {plan_type}, {exec_dept}, {plan_datestart}, 
+{plan_dateend}, {plan_cycle}, {plan_trackstate}, {plan_note}, {state}, {flow_state}, {createuser}, {createdate}, {writedate}, {writeuser})]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                <!-- 生产任务单表 新增 数据SQL配置 -->
+                <entry key="mrp_production_task.add">
+                    <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[INSERT INTO mrp_production_task (production_task_id, Company_ID, Dept_ID, BusiOrg_ID, production_task_code, production_task_name, 
+production_task_type, production_plan_id, production_plan_code, production_task_Origin_id, Partner_ID, task_cycle, task_plan_start_date, 
+task_plan_finish_date, task_start_date, task_finish_date, task_track_state, task_track_note, task_note, bom_id, bom_code, drawing_id, 
+drawing_code, State, Flow_State, CreateUser, CreateDate, WriteDate, WriteUser)
+VALUES ({#uuid}, {company_id}, {dept_id}, {busiorg_id}, {#mrp_production_task.code}, {production_task_name}, {production_task_type}, {production_plan_id},
+{production_plan_code}, {production_task_origin_id}, {partner_id}, {task_cycle}, {task_plan_start_date}, {task_plan_finish_date}, {task_start_date},
+{task_finish_date}, {task_track_state}, {task_track_note}, {task_note}, {bom_id}, {bom_code}, {drawing_id}, {drawing_code}, {state}, {flow_state}, 
+{createuser}, {createdate}, {writedate}, {writeuser})]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+               <!-- 生产任务与工艺路线关系单表 新增 数据SQL配置 -->
+                <entry key="mrp_production_task_rel.add">
+                    <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[INSERT INTO mrp_production_task_rel (production_task_rel_id, production_task_code, task_routing_id, Product_ID,Product_name, Product_Uom, production_product_qty)
+VALUES ({#uuid}, {production_task_code}, {task_routing_id}, {product_id}, {product_name}, {product_uom}, {production_product_qty})]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="update">
+            <map>
+                <!-- 订单计划表修改SQL -->
+                <entry key="mrp_production_plan.update">
+                    <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[UPDATE mrp_production_plan SET pdc_plan_Name = {pdc_plan_name},pdc_plan_type = {pdc_plan_type},pdc_plan_origin_id = {pdc_plan_origin_id},
+Partner_ID = {partner_id},Bom_Code = {bom_code},draw_code = {draw_code},date_start = {date_start},date_planned = {date_planned},
+cycle_total = {cycle_total},user_id = {user_id},Note = {note},WriteDate = {writedate},WriteUser = {writeuser} WHERE pdc_plan_code = {pdc_plan_code}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                <!-- 订单计划安排表修改SQL -->
+                <entry key="mrp_plan_task.update">
+                    <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[UPDATE mrp_plan_task SET task_plan_id = {task_plan_id},plan_type = {plan_type},exec_dept = {exec_dept},plan_dateStart = {plan_datestart},
+plan_dateEnd = {plan_dateend},plan_cycle = {plan_cycle},plan_trackState = {plan_trackstate},plan_note = {plan_note},WriteDate = {writedate},
+WriteUser = {writeuser} WHERE task_plan_id = {task_plan_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                <!-- 订单计划明细单状态修改SQL -->
+                <entry key="mrp_production_plan.state">
+                    <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[UPDATE mrp_production_plan SET State = {state} WHERE pdc_plan_code = {pdc_plan_code}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                <!-- 生产任务单明细单状态修改SQL -->
+                <entry key="mrp_production_task_state.update">
+                    <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[UPDATE mrp_production_task SET State = {state} WHERE production_task_code = {production_task_code}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                <!-- 生产任务单明细单修改SQL -->
+                <entry key="mrp_production_task.update">
+                    <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[UPDATE mrp_production_task SET production_plan_code = {production_plan_code},production_task_Origin_id = {production_task_origin_id},Partner_ID = {partner_id},
+task_cycle = {task_cycle},task_plan_start_date = {task_plan_start_date},task_plan_finish_date = {task_plan_finish_date},task_start_date = {task_start_date},
+task_finish_date = {task_finish_date},task_track_state = {task_track_state},task_track_note = {task_track_note},task_note = {task_note},
+bom_code = {bom_code},drawing_code = {drawing_code},WriteDate = {writedate},WriteUser = {writeuser} WHERE production_task_code = {production_task_code}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                <!-- 生产任务单与工艺路线对照关系明细单修改SQL -->
+                <entry key="mrp_production_task_rel.update">
+                    <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[UPDATE mrp_production_task_rel SET task_routing_id = {task_routing_id},
+Product_ID = {product_id},Product_name = {product_name},Product_Uom = {product_uom},production_product_qty = {production_product_qty} 
+ WHERE production_task_rel_id = {production_task_rel_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+            </map>  
+        </property>
+        <property name="delete">
+            <map>
+              <!-- 生产任务单明细单删除SQL -->
+                 <entry key="mrp_production_task.delete">
+                    <bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[DELETE FROM mrp_production_task WHERE production_task_code = {production_task_code}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                <!-- 生产任务与任务项关联表删除SQL -->
+                 <entry key="mrp_production_task_rel.delete">
+                    <bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[DELETE FROM mrp_production_task_rel WHERE production_task_code = {production_task_code}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                 <!-- 订单计划安排表按照id单条删除SQL -->
+                 <entry key="mrp_plan_task">
+                    <bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[DELETE FROM mrp_plan_task WHERE task_plan_id = {task_plan_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                 <!-- 订单计划安排表 按照订单号，多条删除SQL -->
+                 <entry key="mrp_plan_task.delete">
+                    <bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[DELETE FROM mrp_plan_task WHERE pdc_plan_code = {pdc_plan_code}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                <!-- 订单计划表删除SQL -->
+                 <entry key="mrp_production_plan">
+                    <bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[DELETE FROM mrp_production_plan WHERE pdc_plan_id = {pdc_plan_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean>
+</beans>

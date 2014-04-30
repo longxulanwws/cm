@@ -149,6 +149,29 @@
 						</property>
 					</bean>
 				</entry>
+				<!-- 日常工时维护SQL -->
+                <entry key="mrp_routing_hour_finish_time.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+<![CDATA[
+SELECT * FROM (SELECT c.ID AS mrp_routing_id,b.ID AS mrp_task_id, b.code AS task_code,b.name AS task_name,
+c.code AS routing_code,c.name AS routing_name,c.hour_planned AS hour_planned,a.production_line_Code,c.routing_num
+FROM mrp_production_routing_hour AS a,mrp_task_routing AS b,mrp_routing_hour AS c  
+WHERE a.production_line_no=b.ID AND b.ID=c.task_id) AS TASK
+]]>
+                            </value>
+                        </property>
+                        <property name="order" value="production_line_code"/>
+                        <property name="desc" value="true"/>
+                        <property name="conditions">
+                            <map>
+                                <entry key="production_line_code" value=":like(lr)" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
 				<!-- 查询生产任务明细信息用SQL -->
                 <entry key="mrp_production_routing_hour.query">
                     <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
@@ -191,7 +214,7 @@ ON A.production_line_no = B.ID
                         </property>
                     </bean>
                 </entry>
-                                <!-- 查询生产任务明细信息用SQL -->
+                <!-- 查询生产任务明细信息用SQL -->
                 <entry key="mrp_task_routing_hour.query">
                     <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
                         <property name="dmlType" value="cond" />

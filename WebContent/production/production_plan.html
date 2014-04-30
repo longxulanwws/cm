@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>订单计划选择</title>
+        
+        <link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
+        <script src="../js/jquery.js" type="text/javascript"></script>
+        <script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
+        <script src="../js/common.js" type="text/javascript"></script>
+        <script src="../js/json2.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var defGrid,c_code;
+            $(function(){
+                defGrid = $("#query_list").ligerGrid({
+                    columns:[
+                        {display:'订单计划编号',name:'pdc_plan_code',width:130},
+                        {display:'合同编号',name:'pdc_plan_origin_id',width:130,minWidth:60},
+                        {display:'客户名称',name:'partner_id',width:180,render:sw_partner},                        
+                        {display:'下单日期',name:'date_start',width:90},
+                        {display:'交货日期',name:'date_planned',width:90},
+                        {display:'计划类型',name:'plan_type',width:100,render:function(item){return paramRender(item,'task_type',item.plan_type);}},
+                        {display:'计划开始日期',name:'plan_datestart',width:90},
+                        {display:'计划结束日期',name:'plan_dateend',width:90},
+                        {display:'计划周期',name:'plan_cycle',width:90},
+                        {display:'任务执行情况',name:'plan_trackstate',width:90,render:function(item){return paramRender(item,'production.state',item.plan_trackstate);}},
+                        {display:'任务执行情况说明',name:'plan_note',width:150},
+                        {display:'负责人',name:'user_id',width:90,render:function(item){return paramRender(item,'user',item.user_id);}}
+                    ],
+                    pageSize:20,
+                    usePager: true,
+                    dataAction:'server', 
+                    url: '../common/q.jsp', 
+                    width:'100%',
+                    height:'99%',
+                    dataAction:'server',
+                    checkbox:false,
+                    rownumbers:false,
+                    fixedCellHeight:false,
+                    colDraggable:true,
+                    enabledEdit:true,
+                    clickToEdit:false,
+                    onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
+                    onReload: toQuery,
+                  //第一页
+                    onToFirst: function(item) {
+                        toQuery(item, 1);
+                    },
+                    //最后一页
+                    onToLast: function(item) {
+                        var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+                        if (defGrid.options.total % defGrid.options.pageSize > 0)
+                            p += 1;
+                        toQuery(item, p);
+                    },
+                    //上一页
+                    onToPrev: function(item) {
+                        var p = parseInt(defGrid.options.page);
+                        if (p > 1)
+                            p -= 1;
+                        else
+                            return;
+                        toQuery(item, p);
+                    },
+                    //下一页
+                    onToNext: function(item) {
+                        var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+                        if (defGrid.options.total % defGrid.options.pageSize > 0)
+                            p += 1;
+                        var cp = parseInt(defGrid.options.page); 
+                        if (cp < p)
+                            cp += 1;
+                        toQuery(item, cp);
+                    },
+                    //自定义客户变量（core.param.xml）
+                    param_partner:'partner_list'
+                });
+                var query = getQueryString(window.location.toString());
+                c_code = query.code;
+                $("#pageloading").hide();
+                //默认查询全部数据 
+                toQuery();
+                
+            });
+            
+            //客户信息取得
+            function sw_partner(item) {
+                var swd = paramRender(item, defGrid.options.param_partner, item.partner_id);
+                if (!swd)
+                    swd = item.partner_id;
+                return swd;
+            }
+                function toQuery(item, page, pageSize) {
+                    if (!page)
+                        page = defGrid.options.page;
+                    if (!pageSize)
+                        pageSize = defGrid.options.pageSize;
+                    
+                    var param = new Object();
+                    param.pdc_plan_code = $("#pdc_plan_codeQ").val();
+                    param.pdc_plan_origin_id=$("#pdc_plan_origin_idQ").val();
+                    param.plan_type = c_code;                    
+                    var data = JSON.stringify(reqObj('q','production.select.mrp_pdctask_plan.query',JSON.stringify(param),'l',true,page,pageSize));
+                    ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+                         //增加分页信息 start 
+                        var d = data['data'].Rows;
+                        var ps = defGrid.options.pageSize, p = defGrid.options.page, t = parseInt(data['data'].Total);
+                        if (t > ps) {
+                            for (var i = 0; i < (p - 1) * ps; i++) {
+                                d.unshift(null);
+                            }
+                        }
+                        defGrid.data = data['data'];
+                         //增加分页信息  end 
+                        defGrid.set({data: data['data']});
+                    });
+                }
+                //选择一条记录
+                function getSelectedRow() {
+                    return defGrid.getSelectedRow();
+                }
+        </script>
+        <style type="text/css">
+            label{margin: 5px 20px 5px 15px;}
+            .fields{height:35px;padding-top:5px;}
+            .dict-info{width: 260px;padding: 10px;}
+            .diff {margin:3px 0;}
+            .lineD {width:99%;float:left;position:relative;overflow:hidden;margin:10px 0 2px 2px}
+            .labelD {width:13%;position:relative;float:left;padding-top:3px;}
+            .dplD {width:36%;position:relative;float:left;}
+            .title{font-size:14px;font-weight:bold;background-position:left;padding-left:18px;}
+            .l-dialog-content-nopadding{padding:0 !important;}
+        </style>
+    </head>
+    <body style="padding:0;">
+        <div id="pageloading"></div>  
+        <input type="hidden" id="createUserCodeS" />
+        <div id="layout_main">
+            <div position="center" id="a_center" title="生产订单">
+                <div id="query_cond" class="fields">
+                     <label>订单计划编号</label><input type="text" class="s-text-qCond txt-def" id="pdc_plan_codeQ" />
+                     <label>合同编号</label><input type="text" class="s-text-qCond txt-def" id="pdc_plan_origin_idQ" />
+                    <input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
+                    <input type="button" value="清空" onclick="toReset('#query_cond input,select,textarea');" />
+                </div>
+                <div id="query_list"></div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -86,6 +86,22 @@
                         <property name="rule" value="{seq(4)}" />
                     </bean>
                 </entry>
+                <!-- 订单计划信息编码规则   -->
+                <entry key="production.pdc_plan_code">
+                    <bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+                        <property name="rule" value="'DDJH'{date}{seq(4)}" />
+                        <property name="circle" value="year" />
+                        <property name="group" value="true" />
+                    </bean>
+                </entry>
+                <!-- 生产任务单号信息编码规则   -->
+                <entry key="mrp_production_task.code">
+                    <bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+                        <property name="rule" value="'SCRW'{date}{seq(4)}" />
+                        <property name="circle" value="year" />
+                        <property name="group" value="true" />
+                    </bean>
+                </entry>
 				<entry key="stock.product.id">
 					<bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
 						<property name="rule" value="{seq(6)}" />

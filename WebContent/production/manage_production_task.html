@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>生产任务单维护</title>
+        <link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
+        <script src="../js/jquery.js" type="text/javascript"></script>
+        <script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
+        <script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
+        <script src="../js/validate/messages_zh.js" type="text/javascript"></script>
+        <script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
+        <script src="../js/common.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var pGrid, c_row, opt,c_code,task_routing_id,production_task_code,product_id;
+            var udata,uerid,pdata,plan_hour;
+            $(function(){   
+                udata = getData('user',{orgid:$("#deptCodeS").val()},false);
+                $("#layout_main").ligerLayout({
+                    bottomHeight: "50%",
+                    allowBottomResize:false
+                });
+                $("form").ligerForm();
+                $(".l-textarea").each(function(index){
+                    $(this).removeClass("l-textarea");
+                });
+                $("#d-menu").ligerToolBar({items:[
+                     {text:'保存',click:toAdd,icon:'save'},
+                     {text:'返回',click:toBack,icon:'back'},
+                     {line:true},
+                ]});
+                pGrid = $("#p-div").ligerGrid({
+                    columns:[
+                        {display:'产品名称',name:'task_routing_name',id:'task_routing_name',width:160,align: 'left'},
+                        {display:'产品编号',name:'task_routing_code',id:'task_routing_code',width:80,align: 'left'},
+                        {display:'任务项类别',name:'task_routing_type',width:80,render:function(item){return paramRender(item,'product.task_type',item.task_routing_type);}},
+                        {display:'任务项数量',name:'task_routing_qty',width:80,render:sum_qty},
+                        {display:'计划工时',name:'plan_hours',width:80,render:sum_hour},
+                        {display:'当日完成工时',name:'day_finish_hours',width:80,align:'right',editor:{type:'string'},render:day_finish_hours_change},
+                        {display:'已完成工时',name:'finish_hours',width:80,align:'right',editor:{type:'string'},render:finish_hours_change},
+                        {display:'完成进度(%)',name:'finish_percent',width:80,align:'right',render:finish_percent_change},
+                        {display:'当日实际耗时',name:'day_real_hours',width:80,align:'right',editor:{type:'string'},render:day_real_hours_change},
+                        {display:'实际耗时',name:'real_hours',width:80,align:'right',editor:{type:'string'},render:real_hours_change}
+                    ],
+                    pageSize:20,
+                    usePager: true,
+                    dataAction:'server', 
+                    url: '../common/q.jsp', 
+                    width:'100%',
+                    height:'99%',
+                    dataAction:'server',
+                    checkbox:false,
+                    rownumbers:true,
+                    fixedCellHeight:false,
+                    colDraggable:true,
+                    enabledEdit:true,
+                    clickToEdit:true,
+                    onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
+                    alternatingRow: false, 
+                    tree: { columnId: 'task_routing_name',
+                            idField: 'task_routing_code',
+                            parentIDField: 'up_task_routing_code' },
+                });
+                var query = getQueryString(window.location.toString());
+                opt = query.o;
+                if (opt) {
+                	task_routing_id = query.task_routing_id;
+                	production_task_code = query.production_task_code;
+                	product_id = query.product_id;
+                    
+                    ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
+                        uerid = data['uid'];
+                        $("#genz_dataS").val(data['date']);
+                    }, null, false);
+                    
+                    var param = {task_routing_id:task_routing_id,production_task_code:production_task_code};
+                    var data = JSON.stringify(reqObj('q','production.select.mrp_production_task.manageQuery',JSON.stringify(param)));
+                    ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+                        bindVal(data['data']);
+                        }, null, false);
+                    
+                    param = {task_routing_id:task_routing_id,production_task_code:production_task_code,product_id:product_id};
+                    data = JSON.stringify(reqObj('q','production.select.mrp_production_task_rel.manageQuery',JSON.stringify(param)));
+                    ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+                       pGrid.set({data: data['data']});
+                       }, null, false);
+                }
+                $("#pageloading").hide();
+            });
+            // 查询时数据值绑定  应该可以抽象为公共的功能
+            function bindVal(data) {
+                if (data.Rows && data.Rows.length === 1) {
+                    data = data.Rows[0];
+                    $('#production_task_codeS').val(data.production_task_code);
+                    $('#production_plan_codeS').val(data.production_plan_code);
+                    $('#partner_nameS').val(paramRender(null,'partner_list',data.partner_id));
+                    $('#task_cycleS').val(data.task_cycle);
+                    $('#task_plan_start_dateS').val(data.task_plan_start_date);
+                    $('#task_plan_finish_dateS').val(data.task_plan_finish_date);
+                    $('#product_idS').val(data.product_id);
+                    $('#product_nameS').val(data.product_name);                    
+                    $('#product_qtyS').val(parseFloat(data.production_product_qty).toFixed(1));
+                    $('#product_uomS').val(paramRender(null,'uom',data.product_uom));
+                    $('#genz_userS').val(paramRender(null,'user',uerid));
+                }
+            }
+            //任务项数量计算
+            function sum_qty(item) {
+            	var product_qty = $('#product_qtyS').val();
+                if (item.task_routingqty && product_qty) {
+                    return (parseFloat(item.task_routingqty) * parseFloat(product_qty)).toFixed(2);
+                }
+                return '';
+            }
+            //计划工时计算
+            function sum_hour(item) {
+                var product_qty = $('#product_qtyS').val();
+                var param2 = {task_routing_id:item.task_routing_id};
+                var data = JSON.stringify(reqObj('q','production.select.plan_hours.query',JSON.stringify(param2)));
+                ajaxSubmit("/cm/rbac/cm.do?m=q", data, function(data) {
+                    pdata = data['data'];
+                }, null, false);
+                if (pdata.Rows && pdata.Rows.length === 1){
+                    pdata = pdata.Rows[0];
+                    if (pdata.task_routing_qty && product_qty && item.task_routing_standard_hour) {
+                        plan_hour = (parseFloat(pdata.task_routing_qty) * parseFloat(product_qty) * parseFloat(item.task_routing_standard_hour)).toFixed(2);
+                        item.plan_hours = plan_hour;
+                        return plan_hour;
+                    }
+                }
+                return '';
+            }
+            //当日完成工时
+            function day_finish_hours_change(item){
+            	if (item.task_routing_type!='3'){
+            		return item.day_finish_hours = '';
+            	}
+            	return item.day_finish_hours ? parseFloat(item.day_finish_hours).toFixed(2) : '0';
+            }
+            // 已完成工时
+            function finish_hours_change(item){
+                if (item.task_routing_type!='3'){
+                    return item.finish_hours = '';
+                }
+                return item.finish_hours ? parseFloat(item.finish_hours).toFixed(2) : '0';
+            }
+            // 完成进度
+            function finish_percent_change(item){
+                if (item.finish_hours && item.plan_hours){
+                	var finishpercent = (parseFloat(item.finish_hours)* 100.00 / parseFloat(item.plan_hours) ).toFixed(2);
+                	item.finish_percent = finishpercent;
+                    return finishpercent;
+                }
+                if (item.task_routing_type!='3'){
+                    return item.finish_percent = '';
+                }
+                return item.finish_percent ? parseFloat(item.finish_percent).toFixed(2) : '0';
+            }
+            // 当日实际耗时
+            function day_real_hours_change(item){
+                if (item.task_routing_type!='3'){
+                    return item.day_real_hours = '';
+                }
+                return item.day_real_hours ? parseFloat(item.day_real_hours).toFixed(2) : '0';
+            }
+            // 实际耗时
+            function real_hours_change(item){
+                if (item.task_routing_type!='3'){
+                    return item.real_hours = '';
+                }
+                return item.real_hours ? parseFloat(item.real_hours).toFixed(2) : '0';
+            }
+            //界面的返回处理，实际是关闭标签处理。
+            function toBack()
+            {
+                //关闭修改界面
+                parent.tabManager.removeTabItem("modify_production_task");
+             }
+            
+            function validate() {
+                var valid = true;
+                var r, result;
+                var i = 0;
+                for (; i < pGrid.rows.length; i++) {
+                    r = pGrid.rows[i];
+                    if (r.task_routing_type =='3'){
+                        if (r.day_finish_hours < 0) {
+                            result = '已完成工时有错误，请重新输入！';
+                            break;
+                        }
+                    }
+                   }
+                if (result) {
+                    $.ligerDialog.error('产品明细维护列表第[' + (++i) + ']行存在错误<br/>原因：'.concat(result), '数据错误');
+                    return false;
+                }
+                return true;
+            }
+            // 保存业务处理
+            function toAdd() {
+                pGrid.endEdit();
+                if (!validate())
+                    return;
+                   var rows = pGrid.rows;
+                        for (var i = 0; i < rows.length; i++) {
+                            rows[i].production_task_track_date = $('#genz_dataS').val();;
+                            rows[i].task_routing_qty = strTonum(rows[i].task_routing_qty);
+                            rows[i].day_finish_hours = strTonum(rows[i].day_finish_hours);
+                            rows[i].finish_hours = strTonum(rows[i].finish_hours);
+                            rows[i].finish_percent = strTonum(rows[i].finish_percent);
+                            rows[i].day_real_hours = strTonum(rows[i].day_real_hours);
+                            rows[i].real_hours = strTonum(rows[i].real_hours);
+                            rows[i].production_task_id = $('#production_task_codeS').val();
+                            rows[i].createuser =  $('#genz_userS').val();
+                            rows[i].createdate = $('#genz_dataS').val();
+                        }
+                        var data = JSON.stringify(reqObj('ba','production.add.mrp_production_task_track.add',rows));
+                        ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {
+                            $.ligerDialog.success('保存成功', '操作完成', reloadPage);
+                        });
+                    }
+            //空字符转换成null
+            function strTonum(str){
+            	if (str == ''){
+            		str = null;
+            	}
+            	return str;
+            }
+            //重新加载页面 ，在保存时调用
+             function reloadPage() {
+                    window.location = './manage_production_task.html?o=m&production_task_code='.concat(production_task_code)+
+                        '&task_routing_id='.concat(task_routing_id)+'&product_id='.concat(product_id);
+                }
+        </script>
+        <style type="text/css">
+            .center-height{height: 100%;}
+        </style>
+    </head>
+    <body style="padding:0;">
+        <div id="pageloading"></div>
+        <div id="layout_main">
+            <div position="center" id="a_center" title="基本信息" style="overflow:auto;">
+                <div id="d-menu" class="toolbar"></div>
+                <div style="height:25px;"></div>
+                <form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
+                    <div class="line-div">
+                        <div class="label-div"><label>生产任务单编号</label></div>
+                        <div class="in-div"><input type="text" id="production_task_codeS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                        <div class="label-div"> <label>订单计划编号</label></div>
+                        <div class="in-div"><input type="text" id="production_plan_codeS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                    </div>
+                     <div class="line-div">
+                        <div class="label-div"><label>客户名称</label></div>
+                        <div class="in-div"><input type="text" id="partner_nameS" ltype="text" class="readonly diff" readonly="readonly"  />
+                        </div>
+                        <div class="label-div"><label>计划周期（日）</label></div>
+                        <div class="in-div"><input type="text" id="task_cycleS" ltype="text" class="readonly diff" readonly="readonly" />
+                        </div>
+                    </div>
+                    <div class="line-div">
+                        <div class="label-div"><label>计划开始日期</label></div>
+                        <div class="in-div"><input type="text" id="task_plan_start_dateS" ltype="text" class="readonly diff" readonly="readonly"/></div>
+                        <div class="label-div"><label>计划截止周期</label></div>
+                        <div class="in-div"><input type="text" id="task_plan_finish_dateS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                    </div>
+                    <div class="line-div">
+                        <div class="label-div"><label>产品编号</label></div>
+                        <div class="in-div"><input type="text" id="product_idS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                        <div class="label-div"><label>产品名称</label></div>
+                        <div class="in-div"><input type="text" id="product_nameS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                    </div>
+                    <div class="line-div">
+                        <div class="label-div"><label>生产数量</label></div>
+                        <div class="in-div"><input type="text" id="product_qtyS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                        <div class="label-div"><label>计量单位</label></div>
+                        <div class="in-div"><input type="text" id="product_uomS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                    </div>
+                    <div class="line-div">
+                        <div class="label-div"><label>跟踪日期</label></div>
+                        <div class="in-div"><input type="text" id="genz_dataS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                        <div class="label-div"><label>跟踪人</label></div>
+                        <div class="in-div"><input type="text" id="genz_userS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                    </div>
+                </form>
+            </div>
+            <div position="bottom" id="a_right" title="产品明细维护列表">
+                <div id="p-div"></div>
+            </div>
+        </div>
+    </body>
+</html>
