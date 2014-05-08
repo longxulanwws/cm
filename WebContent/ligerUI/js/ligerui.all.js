@@ -1,9 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -474,7 +474,7 @@
             else
             {
                 this.id = this.options.id || this.element.id || liger.getId(this.__idPrev());
-            }
+            } 
             //存入管理器池
             liger.add(this);
 
@@ -517,7 +517,14 @@
         {
             if (this.element)
             {
-                $(this.element).attr("ligeruiid", this.id);
+                $(this.element).attr("ligeruiid", this.id); 
+            }
+        },
+        _setCls: function (value)
+        {
+            if (this.element && value)
+            {
+                $(this.element).addClass(value);
             }
         },
         //返回要转换成ligerui参数的属性,比如['url']
@@ -590,7 +597,7 @@
         },
         resize: function (width, height)
         {
-            this.set({ width: width, height: height });
+            this.set({ width: width, height: height + 2 });
         }
     });
 
@@ -894,8 +901,12 @@
             {
                 //field in form , column in grid
                 var field = editParm.field || editParm.column, options = controlOptions || {};
+                var isInGrid = editParm.column ? true : false;
                 var p = $.extend({}, e.options);
-                var inputBody = $("<input type='" + (e.password ? "password" : "text") + "'/>");
+                var inputType = "text";
+                if ($.inArray(type, ["password", "file"]) != -1) inputType = type;
+                if (e.password) inputType = "password";
+                var inputBody = $("<input type='" + inputType + "'/>");
                 if (e.body)
                 {
                     inputBody = e.body.clone();
@@ -918,9 +929,10 @@
                     } 
                     if (!e.body)
                     {
-                        var inputName = prefixID  + txtInputName;
+                        var inputName = prefixID + txtInputName;
+                        var inputId = new Date().getTime();
                         inputBody.attr($.extend({
-                            //id: p.id,
+                            id: inputId,
                             name: inputName
                         }, field.attr));
                         if (field.cssClass)
@@ -954,9 +966,14 @@
                     var ext = field.editor.p || field.editor.ext;
                     ext = typeof (ext) == 'function' ? ext(editParm) : ext;
                     $.extend(p, ext);
-                }
+                } 
                 //返回的是ligerui对象
-                return inputBody['liger' + control](p);
+                var lobj = inputBody['liger' + control](p); 
+                if (isInGrid)
+                {
+                    setTimeout(function () { inputBody.focus(); }, 100);
+                }
+                return lobj;
             },
             getValue: function (editor, editParm)
             {
@@ -1096,11 +1113,11 @@
         };
     }
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -1142,7 +1159,8 @@
             Form_columns: 'Grid_columns',
             Form_condition: 'Form',
             Form_popup: 'PopupEdit',
-            Form_buttons: 'Button'
+            Form_buttons: 'Button',
+            Portal_panel:'Panel'
         },
         /*
         config里面配置了某插件参数或者复杂属性参数的类型(动态加载、数组、默认参数)
@@ -1201,6 +1219,27 @@
             },
             CheckBoxList: {
                 dynamics: 'data,parms'
+            },
+            Panel: { 
+            },
+            Portal: {
+                //动态
+                dynamics: 'rows,columns',
+                //数组
+                arrays: 'rows,columns',
+                //复杂属性 columns
+                columns: {
+                    dynamics: 'panels',
+                    arrays: 'panels' 
+                },
+                //复杂属性 rows
+                rows: {
+                    dynamics: 'panels',
+                    arrays: 'panels'
+                },
+                toolbar: {
+                    arrays: 'items'
+                }
             }
         },
 
@@ -1336,7 +1375,7 @@
                     var defaults = $.extend({
                         onrender: null,
                         onrendered : null 
-                    }, liger.defaults[controlName]);
+                    }, liger.defaults[controlName]); 
                     var options = g.getOptions({
                         defaults: defaults,
                         controlName: controlName,
@@ -1356,11 +1395,11 @@
     });
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -1422,6 +1461,8 @@
                 $(box).before(header);
                 if (!$(box).hasClass("l-accordion-content")) $(box).addClass("l-accordion-content");
             });
+            $(".l-accordion-header", g.accordion).removeClass("l-accordion-header-downfirst");
+            $(".l-accordion-content:visible", g.accordion).next(".l-accordion-header:first").addClass("l-accordion-header-downfirst");
 
             //add Even
             $(".l-accordion-toggle", g.accordion).each(function ()
@@ -1475,6 +1516,8 @@
                     .addClass("l-accordion-toggle-close");
                     $(this).next(".l-accordion-content").hide(p.speed);
                 }
+                $(".l-accordion-header", g.accordion).removeClass("l-accordion-header-downfirst");
+                $(".l-accordion-content:visible", g.accordion).next(".l-accordion-header:first").addClass("l-accordion-header-downfirst");
             });
             //init
             g.headerHoldHeight = 0;
@@ -1539,11 +1582,11 @@
 
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -1661,11 +1704,11 @@
 
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -1788,11 +1831,11 @@
         }
     });
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -2103,11 +2146,11 @@
       
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -2129,7 +2172,7 @@
         isShowCheckBox: false,  //是否选择复选框
         columns: null,       //表格状态
         selectBoxWidth: null, //宽度
-        selectBoxHeight: null, //高度
+        selectBoxHeight: 120, //高度
         onBeforeSelect: false, //选择前事件
         onSelected: null, //选择值事件 
         initValue: null,
@@ -2149,9 +2192,14 @@
         hideOnLoseFocus: true,
         hideGridOnLoseFocus : false,
         url: null,              //数据源URL(需返回JSON)
+        emptyText: null,       //空行
+        addRowButton: '新增',           //新增按钮
+        addRowButtonClick: null,        //新增事件
+        triggerIcon : null,         //
         onSuccess: null,
         onError: null,
         onBeforeOpen: null,      //打开下拉框前事件，可以通过return false来阻止继续操作，利用这个参数可以用来调用其他函数，比如打开一个新窗口来选择值
+        onButtonClick: null,      //右侧图标按钮事件，可以通过return false来阻止继续操作，利用这个参数可以用来调用其他函数，比如打开一个新窗口来选择值
         render: null,            //文本框显示html函数
         absolute: true,         //选择框是否在附加到body,并绝对定位
         cancelable: true,      //可取消选择
@@ -2159,6 +2207,7 @@
         parms: null,         //ajax提交表单 
         renderItem : null,   //选项自定义函数
         autocomplete: false,  //自动完成 
+        highLight : false,    //自动完成是否匹配字符高亮显示
         readonly: false,              //是否只读
         ajaxType: 'post',
         alwayShowInTop: false,      //下拉框是否一直显示在上方
@@ -2245,13 +2294,16 @@
                 g.valueField.addClass(p.valueFieldCssClass);
             }
             if (g.valueField[0].name == undefined) g.valueField[0].name = g.valueField[0].id;
+            //update by superzoc 增加初始值
+	    if (p.initValue != null) g.valueField[0].value = p.initValue;
             g.valueField.attr("data-ligerid", g.id);
             //开关
             g.link = $('<div class="l-trigger"><div class="l-trigger-icon"></div></div>');
-           
+            if (p.triggerIcon) g.link.find("div:first").addClass(p.triggerIcon);
             //下拉框
             g.selectBox = $('<div class="l-box-select" style="display:none"><div class="l-box-select-inner"><table cellpadding="0" cellspacing="0" border="0" class="l-box-select-table"></table></div></div>');
             g.selectBox.table = $("table:first", g.selectBox);
+            g.selectBoxInner = g.selectBox.find(".l-box-select-inner:first");
             //外层
             g.wrapper = g.inputText.wrap('<div class="l-text l-text-combobox"></div>').parent();
             g.wrapper.append('<div class="l-text-l"></div><div class="l-text-r"></div>'); 
@@ -2294,6 +2346,7 @@
             }).click(function ()
             {
                 if (p.disabled || p.readonly) return;
+                if (g.trigger('buttonClick') == false) return false;
                 if (g.trigger('beforeOpen') == false) return false;
                 g._toggleSelectBox(g.selectBox.is(":visible"));
             });
@@ -2369,18 +2422,30 @@
         clear : function()
         {
             this._changeValue("", "");
+            $("a.l-checkbox-checked", this.selectBox).removeClass("l-checkbox-checked");
+            $("td.l-selected", this.selectBox).removeClass("l-selected");
+            $(":checkbox", this.selectBox).each(function () { this.checked = false; });
             this.trigger('clear');
         },
-        _setSelectBoxHeight: function (height) {
+        _setSelectBoxHeight: function (height)
+        { 
             if (!height) return;
             var g = this, p = this.options;
             if (p.grid) {
                 g.grid && g.grid.set('height', g.getGridHeight(height));
-            } else if(!p.table) {
+            } else
+            { 
                 var itemsleng = $("tr", g.selectBox.table).length;
                 if (!p.selectBoxHeight && itemsleng < 8) p.selectBoxHeight = itemsleng * 30;
-                if (p.selectBoxHeight) {
-                    g.selectBox.height(p.selectBoxHeight);
+                if (p.selectBoxHeight)
+                {
+                    if (itemsleng < 8)
+                    {
+                        g.selectBoxInner.height('auto');
+                    } else
+                    {
+                        g.selectBoxInner.height(p.selectBoxHeight);
+                    }
                 }
             }
         }, 
@@ -2477,8 +2542,7 @@
             if (value > 20)
             {
                 g.wrapper.css({ width: value });
-                g.inputText.css({ width: value - 20 });
-                g.textwrapper.css({ width: value });
+                g.inputText.css({ width: value - 20 }); 
                 if (!p.selectBoxWidth) {
                     g.selectBox.css({ width: value });
                 }
@@ -2490,8 +2554,7 @@
             if (value > 10)
             {
                 g.wrapper.height(value);
-                g.inputText.height(value - 2); 
-                g.textwrapper.css({ width: value });
+                g.inputText.height(value - 2);  
             }
         },
         _setResize: function (resize)
@@ -2502,8 +2565,10 @@
             }
             //调整大小支持
             if (resize && $.fn.ligerResizable)
-            { 
-                g.selectBox.ligerResizable({ handles: 'se,s,e', onStartResize: function ()
+            {
+                var handles = p.selectBoxHeight ? 'e' : 'se,s,e';
+                g.selectBox.ligerResizable({
+                    handles: handles, onStartResize: function ()
                 {
                     g.resizing = true;
                     g.trigger('startResize');
@@ -2583,27 +2648,29 @@
             });
             if (values.length > 0) values = values.substr(0, values.length - 1);
             return values;
-        },
-        removeItem: function ()
+        }, 
+        insertItem: function (data,index)
         {
+            var g = this, p = this.options;
+            g.data = g.data || [];
+            g.data.splice(index, 0, data);
+            g.setData(g.data);
         },
-        insertItem: function ()
+        addItem: function (data)
         {
-        },
-        addItem: function ()
-        {
-
+            var g = this, p = this.options;
+            g.insertItem(data, (g.data || []).length);
         },
         _setValue: function (value,text)
         {
-            var g = this, p = this.options;  
+            var g = this, p = this.options; 
             text = g.findTextByValue(value);
             if (p.tree)
             {
                 g.selectValueByTree(value);
             }
             else if (!p.isMultiSelect)
-            {
+            {  
                 g._changeValue(value, text);
                 $("tr[value='" + value + "'] td", g.selectBox).addClass("l-selected");
                 $("tr[value!='" + value + "'] td", g.selectBox).removeClass("l-selected");
@@ -2684,7 +2751,7 @@
             var g = this, p = this.options;
             $("table", g.selectBox).html("");
             //g.inputText.val("");
-            //g.valueField.val("");
+            //g.valueField.val(""); 
         },
         setSelect: function ()
         {
@@ -2740,8 +2807,9 @@
         },
         setData: function (data)
         {
-            var g = this, p = this.options; 
-            if (!data || !data.length) return;
+            var g = this, p = this.options;
+            if (g.select) return;
+            if (!data || !data.length) data = [];
             if (g.data != data) g.data = data;
             this.clearContent();
             if (p.columns)
@@ -2760,7 +2828,14 @@
 
                 }
             }
-            var out = [];
+            var out = []; 
+            if (p.emptyText && !g.emptyRow && (data.length == 0 || data[0][p.textField] != p.emptyText))
+            { 
+                g.emptyRow = {};
+                g.emptyRow[p.textField] = p.emptyText;
+                g.emptyRow[p.valueField] = null;
+                data.splice(0, 0, g.emptyRow);
+            } 
             for (var i = 0; i < data.length; i++)
             {
                 var val = data[i][p.valueField];
@@ -2779,7 +2854,7 @@
                             text: txt,
                             key: g.inputText.val()
                         });
-                    } else if (p.autocomplete)
+                    } else if (p.autocomplete && p.highLight)
                     {
                         itemHtml = g._highLight(txt, g.inputText.val());
                     }
@@ -2803,6 +2878,13 @@
             } else { 
                 g.selectBox.table.append(out.join(''));
             }
+            if (p.addRowButton && p.addRowButtonClick && !g.addRowButton)
+            {
+                g.addRowButton = $('<div class="l-box-select-add"><a href="javascript:void(0)" class="link"><div class="icon"></div></a></div>'); 
+                g.addRowButton.find(".link").append(p.addRowButton).click(p.addRowButtonClick);
+                g.selectBoxInner.after(g.addRowButton);
+            }
+            g.set('selectBoxHeight', p.selectBoxHeight);
             //自定义复选框支持
             if (p.isShowCheckBox && $.fn.ligerCheckBox)
             {
@@ -2936,7 +3018,8 @@
             if (p.condition) {
                 var conditionParm = $.extend({
                     labelWidth: 60,
-                    space: 20
+                    space: 20,
+                    width: p.selectBoxWidth
                 }, p.condition); 
                 g.condition = conditionPanel.ligerForm(conditionParm);
             } else {
@@ -3075,7 +3158,8 @@
         {
             return this.selected;
         },
-        getText: function () {
+        getText: function ()
+        { 
             return this.inputText.val();
         },
         setText: function (value) {
@@ -3278,6 +3362,7 @@
         _toggleSelectBox: function (isHide)
         {
             var g = this, p = this.options;
+            if (!g || !p) return;
             var textHeight = g.wrapper.height();
             g.boxToggling = true;
             if (isHide)
@@ -3327,6 +3412,7 @@
         }, 
         _highLight: function (str, key)
         {
+            if (!str) return str;
             var index = str.indexOf(key);
             if (index == -1) return str;
             return str.substring(0, index) + "<span class='l-highLight'>" + key + "</span>" + str.substring(key.length + index);
@@ -3365,11 +3451,11 @@
     
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -3386,6 +3472,7 @@
 
     $.ligerDefaults.DateEditor = {
         format: "yyyy-MM-dd hh:mm",
+        width : null,
         showTime: false,
         onChangeDate: false,
         absolute: true,  //选择框是否在附加到body,并绝对定位
@@ -4283,11 +4370,11 @@
 
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 
@@ -4344,6 +4431,7 @@
         left: null,     //位置left
         top: null,      //位置top
         modal: true,    //是否模态对话框
+        data: null,     //传递数据容器
         name: null,     //创建iframe时 作为iframe的name和id 
         isResize: false, // 是否调整大小
         allowClose: true, //允许关闭
@@ -4419,9 +4507,11 @@
             {
                 p.type = null;
                 g.dialog.addClass("l-dialog-win");
+                
             }
             if (p.cls) g.dialog.addClass(p.cls);
             if (p.id) g.dialog.attr("id", p.id);
+             
             //设置锁定屏幕、拖动支持 和设置图片
             g.mask();
             if (p.isDrag)
@@ -4463,15 +4553,31 @@
                 }
                 else
                 {
-                    g.jiframe = $("<iframe frameborder='0'></iframe>");
+                    g.jiframe = $("<iframe frameborder='0'></iframe>"); 
                     var framename = p.name ? p.name : "ligerwindow" + new Date().getTime();
                     g.jiframe.attr("name", framename);
                     g.jiframe.attr("id", framename);
-                    g.dialog.content.prepend(g.jiframe);
-                    g.dialog.content.addClass("l-dialog-content-nopadding");
+                    g.dialog.content.prepend(g.jiframe); 
+                    g.dialog.content.addClass("l-dialog-content-nopadding l-dialog-content-frame");
+
                     setTimeout(function ()
                     {
-                        g.jiframe.attr("src", p.url);
+                        if (g.dialog.body.find(".l-dialog-loading:first").length == 0)
+                            g.dialog.body.append("<div class='l-dialog-loading' style='display:block;'></div>");
+                        var iframeloading = $(".l-dialog-loading:first", g.dialog.body);
+                        g.jiframe[0].dialog = g;//增加窗口对dialog对象的引用
+                        /*
+                        可以在子窗口这样使用：
+                        var dialog = frameElement.dialog;
+                        var dialogData = dialog.get('data');//获取data参数
+                        dialog.set('title','新标题'); //设置标题
+                        dialog.close();//关闭dialog 
+                        */
+                        g.jiframe.attr("src", p.url).bind('load.dialog', function ()
+                        { 
+                            iframeloading.hide();
+                            g.trigger('loaded');
+                        }); 
                         g.frame = window.frames[g.jiframe.attr("name")];
                     }, 0);
                     // 为了解决ie下对含有iframe的div窗口销毁不正确，进而导致第二次打开时焦点不在当前图层的问题
@@ -4493,6 +4599,7 @@
                     $(".l-dialog-buttons-inner", g.dialog.buttons).prepend(btn);
                     item.width && btn.width(item.width);
                     item.onclick && btn.click(function () { item.onclick(item, g, i) });
+                    item.cls && btn.addClass(item.cls);
                 });
             } else
             {
@@ -4516,6 +4623,19 @@
                     g.close();
             });
             if (!p.fixedType)
+            { 
+                if (p.width == 'auto')
+                {
+                    setTimeout(function ()
+                    {
+                        resetPos()
+                    }, 100);
+                } else
+                {
+                    resetPos();
+                }
+            }
+            function resetPos()
             {
                 //位置初始化
                 var left = 0;
@@ -4761,7 +4881,10 @@
         {
             var g = this, p = this.options;
             if (!this.dialog) return;
-            if (value >= this._borderY)
+            if (value == "auto")
+            {
+                g.dialog.content.height('auto');
+            }else if (value >= this._borderY)
             {
                 var height = value - this._borderY - g.dialog.buttons.outerHeight();
                 if (g.trigger('ContentHeightChange', [height]) == false) return;
@@ -4785,7 +4908,7 @@
                             $(this).addClass("l-dialog-max-over");
                     }, function ()
                     {
-                        $(this).removeClass("l-dialog-max-over l-dialog-recover-over");
+                        $(this).removeClass("l-dialog-max-over l-dialog-recover-over"); 
                     }).click(function ()
                     {
                         if ($(this).hasClass("l-dialog-recover"))
@@ -4917,7 +5040,10 @@
                 {
                     var frame = jframe[0];
                     frame.src = "about:blank";
-                    frame.contentWindow.document.write('');
+                    if (frame.contentWindow &&  frame.contentWindow.document)
+                    {
+                        frame.contentWindow.document.write('');
+                    }
                     $.browser.msie && CollectGarbage();
                     jframe.remove();
                 }
@@ -4935,6 +5061,7 @@
         {
             var g = this;
             l.win.removeTask(this);
+            $.ligerui.remove(this);
             g.unmask();
             g._removeDialog();
             $('body').unbind('keydown.dialog');
@@ -5318,7 +5445,7 @@
     $.ligerDialog.success = function (content, title, onBtnClick)
     {
         return $.ligerDialog.alert(content, title, 'success', onBtnClick);
-    };
+    }; 
     $.ligerDialog.error = function (content, title, onBtnClick)
     {
         return $.ligerDialog.alert(content, title, 'error', onBtnClick);
@@ -5375,11 +5502,11 @@
 
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 
@@ -5709,11 +5836,11 @@
     });
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -5763,7 +5890,10 @@
                 if (i == selectedIndex)
                     $("span", li).addClass("l-selected");
                 if ($(box).attr("title"))
+                {
                     $("span", li).html($(box).attr("title"));
+                    $(box).removeAttr("title");
+                }
                 g.tabs.ul.append(li);
                 if (!$(box).hasClass("l-easytab-panelbox")) $(box).addClass("l-easytab-panelbox");
             });
@@ -5789,11 +5919,11 @@
     });
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -6337,11 +6467,11 @@
     });
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -6361,6 +6491,7 @@
 
     $.ligerDefaults = $.ligerDefaults || {};
     $.ligerDefaults.Form = {
+        width: null,    // 表单的宽度
         //控件宽度
         inputWidth: 180,
         //标签宽度
@@ -6399,7 +6530,8 @@
         //验证
         validate: null,
         //不设置validate属性到inuput
-        unSetValidateAttr : false
+        unSetValidateAttr: false,
+        tab: null
     };
 
     $.ligerDefaults.FormString = {
@@ -6475,6 +6607,9 @@
         type: null,             //表单类型
         editor: null,           //编辑器扩展类型
         label: null,            //Label
+        hideSpace: true,
+        hideLabel: true,
+        rightToken: null,      // ： 
         newline: true,          //换行显示
         op: null,               //操作符 附加到input
         vt: null,               //值类型 附加到input
@@ -6572,7 +6707,7 @@
         _init: function ()
         {
             var g = this, p = this.options;
-            $.ligerui.controls.Form.base._init.call(this);
+            $.ligerui.controls.Form.base._init.call(this); 
             //编辑构造器初始化
             for (var type in liger.editors)
             {
@@ -6596,6 +6731,7 @@
                 p.editorBulider.call(g, $(this));
             });
             g.set(p);
+            g.initValidate();
             if (p.buttons)
             {
                 var jbuttons = $('<ul class="l-form-buttons"></ul>').appendTo(jform);
@@ -6628,6 +6764,11 @@
                 }
             });
         },
+        _setWidth: function (value)
+        {
+            var g = this, p = this.options;
+            if (value) g.form.width(value);
+        },
         getEditor: function (name)
         {
             var g = this, p = this.options;
@@ -6655,8 +6796,10 @@
             {
                 var name = field.name, textField = field.textField, editor = g.editors[fieldIndex];
                 if (!editor || !name) return;
-                var value = editor.editor.getValue(editor.control)
-                if (value)
+                var value = editor.editor.getValue(editor.control, {
+                    field: field
+                });
+                if (value != null && value !== "")
                 {
                     conditions.push({
                         op: field.operator || "like",
@@ -6668,11 +6811,11 @@
             });
             return conditions;
         },
-        //预处理字段 , 排序和分组
+        //预处理字段 , 处理分组
         _preSetFields: function (fields)
         {
             var g = this, p = this.options, lastVisitedGroup = null, lastVisitedGroupIcon = null;
-            //分组： 先填充没有设置分组的字段，然后按照分组排序
+            //分组： 先填充没有设置分组的字段
             $(p.fields).each(function (i, field)
             {
                 if (p.readonly || field.readonly || (field.editor && field.editor.readonly))
@@ -6686,8 +6829,7 @@
                     field.groupicon = lastVisitedGroupIcon;
                 }
                 if (field.group)
-                {
-                    //trim
+                { 
                     field.group = field.group.toString().replace(/^\s\s*/, '').replace(/\s\s*$/, '');
                     lastVisitedGroup = field.group;
                     lastVisitedGroupIcon = field.groupicon;
@@ -6711,18 +6853,26 @@
         {
             var g = this, p = this.options;
             if ($.isFunction(p.prefixID)) p.prefixID = p.prefixID(g);
-            g.validate = {};
-            var jform = $(this.element);
-            $(".l-form-container", jform).remove();
-            //自动创建表单
+            var jform = $(g.element).addClass("l-form");
+            g._initFieldsValidate({
+                fields: fields
+            }); 
+            g._initFieldsHtml({
+                panel: jform,
+                fields: fields
+            });
+            g._createEditors({ 
+                fields: fields
+            }); 
+            g.trigger('afterSetFields');
+        },
+        _initFieldsValidate : function(e)
+        {
+            var g = this, p = this.options;
+            var fields = e.fields;
+            g.validate = g.validate || {};
             if (fields && fields.length)
             {
-                g._preSetFields(fields);
-                if (!jform.hasClass("l-form"))
-                    jform.addClass("l-form");
-                var out = ['<div class="l-form-container">'];
-                var appendULStartTag = false, lastVisitedGroup = null;
-                var groups = [];
                 $(fields).each(function (index, field)
                 {
                     var name = field.name,
@@ -6737,8 +6887,27 @@
                             g.validate.messages = g.validate.messages || {};
                             g.validate.messages[txtInputName] = field.validateMessage;
                         }
-                    }
-
+                    } 
+                });
+            }
+        },
+        _initFieldsHtml : function(e)
+        {
+            var g = this, p = this.options;
+            var jform = e.panel,
+                fields = e.fields,
+                idPrev = e.idPrev || g.id;
+            $(">.l-form-container", jform).remove();
+            var lineWidth = 0, maxWidth = 0;
+            if (fields && fields.length)
+            {
+                g._preSetFields(fields); 
+                var out = ['<div class="l-form-container">'],
+                    appendULStartTag = false,
+                    lastVisitedGroup = null,
+                    groups = [];
+                $(fields).each(function (index, field)
+                { 
                     if ($.inArray(field.group, groups) == -1)
                         groups.push(field.group);
                 });
@@ -6754,13 +6923,14 @@
                         if (field.type == "hidden")
                         {
                             if (!$("#" + inputName).length)
-                                out.push('<div style="display:none" id="' + (g.id + "|" + i) + '"></div>');
+                                out.push('<div style="display:none" id="' + (idPrev + "|" + i) + '"></div>');
                             return;
                         }
                         var toAppendGroupRow = field.group && field.group != lastVisitedGroup;
                         if (index == 0 || toAppendGroupRow) newline = true;
                         if (newline)
                         {
+                            lineWidth = 0;
                             if (appendULStartTag)
                             {
                                 out.push('</ul>');
@@ -6788,14 +6958,23 @@
                         out.push('"');
                         out.push(' fieldindex=' + index);
                         out.push('><ul>');
-                        //append label
-                        out.push(g._buliderLabelContainer(field, index));
+                        if (!field.hideLabel)
+                        {
+                            out.push(g._buliderLabelContainer(field, index));
+                        }
                         //append input 
-                        out.push(g._buliderControlContainer(field, index));
+                        out.push(g._buliderControlContainer(field, index, e.idPrev));
                         //append space
-                        out.push(g._buliderSpaceContainer(field, index));
+                        if (!field.hideSpace)
+                        {
+                            out.push(g._buliderSpaceContainer(field, index));
+                        }
                         out.push('</ul></li>');
 
+                        lineWidth += (field.width || p.inputWidth || 0);
+                        lineWidth += (field.space || p.space || 0);
+                        lineWidth += (field.labelWidth || p.labelWidth || 0);
+                        if (lineWidth > maxWidth) maxWidth = lineWidth;
                     });
                 });
                 if (appendULStartTag)
@@ -6805,80 +6984,120 @@
                 }
                 out.push('</div>');
                 jform.append(out.join(''));
-
+                if (!p.width || maxWidth > p.width)
+                {
+                    //jform.width(maxWidth + 10);
+                }
                 $(".l-group .togglebtn", jform).remove();
                 $(".l-group", jform).width(jform.width() * 0.95).append("<div class='togglebtn'></div>");
             }
-            (function ()
+        },
+        _createEditors : function(e)
+        {
+            var g = this, p = this.options;
+            var fields = e.fields,
+                idPrev = e.idPrev || g.id,
+                editPrev = e.editPrev || "";
+            g.editors = g.editors || {}; 
+            $(fields).each(function (fieldIndex, field)
             {
-                g.editors = g.editors || {};
-                $(fields).each(function (fieldIndex, field)
+                var container = document.getElementById(idPrev + "|" + fieldIndex),
+                    editor = p.editors[field.type],
+                    editId = editPrev + fieldIndex;
+                if (!container) return;
+                container = $(container);
+                var editorControl = g._createEditor(editor, container, {
+                    field: field
+                }, container.width(), container.height());  
+                if (!editorControl) return;
+                if (g.editors[editId] && g.editors[editId].control && g.editors[editId].control.destroy)
                 {
-                    var container = document.getElementById(g.id + "|" + fieldIndex), editor = p.editors[field.type];
-                    if (!container) return;
-                    container = $(container);
-                    var editorControl = g._createEditor(editor, container, {
-                        field: field
-                    }, container.width(), container.height());
-                    if (g.editors[fieldIndex] && g.editors[fieldIndex].control && g.editors[fieldIndex].control.destroy)
-                    {
-                        g.editors[fieldIndex].control.destroy();
-                    }
-                    g.editors[fieldIndex] = {
-                        control: editorControl,
-                        editor: editor
-                    };
-                });
-                g.initValidate();
-                g.trigger('afterSetFields');
-            })();
-            //}).ligerDefer(g, 10);
+                    g.editors[editId].control.destroy();
+                }
+                g.editors[editId] = {
+                    control: editorControl,
+                    editor: editor
+                };
+            }); 
         },
         getData: function ()
         {
             var g = this, p = this.options;
-            g.data = g.data || {};
-            $(p.fields).each(function (fieldIndex, field)
+            g.data = {};
+            getFieldValueToData(p.fields);
+            if (p.tab && p.tab.items)
+            { 
+                for (var i = 0; i < p.tab.items.length; i++)
+                {
+                    var item = p.tab.items[i];
+                    getFieldValueToData(item.fields, i);
+                }
+            }
+            function getFieldValueToData(fields, tabIndex)
             {
-                var name = field.name, textField = field.textField, editor = g.editors[fieldIndex];
-                if (!editor) return;
-                if (name)
+                $(fields).each(function (fieldIndex, field)
                 {
-                    var value = editor.editor.getValue(editor.control)
-                    g._setValueByName(g.data, name, value);
-                }
-                if (textField)
-                {
-                    var value = editor.editor.getText(editor.control)
-                    g._setValueByName(g.data, textField, value);
-                }
-            });
+                    var name = field.name,
+                        textField = field.textField,
+                        editPrev = tabIndex == null ? "" : "tab" + tabIndex + "_",
+                        editor = g.editors[editPrev + fieldIndex];
+                    if (!editor) return;
+                    if (name)
+                    {
+                        var value = editor.editor.getValue(editor.control, {
+                            field: field
+                        });
+                        g._setValueByName(g.data, name, value);
+                    }
+                    if (textField)
+                    {
+                        var value = editor.editor.getText(editor.control, {
+                            field: field
+                        });
+                        g._setValueByName(g.data, textField, value);
+                    }
+                });
+            }
             return g.data;
         },
         setData: function (data)
         {
-            var g = this, p = this.options;
-            var fields = g.get('fields');
+            var g = this, p = this.options; 
             g.data = data || {};
-            (function ()
+            setDataToFields(p.fields);
+            if (p.tab && p.tab.items)
+            {
+                for (var i = 0; i < p.tab.items.length; i++)
+                {
+                    var item = p.tab.items[i];
+                    setDataToFields(item.fields, i);
+                }
+            }
+            function setDataToFields(fields, tabIndex)
             {
                 $(fields).each(function (fieldIndex, field)
                 {
-                    var name = field.name, textField = field.textField, editor = g.editors[fieldIndex];
+                    var name = field.name,
+                        textField = field.textField,
+                        editPrev = tabIndex == null ? "" : "tab" + tabIndex + "_",
+                        editor = g.editors[editPrev + fieldIndex];
                     if (!editor) return;
                     if (name && (name in g.data))
                     {
                         var value = g._getValueByName(g.data, name);
-                        editor.editor.setValue(editor.control, value);
+                        editor.editor.setValue(editor.control, value, {
+                            field: field
+                        });
                     }
                     if (textField && (textField in g.data))
                     {
                         var text = g._getValueByName(g.data, textField);
-                        editor.editor.setText(editor.control, text);
+                        editor.editor.setText(editor.control, text, {
+                            field: field
+                        });
                     }
                 });
-            })();
-            //}).ligerDefer(g, 20);
+            }
         },
         _setValueByName: function (data, name, value)
         {
@@ -6921,7 +7140,7 @@
         valid: function ()
         {
             var g = this, p = this.options;
-            if (!g.form || !g.validator) return;
+            if (!g.form || !g.validator) return true;
             return g.form.valid();
         },
         //设置验证
@@ -6936,7 +7155,7 @@
             var validate = p.validate == true ? {} : p.validate;
             var validateOptions = $.extend({
                 errorPlacement: function (lable, element)
-                {
+                { 
                     if (!element.attr("id"))
                         element.attr("id", new Date().getTime());
                     if (element.hasClass("l-textarea"))
@@ -6958,7 +7177,6 @@
                 {
                     if (!lable.attr("for")) return;
                     var element = $("#" + lable.attr("for"));
-
                     if (element.hasClass("l-textarea"))
                     {
                         element.removeClass("l-textarea-invalid");
@@ -6976,8 +7194,8 @@
             g.validator = g.form.validate(validateOptions);
         },
         //提示 验证错误信息
-        showInvalid: function (validator)
-        {
+        showInvalid: function ()
+        { 
             var g = this, p = this.options;
             if (!g.validator) return;
             var jmessage = $('<div><div class="invalid">' + p.invalidMessage.replace('{errorCount}', g.validator.errorList.length) + '<a class="viewInvalidDetail" href="javascript:void(0)">' + p.detailMessage + '</a></div><div class="invalidDetail" style="display:none;">' + getInvalidInf(g.validator.errorList) + '</div></div>');
@@ -7005,10 +7223,16 @@
         _createEditor: function (editorBuilder, container, editParm, width, height)
         {
             var g = this, p = this.options;
-            var editor = editorBuilder.create.call(this, container, editParm, p);
-            if (editor && editorBuilder.resize)
-                editorBuilder.resize.call(this, editor, width, height, editParm);
-            return editor;
+            try
+            { 
+                var editor = editorBuilder.create.call(this, container, editParm, p);
+                if (editor && editorBuilder.resize)
+                    editorBuilder.resize.call(this, editor, width, height, editParm);
+                return editor;
+            } catch (e)
+            {
+                return null;
+            }
         },
         //标签部分
         _buliderLabelContainer: function (field)
@@ -7017,7 +7241,7 @@
             var label = field.label || field.display;
             var labelWidth = field.labelWidth || field.labelwidth || p.labelWidth;
             var labelAlign = field.labelAlign || p.labelAlign;
-            if (label) label += p.rightToken;
+            if (label) label += field.rightToken || p.rightToken;
             var out = [];
             out.push('<li');
             if (p.labelCss)
@@ -7025,7 +7249,11 @@
                 out.push(' class="' + p.labelCss + '"');
             }
             out.push(' style="');
-            if (labelWidth)
+            if (/px$/i.test(labelWidth) || /auto/i.test(labelWidth) || /%$/i.test(labelWidth))
+            {
+                out.push('width:' + labelWidth + ';');
+            }
+            else if (labelWidth)
             {
                 out.push('width:' + labelWidth + 'px;');
             }
@@ -7043,14 +7271,15 @@
             return out.join('');
         },
         //控件部分
-        _buliderControlContainer: function (field, fieldIndex)
+        _buliderControlContainer: function (field, fieldIndex,idPrev)
         {
             var g = this, p = this.options;
-            var width = field.width || p.inputWidth;
-            var align = field.align || field.textAlign || field.textalign || p.align;
-            var out = [];
+            var width = field.width || p.inputWidth,
+                align = field.align || field.textAlign || field.textalign || p.align,
+                out = [],
+                idPrev = idPrev || g.id;
             out.push('<li');
-            out.push(' id="' + (g.id + "|" + fieldIndex) + '"');
+            out.push(' id="' + (idPrev + "|" + fieldIndex) + '"');
             if (p.fieldCss)
             {
                 out.push(' class="' + p.fieldCss + '"');
@@ -7064,8 +7293,7 @@
             {
                 out.push('text-align:' + align + ';');
             }
-            out.push('">');
-            //out.push(g._buliderControl(field, fieldIndex));
+            out.push('">'); 
             out.push('</li>');
             return out.join('');
         },
@@ -7074,6 +7302,7 @@
         {
             var g = this, p = this.options;
             var spaceWidth = field.space || field.spaceWidth || p.space;
+            if (field.space === 0 || field.spaceWidth === 0) spaceWidth = 0;
             var out = [];
             out.push('<li');
             if (p.spaceCss)
@@ -7081,6 +7310,10 @@
                 out.push(' class="' + p.spaceCss + '"');
             }
             out.push(' style="');
+            if (/px$/i.test(spaceWidth) || /auto/i.test(spaceWidth) || /%$/i.test(spaceWidth))
+            {
+                out.push('width:' + spaceWidth + ';');
+            }
             if (spaceWidth)
             {
                 out.push('width:' + spaceWidth + 'px;');
@@ -7092,51 +7325,7 @@
             }
             out.push('</li>');
             return out.join('');
-        },
-        _buliderControl: function (field, fieldIndex)
-        {
-            var g = this, p = this.options;
-            var width = field.width || p.inputWidth,
-            name = field.name || field.id,
-            type = (field.type || "text").toLowerCase(),
-            readonly = (field.readonly || (field.editor && field.editor.readonly)) ? true : false;
-            var out = [];
-            if (type == "textarea" || type == "htmleditor")
-            {
-                out.push('<textarea ');
-            }
-            else if ($.inArray(type, ["checkbox", "radio", "password", "file"]) != -1)
-            {
-                out.push('<input type="' + type + '" ');
-            }
-            else if ($.inArray(type, ["select", "combobox", "autocomplete", "popup", "radiolist", "checkboxlist", "listbox"]) != -1)
-            {
-                out.push('<input type="hidden" ');
-            }
-            else
-            {
-                out.push('<input type="text" ');
-            }
-            out.push('name="' + name + '" ');
-            out.push('fieldindex="' + fieldIndex + '" ');
-            field.cssClass && out.push('class="' + field.cssClass + '" ');
-            p.appendID && out.push(' id="' + name + '" ');
-            out.push(g._getInputAttrHtml(field));
-            if (field.validate && !readonly)
-            {
-                out.push(" validate='" + p.toJSON(field.validate) + "' ");
-                g.validate = g.validate || {};
-                g.validate.rules = g.validate.rules || {};
-                g.validate.rules[name] = field.validate;
-                if (field.validateMessage)
-                {
-                    g.validate.messages = g.validate.messages || {};
-                    g.validate.messages[name] = field.validateMessage;
-                }
-            }
-            out.push(' />');
-            return out.join('');
-        },
+        }, 
         _getInputAttrHtml: function (field)
         {
             var out = [], type = (field.type || "text").toLowerCase();
@@ -7156,6 +7345,59 @@
                 }
             }
             return out.join('');
+        },
+        _setTab: function (tab)
+        {
+            var g = this, p = this.options;
+            if (!tab || !tab.items) return;
+            var jtab = $('<div class="l-form-tabs"></div>').appendTo(g.element);
+            var jtabNav = $('<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" original-title="">').appendTo(jtab);
+            for (var i = 0; i < tab.items.length; i++)
+            {
+                var tabItem = tab.items[i],
+                    jnavItem = $('<li class="ui-state-default ui-corner-top"><a href="javascript:void(0)"></a></li>').appendTo(jtabNav),
+                    jcontentItem = $('<div class="ui-tabs-panel ui-widget-content ui-corner-bottom">').appendTo(jtab),
+                    idPrev = g.id +"|tdb" + i;
+                jnavItem.add(jcontentItem).attr("data-index", i);
+                jnavItem.find("a:first").text(tabItem.title); 
+                g._initFieldsValidate({
+                    fields: tabItem.fields
+                });
+                g._initFieldsHtml({
+                    panel: jcontentItem,
+                    fields: tabItem.fields,
+                    idPrev: idPrev
+                }); 
+                g._createEditors({
+                    fields: tabItem.fields,
+                    idPrev: idPrev,
+                    editPrev: 'tab' + i + "_"
+                });
+            }
+            jtabNav.find("li").hover(function ()
+            {
+                $(this).addClass("ui-state-active");
+            }, function ()
+            {
+                $(this).removeClass("ui-state-active");
+            }).click(function ()
+            {
+                var index = $(this).attr("data-index");
+                g.selectTab(index);
+            }); 
+            g.selectTab(0);
+        },
+        selectTab : function (index)
+        {
+            var g = this, p = this.options;
+            var jtab = $(g.element).find(".l-form-tabs:first");
+            var links = jtab.find(".ui-tabs-nav li"), contents = jtab.find(".ui-tabs-panel");
+            links.filter("[data-index=" + index + "]")
+                .addClass("ui-tabs-selected ui-state-active ui-state-hover");
+            links.filter("[data-index!=" + index + "]")
+                .removeClass("ui-tabs-selected ui-state-active ui-state-hover"); 
+            contents.filter("[data-index=" + index + "]").show();
+            contents.filter("[data-index!=" + index + "]").hide();
         }
     });
 
@@ -7173,11 +7415,11 @@
     }
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 
@@ -7222,7 +7464,7 @@
         dateFormat: 'yyyy-MM-dd',              //默认时间显示格式
         inWindow: true,                        //是否以窗口的高度为准 height设置为百分比时可用
         statusName: '__status',                    //状态名
-        method: 'post',                         //提交方式
+        method: 'post',                         //获取数据http方式
         async: true,
         fixedCellHeight: true,                       //是否固定单元格的高度
         heightDiff: 0,                         //高度补差,当设置height:100%时，可能会有高度的误差，可以通过这个属性调整
@@ -7270,11 +7512,12 @@
         rowDraggingRender: null,
         autoCheckChildren: true,                  //是否自动选中子节点
         onRowDragDrop: null,                    //行拖拽事件
-        rowHeight: 22,                           //行默认的高度
-        headerRowHeight: 23,                    //表头行的高度
+        rowHeight: 28,                           //行默认的高度
+        headerRowHeight: 28,                    //表头行的高度
         toolbar: null,                           //工具条,参数同 ligerToolbar的,额外参数有title、icon
         toolbarShowInLeft: true,               //工具条显示在左边
         headerImg: null,                        //表格头部图标  
+        editorTopDiff : 0,                      //编辑器top误差
         unSetValidateAttr: true,             //是否不设置validate属性到inuput
         onDragCol: null,                       //拖动列事件
         onToggleCol: null,                     //切换列事件
@@ -7308,6 +7551,10 @@
         onRowDragDrop: null,                       //行拖拽后事件
         onGroupExtend: null,                        //分组展开事件
         onGroupCollapse: null,                     //分组收缩事件
+        onTreeExpand: null,                        //树展开事件
+        onTreeCollapse: null,                     //树收缩事件
+        onTreeExpanded: null,                        //树展开事件
+        onTreeCollapsed: null,                     //树收缩事件
         onLoadData: null                       //加载数据前事件
     };
     $.ligerDefaults.GridString = {
@@ -7705,7 +7952,8 @@
             var g = this;
             var inner = g.gridbody.find(".l-grid-body-inner:first");
             if (!inner.length) return false;
-            return g.gridbody.width() < inner.width();
+            //20为横向滚动条的宽度
+            return g.gridbody.width() - 20 < inner.width();
         },
         _setHeight: function (h)
         {
@@ -7736,9 +7984,9 @@
             if (typeof h == "string" && h.indexOf('%') > 0)
             {
                 if (p.inWindow)
-                    h = $(window).height() * parseFloat(h) * 0.01;
+                    h = $(window).height() * parseInt(h) * 0.01;
                 else
-                    h = g.grid.parent().height() * parseFloat(h) * 0.01;
+                    h = g.grid.parent().height() * parseInt(h) * 0.01;
             }
             if (p.title) h -= 24;
             if (p.usePager) h -= 32;
@@ -7978,7 +8226,7 @@
                     //保存缓存数据-记录总数
                     if (g.data[p.record] != null && g.cacheData.records)
                     {
-                        g.cacheData.records  = g.data[p.record];
+                        g.cacheData.records = g.data[p.record];
                     }
                     if (p.dataAction == "server") //服务器处理好分页排序数据
                     {
@@ -9418,6 +9666,30 @@
             }
             rowdata['__hasChildren'] = false;
         },
+
+        collapseAll: function ()
+        {
+            var g = this, p = this.options;
+            $(g.rows).each(function (rowIndex, rowParm)
+            {
+                var targetRowObj = g.getRowObj(rowParm);
+                var linkbtn = $(".l-grid-tree-link", targetRowObj);
+                if (linkbtn.hasClass("l-grid-tree-link-close")) return;
+                g.toggle(rowParm);
+            });
+        },
+        expandAll: function ()
+        {
+            var g = this, p = this.options;
+            $(g.rows).each(function (rowIndex, rowParm)
+            {
+                var targetRowObj = g.getRowObj(rowParm);
+                var linkbtn = $(".l-grid-tree-link", targetRowObj);
+                if (linkbtn.hasClass("l-grid-tree-link-open")) return;
+                g.toggle(rowParm);
+            });
+        },
+
         collapse: function (rowParm)
         {
             var g = this, p = this.options;
@@ -9447,12 +9719,14 @@
             g.collapsedRows = g.collapsedRows || [];
             if (linkbtn.hasClass("l-grid-tree-link-close")) //收缩
             {
+                if (g.hasBind('treeExpand') && g.trigger('treeExpand', [rowdata]) == false) return false;
                 linkbtn.removeClass("l-grid-tree-link-close").addClass("l-grid-tree-link-open");
                 indexInCollapsedRows = $.inArray(rowdata, g.collapsedRows);
                 if (indexInCollapsedRows != -1) g.collapsedRows.splice(indexInCollapsedRows, 1);
             }
             else //折叠
             {
+                if (g.hasBind('treeCollapse') && g.trigger('treeCollapse', [rowdata]) == false) return false;
                 opening = false;
                 linkbtn.addClass("l-grid-tree-link-close").removeClass("l-grid-tree-link-open");
                 indexInCollapsedRows = $.inArray(rowdata, g.collapsedRows);
@@ -9475,6 +9749,7 @@
                     currentRow.hide();
                 }
             }
+            g.trigger(opening ? 'treeExpanded' : 'treeCollapsed', [rowdata]);
         },
         _bulid: function ()
         {
@@ -9650,9 +9925,9 @@
                     var colwidth = col.width || p.columnWidth;
                     var isAuto = (!colwidth || colwidth == "auto") ? true : false;
                     if (isAuto) autoColumnNumber++;
-                    else noAutoColumnWidth += (parseFloat(g._getColumnWidth(col)) + 1);
+                    else noAutoColumnWidth += (parseInt(g._getColumnWidth(col)) + 1);
                 });
-                colwidth = parseFloat((g.grid.width() - noAutoColumnWidth) / autoColumnNumber) - 1;
+                colwidth = parseInt((g.grid.width() - noAutoColumnWidth) / autoColumnNumber) - 1;
             }
             if (typeof (colwidth) == "string" && colwidth.indexOf('%') > 0)
             {
@@ -9987,6 +10262,7 @@
                 gridhtmlarr.push(g._getHtmlFromData(data, frozen));
             }
             gridhtmlarr.push('</tbody></table></div>');
+            if (frozen) gridhtmlarr.push('<div class="l-jplace"></div>');
             (frozen ? g.f.gridbody : g.gridbody).html(gridhtmlarr.join(''));
             //分组时不需要            
             if (!g.enabledGroup())
@@ -10356,9 +10632,9 @@
                     top = pc.top + pb.top + pv.top + topbarHeight;
 
                 jcell.html("");
-                g.setCellEditing(rowdata, column, true);
+                g.setCellEditing(rowdata, column, true); 
                 container
-                    .css({ left: left, top: $.browser.safari ? top + 2 : top + 1 })
+                    .css({ left: left, top: ($.browser.safari ? top : top - 1) + p.editorTopDiff })
                     .show();
                 if (column.textField) editParm.text = g._getValueByName(rowdata, column.textField);
                 var editorInput = g._createEditor(editor, container, editParm, width, height - 1);
@@ -10367,24 +10643,27 @@
                 g.bind('sysEndEdit', function ()
                 {
                     var newValue = editor.getValue(editorInput, editParm);
+                    if (column.textField && editor.getText)
+                    {
+                        editParm.text = editor.getText(editorInput, editParm);
+                    }
+                    if (editor.getSelected)
+                    {
+                        editParm.selected = editor.getSelected(editorInput, editParm);
+                    }
                     if (newValue != currentdata)
                     {
                         $(rowcell).addClass("l-grid-row-cell-edited");
                         g.changedCells[rowid + "_" + column['__id']] = true;
-                        editParm.value = newValue;
-                        if (column.textField && editor.getText)
+                        if (column.textField != column.name) //如果textField跟name一样，那么获取text就可以
                         {
-                            editParm.text = editor.getText(editorInput, editParm);
+                            editParm.value = newValue;
                         }
-                        if (editor.getSelected)
-                        {
-                            editParm.selected = editor.getSelected(editorInput, editParm);
-                        }
-                        if (column.editor.onChange) column.editor.onChange(editParm);
-                        if (g._checkEditAndUpdateCell(editParm))
-                        {
-                            if (column.editor.onChanged) column.editor.onChanged(editParm);
-                        }
+                    }
+                    if (column.editor.onChange) column.editor.onChange(editParm);
+                    if (g._checkEditAndUpdateCell(editParm))
+                    {
+                        if (column.editor.onChanged) column.editor.onChanged(editParm);
                     }
                 });
             }
@@ -10754,7 +11033,6 @@
                     g.gridheader[0].scrollLeft = scrollLeft;
                 if (scrollTop != null)
                     g.f.gridbody[0].scrollTop = scrollTop;
-                g.endEdit();
                 g.trigger('SysGridHeightChanged');
             });
             //工具条 - 切换每页记录数事件
@@ -10764,7 +11042,7 @@
                     return false;
                 p.newPage = 1;
                 p.pageSize = this.value;
-                g.loadData(p.where);
+                g.loadData(p.dataAction != "local" ? p.where : false);
             });
             //工具条 - 切换当前页事件
             $('span.pcontrol :text', g.toolbar).blur(function (e)
@@ -11544,7 +11822,7 @@
                     {
                         parentHeight = gridparent.height();
                     }
-                    h = parentHeight * parseFloat(p.height) * 0.01;
+                    h = parentHeight * parseInt(p.height) * 0.01;
                     if (p.inWindow || gridparent[0].tagName.toLowerCase() == "body")
                         h -= (g.grid.offset().top - parseInt($('body').css('paddingTop')));
                 }
@@ -11598,11 +11876,11 @@
         }
     }
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -11624,7 +11902,9 @@
         leftWidth: 110,
         centerWidth: 300,
         rightWidth: 170,
-        InWindow: true,     //是否以窗口的高度为准 height设置为百分比时可用
+        centerBottomHeight: 100,
+        allowCenterBottomResize: true, 
+        inWindow: true,     //是否以窗口的高度为准 height设置为百分比时可用
         heightDiff: 0,     //高度补差
         height: '100%',      //高度
         onHeightChanged: null,
@@ -11639,13 +11919,13 @@
         space: 3, //间隔 
         onEndResize: null,          //调整大小结束事件
         minLeftWidth: 80,            //调整左侧宽度时的最小允许宽度
-        minRightWidth: 80           //调整右侧宽度时的最小允许宽度
+        minRightWidth: 80           //调整右侧宽度时的最小允许宽度 
     };
 
     $.ligerMethos.Layout = {};
 
     $.ligerui.controls.Layout = function (element, options)
-    {
+    { 
         $.ligerui.controls.Layout.base.constructor.call(this, element, options);
     };
     $.ligerui.controls.Layout.ligerExtend($.ligerui.core.UIComponent, {
@@ -11660,6 +11940,13 @@
         _extendMethods: function ()
         {
             return $.ligerMethos.Layout;
+        },
+        _init: function()
+        {
+            $.ligerui.controls.Layout.base._init.call(this);
+
+            var g = this, p = this.options;
+            if (p.InWindow != null && p.inWindow == null) p.inWindow = p.InWindow; //旧版本命名错误纠正
         },
         _render: function ()
         {
@@ -11721,6 +12008,12 @@
                     g.left.content.attr("title", "");
                     $(".l-layout-header-inner", g.left.header).html(lefttitle);
                 }
+                //set title 
+                if (g.left.content.attr("hidetitle"))
+                {
+                    g.left.content.attr("title", "");
+                    g.left.header.remove();
+                }
                 //set width
                 g.leftWidth = p.leftWidth;
                 if (g.leftWidth)
@@ -11741,11 +12034,43 @@
                     g.center.prepend(g.center.header);
                     g.center.header.html(centertitle);
                 }
+                if (g.center.content.attr("hidetitle"))
+                {
+                    g.center.content.attr("title", "");
+                    g.center.header.remove();
+                }
                 //set width
                 g.centerWidth = p.centerWidth;
                 if (g.centerWidth)
-                    g.center.width(g.centerWidth);
-            }
+                    g.center.width(g.centerWidth); 
+
+                //centerBottom
+                if ($("> div[position=centerbottom]", g.layout).length > 0)
+                {
+                    g.centerBottom = $("> div[position=centerbottom]", g.layout).wrap('<div class="l-layout-centerbottom" ></div>').parent();
+                    g.centerBottom.content = $("> div[position=centerbottom]", g.centerBottom);
+                    g.centerBottom.content.addClass("l-layout-content");
+                    //set title
+                    var centertitle = g.centerBottom.content.attr("title");
+                    if (centertitle)
+                    {
+                        g.centerBottom.content.attr("title", "");
+                        g.centerBottom.header = $('<div class="l-layout-header"></div>');
+                        g.centerBottom.prepend(g.centerBottom.header);
+                        g.centerBottom.header.html(centertitle);
+                    }
+                    if (g.centerBottom.content.attr("hidetitle"))
+                    {
+                        g.centerBottom.content.attr("title", "");
+                        if (g.centerBottom.header)
+                        {
+                            g.centerBottom.header.remove();
+                        }
+                    }
+                    if (g.centerWidth)
+                        g.centerBottom.width(g.centerWidth);
+                }
+            } 
             //right
             if ($("> div[position=right]", g.layout).length > 0)
             {
@@ -11765,6 +12090,11 @@
                 {
                     g.right.content.attr("title", "");
                     $(".l-layout-header-inner", g.right.header).html(righttitle);
+                }
+                if (g.right.content.attr("hidetitle"))
+                {
+                    g.right.content.attr("title", "");
+                    g.right.header.remove();
                 }
                 //set width
                 g.rightWidth = p.rightWidth;
@@ -11981,6 +12311,16 @@
                     g._start('bottomresize', e);
                 });
             }
+            if (g.centerBottom && p.allowCenterBottomResize)
+            {
+                g.centerBottomDropHandle = $("<div class='l-layout-drophandle-centerbottom'></div>");
+                g.layout.append(g.centerBottomDropHandle);
+                g.centerBottomDropHandle.show();
+                g.centerBottomDropHandle.mousedown(function (e)
+                {
+                    g._start('centerbottomresize', e);
+                });
+            }
             g.draggingxline = $("<div class='l-layout-dragging-xline'></div>");
             g.draggingyline = $("<div class='l-layout-dragging-yline'></div>");
             g.mask = $("<div class='l-dragging-mask'></div>");
@@ -12005,11 +12345,19 @@
             {
                 g.bottomDropHandle.css({ top: parseInt(g.bottom.css('top')) - p.space, width: g.bottom.width() });
             }
+            if (g.centerBottomDropHandle)
+            {
+                g.centerBottomDropHandle.css({
+                    top: parseInt(g.centerBottom.css('top')) - p.space,
+                    left: parseInt(g.center.css('left')),
+                    width: g.center.width()
+                });
+            }
         },
         _onResize: function ()
         { 
             var g = this, p = this.options;
-            var oldheight = g.layout.height();
+            var oldheight = g.layout.height(); 
             //set layout height 
             var h = 0;
             var windowHeight = $(window).height();
@@ -12017,7 +12365,7 @@
             if (typeof (p.height) == "string" && p.height.indexOf('%') > 0)
             {
                 var layoutparent = g.layout.parent();
-                if (p.InWindow || layoutparent[0].tagName.toLowerCase() == "body")
+                if (p.inWindow || layoutparent[0].tagName.toLowerCase() == "body")
                 {
                     parentHeight = windowHeight;
                     parentHeight -= parseInt($('body').css('paddingTop'));
@@ -12028,7 +12376,7 @@
                     parentHeight = layoutparent.height();
                 }
                 h = parentHeight * parseFloat(p.height) * 0.01;
-                if (p.InWindow || layoutparent[0].tagName.toLowerCase() == "body")
+                if (p.inWindow || layoutparent[0].tagName.toLowerCase() == "body")
                     h -= (g.layout.offset().top - parseInt($('body').css('paddingTop')));
             }
             else
@@ -12122,11 +12470,13 @@
                     }
                 }
                 g.center.css({ left: g.centerLeft });
-                g.center.width(g.centerWidth);
-                g.center.height(g.middleHeight);
+                g.centerWidth >= 0 && g.center.width(g.centerWidth);
+                g.middleHeight >= 0 && g.center.height(g.middleHeight);
                 var contentHeight = g.middleHeight;
                 if (g.center.header) contentHeight -= g.center.header.height();
-                g.center.content.height(contentHeight);
+                contentHeight >= 0 && g.center.content.height(contentHeight);
+                 
+                g._updateCenterBottom(true);
             }
             if (g.left)
             {
@@ -12175,6 +12525,26 @@
             g._setDropHandlePosition();
 
         },
+        //加了centerBottom以后，需要对centerBottom进行刷新处理一下
+        _updateCenterBottom: function (isHeightResize)
+        {
+            var g = this, p = this.options;
+            if (g.centerBottom)
+            {
+                if (isHeightResize)
+                {
+                    var centerBottomHeight = g.centerBottomHeight || p.centerBottomHeight;
+                    g.centerBottom.css({ left: g.centerLeft });
+                    g.centerWidth >= 0 && g.centerBottom.width(g.centerWidth);
+                    var centerHeight = g.center.height(), centerTop = parseInt(g.center.css("top"));
+                    g.centerBottom.height(centerBottomHeight)
+                    g.centerBottom.css({ top: centerTop + centerHeight - centerBottomHeight + 2 });
+                    g.center.height(centerHeight - centerBottomHeight - 2);
+                }
+                var centerLeft = parseInt(g.center.css("left"));
+                g.centerBottom.width(g.center.width()).css({ left: centerLeft });
+            }
+        },
         _start: function (dragtype, e)
         {
             var g = this, p = this.options;
@@ -12191,6 +12561,13 @@
                 g.yresize = { startY: e.pageY };
                 g.draggingxline.css({ top: e.pageY - g.layout.offset().top, width: g.layout.width() }).show();
                 $('body').css('cursor', 'row-resize'); 
+                g.mask.height(g.layout.height()).removeClass("l-layout-xmask").addClass("l-layout-ymask").show();
+            }
+            else if (dragtype == 'centerbottomresize')
+            {
+                g.yresize = { startY: e.pageY };
+                g.draggingxline.css({ top: e.pageY - g.layout.offset().top, width: g.layout.width() }).show();
+                $('body').css('cursor', 'row-resize');
                 g.mask.height(g.layout.height()).removeClass("l-layout-xmask").addClass("l-layout-ymask").show();
             }
             else
@@ -12246,7 +12623,7 @@
                     if (g.center)
                         g.center.width(g.center.width() - g.xresize.diff).css({ left: parseInt(g.center.css('left')) + g.xresize.diff });
                     else if (g.right)
-                        g.right.width(g.left.width() - g.xresize.diff).css({ left: parseInt(g.right.css('left')) + g.xresize.diff });
+                        g.right.width(g.left.width() - g.xresize.diff).css({ left: parseInt(g.right.css('left')) + g.xresize.diff }); 
                 }
                 else if (g.dragtype == 'rightresize')
                 {
@@ -12262,6 +12639,7 @@
                     else if (g.left)
                         g.left.width(g.left.width() + g.xresize.diff);
                 }
+                g._updateCenterBottom();
             }
             else if (g.yresize && g.yresize.diff != undefined)
             {
@@ -12282,6 +12660,7 @@
                         g.right.css({ top: g.middleTop }).height(g.middleHeight);
                         g.rightCollapse.css({ top: g.middleTop }).height(g.middleHeight);
                     }
+                    g._updateCenterBottom(true);
                 }
                 else if (g.dragtype == 'bottomresize')
                 {
@@ -12300,6 +12679,16 @@
                         g.right.height(g.middleHeight);
                         g.rightCollapse.height(g.middleHeight);
                     }
+                    g._updateCenterBottom(true);
+                }
+                else if (g.dragtype == 'centerbottomresize')
+                {
+                    g.centerBottomHeight = g.centerBottomHeight || p.centerBottomHeight;
+                    g.centerBottomHeight -= g.yresize.diff; 
+                    var centerBottomTop = parseInt(g.centerBottom.css("top"));
+                    g.centerBottom.css("top" , centerBottomTop + g.yresize.diff);
+                    g.centerBottom.height(g.centerBottom.height() - g.yresize.diff);    
+                    g.center.height(g.center.height() + g.yresize.diff); 
                 }
             }
             g.trigger('endResize', [{
@@ -12322,11 +12711,11 @@
     });
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -12559,7 +12948,7 @@
         }, 
         getSelectedItems: function()
         {
-            var g = this, p = this.options;
+            var g = this, p = this.options; 
             if (!g.data) return null;
             var value = g.getValue();
             if (!value) return null;
@@ -12804,11 +13193,11 @@
       
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -12926,6 +13315,11 @@
         {
             var g = this, p = this.options;
             $("> .l-menu-item[menuitemid=" + itemid + "]", g.menu.items).removeClass("l-menu-item-disable");
+        },
+        setMenuText : function(itemid,text)
+        {
+            var g = this, p = this.options;
+            $("> .l-menu-item[menuitemid=" + itemid + "] >.l-menu-item-text:first", g.menu.items).html(text);
         },
         setDisabled: function (itemid)
         {
@@ -13065,11 +13459,11 @@
 
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -13163,11 +13557,11 @@
     });
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -13398,11 +13792,271 @@
 
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
+* 
+*/
+(function ($)
+{
+
+    $.fn.ligerPanel = function (options)
+    {
+        return $.ligerui.run.call(this, "ligerPanel", arguments);
+    };
+
+    $.ligerDefaults.Panel = {
+        width: 400,
+        height : 300,
+        title: 'Panel',
+        content: null,      //内容
+        url: null,          //远程内容Url
+        frameName: null,     //创建iframe时 作为iframe的name和id 
+        data: null,          //可用于传递到iframe的数据
+        showClose: false,    //是否显示关闭按钮
+        showToggle: true,    //是否显示收缩按钮 
+        icon: null,          //左侧按钮
+        onClose:null,       //关闭前事件
+        onClosed:null,      //关闭事件
+        onLoaded:null           //url模式 加载完事件
+    };
+
+    $.ligerMethos.Panel = {};
+
+    $.ligerui.controls.Panel = function (element, options)
+    {
+        $.ligerui.controls.Panel.base.constructor.call(this, element, options);
+    };
+    $.ligerui.controls.Panel.ligerExtend($.ligerui.core.UIComponent, {
+        __getType: function ()
+        {
+            return 'Panel';
+        },
+        __idPrev: function ()
+        {
+            return 'Panel';
+        },
+        _extendMethods: function ()
+        {
+            return $.ligerMethos.Panel;
+        },
+        _init: function ()
+        {
+            var g = this, p = this.options;
+            $.ligerui.controls.Panel.base._init.call(this);
+            p.content = p.content || $(g.element).html(); 
+        },
+        _render: function ()
+        {
+            var g = this, p = this.options; 
+            g.panel = $(g.element).addClass("l-panel").html("");
+            g.panel.append('<div class="l-panel-header"><span></span><div class="icons"></div></div><div class="l-panel-content"></div>');
+             
+            g.set(p);
+ 
+            g.panel.bind("click.panel", function (e)
+            { 
+                var obj = (e.target || e.srcElement), jobj = $(obj);
+                if (jobj.hasClass("l-panel-header-toggle"))
+                {
+                    g.toggle();
+                } else if (jobj.hasClass("l-panel-header-close"))
+                {
+                    g.close();
+                }
+            });
+        },
+        _setChildren: function(children)
+        {
+            var g = this, p = this.options;
+            var tagNames = {
+                input : ["textbox", "combobox", "select"] 
+            };
+            var PluginNameMatchs  = 
+            {
+                "grid" : "ligerGrid",
+                "toolbar":"ligerToolBar",
+                "tree":"ligerTree",
+                "form":"ligerForm",
+                "menu":"ligerMenu",
+                "menubar":"ligerMenuBar",
+                "portal":"ligerPortal",
+                "combobox":"ligerComboBox",
+                "textbox":"ligerTextBox",
+                "spinner":"ligerSpinner",
+                "listbox":"ligerListBox",
+                "checkbox":"ligerCheckBox",
+                "radio":"ligerRadio",
+                "checkboxlist":"ligerCheckBoxList",
+                "radiolist":"ligerRadioList",
+                "popupedit":"ligerPopupEdit",
+                "button":"ligerButton",
+                "dateeditor":"ligerDateEditor",
+                "dialog":"ligerDialog",
+                "panel":"ligerPanel",
+                "layout":"ligerLayout",
+                "accordion":"ligerAccordion",
+                "tab":"ligerTab" 
+            }; 
+            if (!children || !children.length) return;
+            for (var i = 0; i < children.length; i++)
+            {
+                var child = children[i], type = child.type;
+                var tagName = tagNames[type] || "div"; 
+                var plugin = PluginNameMatchs[type];
+                if (!plugin) continue;
+                var element = document.createElement(tagName);
+                g.panel.find(".l-panel-content").append(element);
+                var childOp = $.extend({},child);
+                childOp.type = null;
+                $(element)[plugin](childOp);
+            }
+        },
+        collapse: function ()
+        {
+            var g = this, p = this.options;
+            var toggle = g.panel.find(".l-panel-header .l-panel-header-toggle:first");
+            if (toggle.hasClass("l-panel-header-toggle-hide")) return;
+            g.toggle();
+        },
+        expand: function ()
+        {
+            var g = this, p = this.options;
+            var toggle = g.panel.find(".l-panel-header .l-panel-header-toggle:first");
+            if (!toggle.hasClass("l-panel-header-toggle-hide")) return;
+            g.toggle();
+        },
+        toggle : function()
+        {
+            var g = this, p = this.options;
+            var toggle = g.panel.find(".l-panel-header .l-panel-header-toggle:first");
+            if (toggle.hasClass("l-panel-header-toggle-hide"))
+            {
+                toggle.removeClass("l-panel-header-toggle-hide");
+            } else
+            {
+                toggle.addClass("l-panel-header-toggle-hide");
+            }
+            g.panel.find(".l-panel-content:first").toggle("normal");
+        },
+        _setShowToggle:function(v)
+        {
+            var g = this, p = this.options;
+            var header = g.panel.find(".l-panel-header:first");
+            if (v)
+            {
+                var toggle = $("<div class='l-panel-header-toggle'></div>"); 
+                toggle.appendTo(header.find(".icons")); 
+            } else
+            {
+                header.find(".l-panel-header-toggle").remove();
+            }
+        },
+        _setContent: function (v)
+        {
+            var g = this, p = this.options;
+            var content = g.panel.find(".l-panel-content:first");
+            if (v)
+            {
+                content.html(v);
+            }
+        },
+        _setUrl: function (url)
+        {
+            var g = this, p = this.options;
+            var content = g.panel.find(".l-panel-content:first");
+            if (url)
+            {
+                g.jiframe = $("<iframe frameborder='0'></iframe>");
+                var framename = p.frameName ? p.frameName : "ligerpanel" + new Date().getTime();
+                g.jiframe.attr("name", framename);
+                g.jiframe.attr("id", framename);
+                content.prepend(g.jiframe); 
+
+                setTimeout(function ()
+                {
+                    if (content.find(".l-panel-loading:first").length == 0)
+                        content.append("<div class='l-panel-loading' style='display:block;'></div>");
+                    var iframeloading = $(".l-panel-loading:first", content);
+                    g.jiframe[0].panel = g;//增加窗口对panel对象的引用
+                    /*
+                    可以在子窗口这样使用：
+                    var panel = frameElement.panel;
+                    var panelData = dialog.get('data');//获取data参数
+                    panel.set('title','新标题'); //设置标题
+                    panel.close();//关闭dialog 
+                    */
+                    g.jiframe.attr("src", p.url).bind('load.panel', function ()
+                    {
+                        iframeloading.hide();
+                        g.trigger('loaded');
+                    });
+                    g.frame = window.frames[g.jiframe.attr("name")];
+                }, 0); 
+            }
+        },
+        _setShowClose: function (v)
+        {
+            var g = this, p = this.options;
+            var header = g.panel.find(".l-panel-header:first");
+            if (v)
+            {
+                var btn = $("<div class='l-panel-header-close'></div>"); 
+                btn.appendTo(header.find(".icons"));
+            } else
+            {
+                header.find(".l-panel-header-close").remove();
+            }
+        },
+        close:function()
+        {
+            var g = this, p = this.options;
+            if (g.trigger('close') == false) return;
+            g.panel.remove();
+            g.trigger('closed');
+        }, 
+        show: function ()
+        {
+            this.panel.show();
+        },
+        _setIcon : function(url)
+        {
+            var g = this;
+            if (!url)
+            {
+                g.panel.removeClass("l-panel-hasicon");
+                g.panel.find('img').remove();
+            } else
+            {
+                g.panel.addClass("l-panel-hasicon");
+                g.panel.append('<img src="' + url + '" />');
+            }
+        }, 
+        _setWidth: function (value)
+        { 
+            value && this.panel.width(value);
+        },
+        _setHeight: function (value)
+        { 
+            var g = this, p = this.options;
+            var header = g.panel.find(".l-panel-header:first");
+            this.panel.find(".l-panel-content:first").height(value - header.height());
+        },
+        _setTitle: function (value)
+        {
+            this.panel.find(".l-panel-header span:first").text(value);
+        } 
+    }); 
+
+
+})(jQuery);﻿/**
+* jQuery ligerUI 1.2.4
+* 
+* http://ligerui.com
+*  
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -13624,6 +14278,21 @@
                 g.inputText.height(value - 2);
             }
         },
+        getData : function()
+        { 
+            var g = this, p = this.options;
+            var data = [];
+            var v = $(g.valueField).val(), t = $(g.inputText).val();
+            var values = v ? v.split(p.split) : null, texts = t ? t.split(p.split) : null;
+            $(values).each(function (i)
+            {
+                var o = {};
+                o[p.textField] = texts[i];
+                o[p.valueField] = values[i];
+                data.push(o);
+            });
+            return data;
+        },
         _getText: function ()
         {
             return $(this.inputText).val();
@@ -13727,6 +14396,7 @@
                         valueField: p.valueField,
                         textField: p.textField,
                         split: p.split,
+                        lastSelected : g.getData(),
                         onSelect: function (e)
                         {
                             if (g.trigger('select', e) == false) return;
@@ -13740,7 +14410,7 @@
                                 g.setText(e.text);
                             }
                             g.trigger('selected', e);
-                        },
+                        }, 
                         selectInit: function (rowdata)
                         {
                             var value = g.getValue();
@@ -13776,7 +14446,7 @@
             selectInit: function (rowdata) { return false }  //选择初始化
         }, p);
         if (!p.grid) return;
-        var win, grid, condition, lastSelected = [];
+        var win, grid, condition, lastSelected = p.lastSelected || []; 
         return function ()
         {
             show();
@@ -13869,6 +14539,15 @@
 
             grid.refreshSize();
         }
+        function exist(value,data)
+        {
+            for (var i = 0; data && data[i]; i++)
+            {
+                var item = data[i];
+                if (item[p.valueField] == value) return true;
+            }
+            return false;
+        }
         function toSelect()
         {
             var selected = grid.selected || [];
@@ -13882,11 +14561,11 @@
                 data.push(o);
             });
             var unSelected = [];
-            $(lastSelected).each(function ()
+            $(lastSelected).each(function (i,item)
             {
-                if ($.inArray(this, selected) == -1 && $.inArray(this, grid.rows) != -1)
+                if (!exist(item[p.valueField], selected) && exist(item[p.valueField], grid.rows))
                 {
-                    unSelected.push(this);
+                    unSelected.push(item);
                 }
             });
             var removeValue = [], removeText = [], removeData = [];
@@ -13910,11 +14589,575 @@
     };
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
+* 
+*/
+(function ($)
+{
+
+    $.fn.ligerPortal = function (options)
+    {
+        return $.ligerui.run.call(this, "ligerPortal", arguments);
+    };
+
+    $.ligerDefaults.Portal = {
+        width: null,
+        /*行元素：组件允许以纵向方式分割为几块
+        每一块(行)允许自定义N个列(column)
+        每一列允许自定义N个Panel(最小元素)
+        rows:[
+            {columns:[ 
+                {
+                   width : '50%',
+                   panels : [{width:'100%',content:'内容'},{width:'100%',url:@url1}]
+                },{
+                   width : '50%',
+                   panels : [{width:'100%',url:@url2}]
+                }
+            ]}
+        ]
+        */
+        rows: null,
+        /* 列元素： 组件将认为只存在一个row(块),
+       这一块 允许自定义N个列(column),结构同上
+        */
+        columns:null,
+        url: null,          //portal结构定义URL   
+        method: 'get',                         //获取数据http方式
+        parms: null,                         //提交到服务器的参数
+        draggable: false,   //是否允许拖拽
+        onLoaded:null       //url模式 加载完事件
+    };
+    $.ligerDefaults.Portal_rows = {
+        width: null,
+        height: null 
+    };
+    $.ligerDefaults.Portal_columns = {
+        width: null,
+        height: null 
+    };
+
+    $.ligerMethos.Portal = {};
+
+ 
+
+    $.ligerui.controls.Portal = function (element, options)
+    {
+        $.ligerui.controls.Portal.base.constructor.call(this, element, options);
+    };
+    $.ligerui.controls.Portal.ligerExtend($.ligerui.core.UIComponent, {
+        __getType: function ()
+        {
+            return 'Portal';
+        },
+        __idPrev: function ()
+        {
+            return 'Portal';
+        },
+        _extendMethods: function ()
+        {
+            return $.ligerMethos.Portal;
+        },
+        _init: function ()
+        {
+            var g = this, p = this.options;
+            $.ligerui.controls.Portal.base._init.call(this); 
+            if ($(">div", g.element).length) //如果已经定义了DIV子元素,那么这些元素将会转换为columns,这里暂时保存到tempInitPanels
+            { 
+                p.columns = [];
+                $(">div", g.element).each(function (i, jpanel)
+                {
+                    p.columns[i] = {
+                        panels :[]
+                    };
+                });
+
+                g.tempInitPanels = $("<div></div>");
+                $(">div", g.element).appendTo(g.tempInitPanels); 
+            }
+            if (!p.rows && p.columns)
+            {
+                p.rows = [{
+                    columns: p.columns
+                }];
+            }
+        },
+        _render: function ()
+        {
+            var g = this, p = this.options;
+            
+            g.portal = $(g.element).addClass("l-portal").html(""); 
+             
+            g.set(p);
+             
+        }, 
+        _setRows: function (rows)
+        {
+            var g = this, p = this.options;
+            g.rows = [];
+            if (rows && rows.length)
+            {
+                for (var i = 0; i < rows.length; i++)
+                { 
+                    var row = rows[i];
+                    var jrow = $('<div class="l-row"></div>').appendTo(g.portal); 
+                    g.rows[i] = g._renderRow({
+                        row: row,
+                        rowIndex: i,
+                        jrow: jrow
+                    });
+                    jrow.append('<div class="l-clear"></div>');
+                }
+            }
+        },
+        _renderRow : function(e)
+        {
+            var row = e.row, rowIndex = e.rowIndex, jrow = e.jrow;
+            var g = this, p = this.options;
+            var rowObj = {
+                element : jrow[0]
+            };
+            if (row.width) jrow.width(row.width);
+            if (row.height) jrow.height(row.height);
+            if (row.columns) rowObj.columns = [];
+            if (row.columns && row.columns.length)
+            {  
+                for (var i = 0; i < row.columns.length; i++)
+                {
+                    var column = row.columns[i];
+                    var jcolumn = $('<div class="l-column"></div>').appendTo(jrow);
+                    rowObj.columns[i] = g._renderColumn({
+                        column: column,
+                        columnIndex: i,
+                        jcolumn: jcolumn,
+                        rowIndex : rowIndex
+                    });  
+                }
+            }
+            return rowObj;
+        },
+        remove: function (e)
+        {
+            var g = this, p = this.options;
+            var rowIndex = e.rowIndex, columnIndex = e.columnIndex, index = e.index;
+            if (index == null) index = -1; 
+            if (index >= 0 && g.rows[rowIndex] && g.rows[rowIndex].columns && g.rows[rowIndex].columns[columnIndex] && g.rows[rowIndex].columns[columnIndex].panels)
+            {
+                var panel = g.rows[rowIndex].columns[columnIndex].panels[index]; 
+                panel && panel.close();
+                g._updatePortal();
+            }  
+        },
+        add: function (e)
+        {
+            var g = this, p = this.options;
+            var rowIndex = e.rowIndex, columnIndex = e.columnIndex, index = e.index, panel = e.panel;
+            if (index == null) index = -1;
+            if (!(g.rows[rowIndex] && g.rows[rowIndex].columns && g.rows[rowIndex].columns[columnIndex])) return;
+            var gColumn = g.rows[rowIndex].columns[columnIndex], pColumn = p.rows[rowIndex].columns[columnIndex], ligerPanel, jcolumn = $(gColumn.element);
+            pColumn.panels = pColumn.panels || [];
+            gColumn.panels = gColumn.panels || [];
+            pColumn.panels.splice(index, 0, panel); 
+            if (index < 0)
+            { 
+                var jpanel = $('<div></div>').insertBefore(gColumn.jplace);
+                ligerPanel = jpanel.ligerPanel(panel); 
+            } else if(gColumn.panels[index])
+            {
+                var jpanel = $('<div></div>').insertBefore(gColumn.panels[index].panel);
+                ligerPanel = jpanel.ligerPanel(panel);
+            }
+            if (ligerPanel)
+            {
+                ligerPanel.bind('closed', g._createPanelClosed());
+                g.setPanelEvent({
+                    panel: ligerPanel
+                });
+                gColumn.panels.splice(index, 0, ligerPanel);
+            }
+            g._updatePortal();
+        },
+        _createPanelClosed : function ()
+        {
+            var g = this, p = this.options;
+            return function ()
+            {
+                var panel = this;//ligerPanel对象
+                var panels = g.getPanels();
+                var rowIndex, columnIndex, index;
+                $(panels).each(function ()
+                {
+                    if (this.panel == panel)
+                    {
+                        rowIndex = this.rowIndex;
+                        columnIndex = this.columnIndex;
+                        index = this.index;
+                    }
+                });
+                p.rows[rowIndex].columns[columnIndex].panels.splice(index, 1);
+                g.rows[rowIndex].columns[columnIndex].panels.splice(index, 1);
+            };
+        },
+        _renderColumn: function (e)
+        {
+            var column = e.column, columnIndex = e.columnIndex, jcolumn = e.jcolumn;
+            var rowIndex = e.rowIndex;
+            var g = this, p = this.options;
+            var columnObj = {
+                element : jcolumn[0]
+            };
+            if (column.width) jcolumn.width(column.width);
+            if (column.height) jcolumn.height(column.height);
+            if (column.panels) columnObj.panels = [];
+            if (column.panels && column.panels.length)
+            {
+                for (var i = 0; i < column.panels.length; i++)
+                {
+                    var panel = column.panels[i]; 
+                    var jpanel = $('<div></div>').appendTo(jcolumn);
+                    columnObj.panels[i] = jpanel.ligerPanel(panel);
+                    columnObj.panels[i].bind('closed', g._createPanelClosed());
+                    g.setPanelEvent({ 
+                        panel: columnObj.panels[i]
+                    });
+                }
+            } else if(g.tempInitPanels)
+            {
+              
+                var tempPanel = g.tempInitPanels.find(">div:eq(" + columnIndex + ")");
+                if (tempPanel.length)
+                {
+                    columnObj.panels = [];
+                    var panelOptions = {};
+                    var jelement = tempPanel.clone();
+                    if (liger.inject && liger.inject.getOptions)
+                    {
+                        panelOptions = liger.inject.getOptions({
+                            jelement: jelement,
+                            defaults: $.ligerDefaults.Panel,
+                            config: liger.inject.config.Panel
+                        });
+                    }
+                    columnObj.panels[0] = jelement.appendTo(jcolumn).ligerPanel(panelOptions);
+                    columnObj.panels[0].bind('closed', g._createPanelClosed());
+                    g.setPanelEvent({ 
+                        panel: columnObj.panels[0]
+                    });
+                } 
+            }
+            columnObj.jplace = $('<div class="l-column-place"></div>').appendTo(jcolumn);
+            return columnObj; 
+        },
+        setPanelEvent: function(e)
+        {  
+            //panel:ligerui对象,jpanel:jQuery dom对象
+            var panel = e.panel, jpanel = panel.panel;
+            var g = this, p = this.options;
+            //拖拽支持
+            if ($.fn.ligerDrag && p.draggable)
+            { 
+                jpanel.addClass("l-panel-draggable").ligerDrag({
+                    proxy: false, revert: true,
+                    handler: ".l-panel-header span:first",
+                    onRendered: function ()
+                    { 
+                    },
+                    onStartDrag: function (current, e)
+                    {
+                        g.portal.find(">.l-row").addClass("l-row-dragging");
+                        this.jplace = $('<div class="l-panel-place"></div>');
+                        this.jplace.height(jpanel.height());
+                        jpanel.width(jpanel.width());
+                        jpanel.addClass("l-panel-dragging"); 
+                        jpanel.css("position", "absolute"); 
+                        jpanel.after(this.jplace); 
+                        g._updatePortal();
+                    },
+                    onDrag: function (current, e)
+                    {
+                        var pageX = e.pageX || e.screenX, pageY = e.pageY || e.screenY;
+                        var height = jpanel.height(), width = jpanel.width(), offset = jpanel.offset();
+                        var centerX = offset.left + width / 2, centerY = offset.top + 10; 
+                        var panels = g.getPanels(), emptyColumns = g.getEmptyColumns();
+                        var result = getPositionIn(panels, emptyColumns, centerX, centerY);
+                        if (result)
+                        { 
+                            //判断是否跟上次匹配的位置一致
+                            if (this.placeStatus)
+                            {
+                                if (this.placeStatus.panel && result.panel)
+                                {
+                                    if (this.placeStatus.panel.rowIndex == result.panel.rowIndex &&
+                                this.placeStatus.panel.columnIndex == result.panel.columnIndex &&
+                                this.placeStatus.panel.index == result.panel.index &&
+                                this.placeStatus.position == result.position)
+                                    {
+                                        return;
+                                    }
+                                }
+                                if (this.placeStatus.column && result.column) //定位到空元素行
+                                {
+                                    if (this.placeStatus.column.rowIndex == result.column.rowIndex && this.placeStatus.column.columnIndex == result.column.columnIndex && this.placeStatus.position == result.position)
+                                    {
+                                        return;
+                                    }
+                                }
+                            }
+                            if (result.position == "top")
+                            { 
+                                this.jplace.insertBefore(result.panel ? result.panel.jpanel : result.column.jplace);
+                                this.savedPosition = result.panel ? result.panel : result.column
+                                this.savedPosition.inTop = true;
+                            } else if (result.position == "bottom")
+                            {
+                                this.jplace.insertAfter(result.panel.jpanel);
+                                this.savedPosition = result.panel;
+                                this.savedPosition.inTop = false;
+                            }
+                            this.placeStatus = result; 
+                        } 
+                        else//没有匹配到
+                        {
+                            this.placeStatus = null; 
+                        }
+
+                        //从指定的元素集合匹配位置
+                        function getPositionIn(panels, columns, x, y)
+                        {
+                            for (i = 0, l = panels.length; i < l; i++)
+                            {
+                                var o = panels[i];
+                                if (o.panel == panel) //如果是本身
+                                {
+                                    continue;
+                                }
+                                var r = positionIn(o, null, x, y);
+                                if (r) return r;
+                            }
+                            for (i = 0, l = columns.length; i < l; i++)
+                            {
+                                var column = columns[i];
+                                var r = positionIn(null, column, x, y);
+                                if (r) return r;
+                            }
+                            return null;
+                        }
+                        //坐标在目标区域范围内 x,y为panel标题栏中间的位置
+                        function positionIn(panel, column, x, y)
+                        {
+                            var jelement = panel ? panel.jpanel : column.jplace;
+                            if (!jelement) return null;
+                            var height = jelement.height(), width = jelement.width();
+                            var left = jelement.offset().left, top = jelement.offset().top;
+                            var diff = 3;
+                            if (x > left - diff && x < left + width + diff)
+                            {
+                                if (y > top - diff && y < top + height / 2 + diff)
+                                {
+                                    return {
+                                        panel: panel,
+                                        column: column,
+                                        position: "top"
+                                    };
+                                }
+                                if (y > top + height / 2 - diff && y < top + height + diff)
+                                {
+                                    return {
+                                        panel: panel,
+                                        column: column,
+                                        position: panel ? "bottom" : "top"
+                                    };
+                                }
+                            }
+                            return null;
+                        }
+                    },
+                    onStopDrag: function (current, e)
+                    {
+                        g.portal.find(">.l-row").removeClass("l-row-dragging");
+                        panel.set('width', panel.get('width')); 
+                        jpanel.removeClass("l-panel-dragging");
+                        //将jpanel替换到jplace的位置 
+                        if (this.jplace)
+                        {
+                            jpanel.css({
+                                "position": "relative",
+                                "left": null,
+                                "top": null
+                            });
+                            jpanel.insertAfter(this.jplace); 
+                            g.portal.find(">.l-row > .l-column >.l-panel-place").remove();
+
+                            if (this.savedPosition)
+                            {
+                                var panels = g.getPanels();
+                                var rowIndex, columnIndex, index;
+                                $(panels).each(function ()
+                                {
+                                    if (this.panel == panel)
+                                    {
+                                        rowIndex = this.rowIndex;
+                                        columnIndex = this.columnIndex;
+                                        index = this.index;
+                                    }
+                                });
+                                var oldPanelOptions = p.rows[rowIndex].columns[columnIndex].panels[index];
+                                var oldPanel = g.rows[rowIndex].columns[columnIndex].panels[index];
+                                p.rows[rowIndex].columns[columnIndex].panels.splice(index, 1);
+                                g.rows[rowIndex].columns[columnIndex].panels.splice(index, 1);
+
+                                if (this.savedPosition.panel)
+                                { 
+                                  
+                                    p.rows[this.savedPosition.rowIndex].columns[this.savedPosition.columnIndex].panels.splice(this.savedPosition.index + this.savedPosition.inTop ? -1 : 0, 0, oldPanelOptions); 
+                                    g.rows[this.savedPosition.rowIndex].columns[this.savedPosition.columnIndex].panels.splice(this.savedPosition.index + this.savedPosition.inTop ? -1 : 0, 0, oldPanel);
+                                } else
+                                {
+                                    p.rows[this.savedPosition.rowIndex].columns[this.savedPosition.columnIndex].panels = [oldPanelOptions];
+                                    g.rows[this.savedPosition.rowIndex].columns[this.savedPosition.columnIndex].panels = [oldPanel];
+                                } 
+                            }
+                        }
+                        g._updatePortal();
+                       
+                        return false;
+                    }
+                });
+            }
+         
+        },
+        _updatePortal:function()
+        {
+            var g = this, p = this.options;
+            $(g.rows).each(function (rowIndex)
+            {
+                $(this.columns).each(function (columnIndex)
+                {
+                    if (this.panels && this.panels.length)
+                    {
+                        $(this.element).removeClass("l-column-empty");
+                    } else
+                    {
+                        $(this.element).addClass("l-column-empty");
+                    }
+                });
+            });
+        },
+        getPanels : function ()
+        {
+            var g = this, p = this.options;
+            var panels = []; 
+            $(g.rows).each(function (rowIndex)
+            { 
+                $(this.columns).each(function (columnIndex)
+                { 
+                    $(this.panels).each(function (index)
+                    {
+                        panels.push({
+                            rowIndex: rowIndex,
+                            columnIndex: columnIndex,
+                            index: index,
+                            panel : this,
+                            jpanel : this.panel
+                        });
+                    }); 
+                }); 
+            }); 
+            return panels;
+        },
+        getPanel: function (e)
+        {
+            var g = this, p = this.options;
+            e = $.extend({
+                rowIndex: 0,
+                columnIndex: 0,
+                index : 0
+            }, e);
+            var panel = null;
+            $(g.rows).each(function (rowIndex)
+            {
+                $(this.columns).each(function (columnIndex)
+                {
+                    $(this.panels).each(function (index)
+                    {
+                        if (panel) return;
+                        if (rowIndex == e.rowIndex && columnIndex == e.columnIndex && index == e.index)
+                        {
+                            panel = this;
+                        } 
+                    });
+                });
+            });
+            return panel;
+        },
+        getEmptyColumns:function(){
+            var g = this, p = this.options;
+            var columns = [];
+            $(g.rows).each(function (rowIndex)
+            { 
+                $(this.columns).each(function (columnIndex)
+                {
+                    if (!this.panels || !this.panels.length)
+                    {
+                        columns.push({
+                            rowIndex: rowIndex,
+                            columnIndex: columnIndex, 
+                            jplace : this.jplace
+                        });
+                    }
+                }); 
+            });
+            return columns;
+        },
+        _setUrl: function (url)
+        {
+            var g = this, p = this.options;
+            if (!url) return;
+            $.ajax({
+                url: url, data: p.parms, type: p.method, dataType: 'json',
+                success: function (rows)
+                {
+                    g.set('rows', rows);
+                }
+            });
+        },  
+        _setWidth: function (value)
+        { 
+            value && this.portal.width(value);
+        },
+        collapseAll: function ()
+        {
+            var g = this, p = this.options;
+            var panels = g.getPanels();
+            $(panels).each(function (i,o)
+            {
+                var panel = o.panel; 
+                panel.collapse();
+            });
+        },
+        expandAll: function ()
+        {
+            var g = this, p = this.options;
+            var panels = g.getPanels();
+            $(panels).each(function (i, o)
+            {
+                var panel = o.panel;
+                panel.expand();
+            });
+        }
+    }); 
+
+
+})(jQuery);﻿/**
+* jQuery ligerUI 1.2.4
+* 
+* http://ligerui.com
+*  
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 
@@ -14055,11 +15298,11 @@
 
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -14362,11 +15605,11 @@
       
 
 })(jQuery);/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -14642,11 +15885,11 @@
 
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -15040,11 +16283,11 @@
 
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -15067,6 +16310,8 @@
         contextmenu: true,
         dblClickToClose: false, //是否双击时关闭
         dragToMove: false,    //是否允许拖动时改变tab项的位置
+        showSwitch: false,       //显示切换窗口按钮
+        showSwitchInTab: false, //切换窗口按钮显示在最后一项
         onBeforeOverrideTabItem: null,
         onAfterOverrideTabItem: null,
         onBeforeRemoveTabItem: null,
@@ -15141,7 +16386,7 @@
             g.tab.content = $('<div class="l-tab-content"></div>');
             $("> div", g.tab).appendTo(g.tab.content);
             g.tab.content.appendTo(g.tab);
-            g.tab.links = $('<div class="l-tab-links"><ul style="left: 0px; "></ul></div>');
+            g.tab.links = $('<div class="l-tab-links"><ul style="left: 0px; "></ul><div class="l-tab-switch"></div></div>');
             g.tab.links.prependTo(g.tab);
             g.tab.links.ul = $("ul", g.tab.links);
             var lselecteds = $("> div[lselected=true]", g.tab.content);
@@ -15236,6 +16481,87 @@
             });
 
             g.set(p);
+        },
+        _setShowSwitch: function (value)
+        {
+            var g = this, p = this.options;
+            if (value)
+            {
+                if (!$(".l-tab-switch", g.tab.links).length)
+                {
+                    $("<div class='l-tab-switch'></div>").appendTo(g.tab.links); 
+                }
+                $(g.tab).addClass("l-tab-switchable");
+                $(".l-tab-switch", g.tab).click(function ()
+                {
+                    g.toggleSwitch(this);
+                }); 
+            }
+            else
+            {
+                $(g.tab).removeClass("l-tab-switchable");
+                $("body > .l-tab-windowsswitch").remove();
+            }
+        },
+        _setShowSwitchInTab:function(value)
+        {
+            var g = this, p = this.options;
+            if (p.showSwitch && value)
+            {
+                $(g.tab).removeClass("l-tab-switchable");
+                $(".l-tab-switch", g.tab).remove();
+                var tabitem = $("<li class='l-tab-itemswitch'><a></a><div class='l-tab-links-item-left'></div><div class='l-tab-links-item-right'></div></li>");
+                tabitem.appendTo(g.tab.links.ul);
+                tabitem.click(function ()
+                {
+                    g.toggleSwitch(this);
+                });
+            } else
+            {
+                $(".l-tab-itemswitch", g.tab.ul).remove(); 
+            }
+        },
+        toggleSwitch: function (btn)
+        {
+            var g = this, p = this.options; 
+            if ($("body > .l-tab-windowsswitch").length)
+            {
+                $("body > .l-tab-windowsswitch").remove();
+                return;
+            }
+            if (btn == null) return;
+            var windowsswitch = $("<div class='l-tab-windowsswitch'></div>").appendTo('body');
+            var tabItems = g.tab.links.ul.find('>li');
+            var selectedTabItemID = g.getSelectedTabItemID();
+            tabItems.each(function (i, item)
+            {
+                var jlink = $("<a href='javascript:void(0)'></a>");
+                jlink.text($(item).find("a").text());
+                var tabid = $(item).attr("tabid");
+                if (tabid == null) return;
+                if (tabid == selectedTabItemID)
+                {
+                    jlink.addClass("selected");
+                }
+                jlink.attr("tabid", tabid);
+                windowsswitch.append(jlink);
+            });
+            windowsswitch.css({
+                top: $(btn).offset().top + $(btn).height(),
+                left: $(btn).offset().left - windowsswitch.width()  
+            });
+            windowsswitch.bind("click", function (e)
+            {
+                var obj = (e.target || e.srcElement);
+                if (obj.tagName.toLowerCase() == "a")
+                {
+                    var tabid = $(obj).attr("tabid");
+                    g.selectTabItem(tabid);
+                    g.moveToTabItem(tabid);
+                    $("body > .l-tab-windowsswitch").remove();
+                    return;
+                }
+            });
         },
         _applyDrag: function (tabItemDom)
         {
@@ -15368,8 +16694,11 @@
             var mainwidth = g.tab.width();
             if (sumwidth > mainwidth)
             {
-                g.tab.links.append('<div class="l-tab-links-left"></div><div class="l-tab-links-right"></div>');
-                g.setTabButtonEven();
+                if (!$(".l-tab-links-left", g.tab).length)
+                {
+                    g.tab.links.append('<div class="l-tab-links-left"><span></span></div><div class="l-tab-links-right"><span></span></div>');
+                    g.setTabButtonEven();
+                }
                 return true;
             } else
             {
@@ -15404,60 +16733,91 @@
             });
         },
         //切换到上一个tab
-        moveToPrevTabItem: function ()
+        moveToPrevTabItem: function (tabid)
         {
             var g = this, p = this.options;
-            var btnWitdth = $(".l-tab-links-left", g.tab.links).width();
-            var leftList = new Array(); //记录每个tab的left,由左到右
-            $("li", g.tab.links).each(function (i, item)
+            var tabItems = $("> li", g.tab.links.ul),
+                 nextBtn = $(".l-tab-links-right", g.tab),
+                 prevBtn = $(".l-tab-links-left", g.tab);
+            if (!nextBtn.length || !prevBtn.length) return false;
+            var nextBtnOffset = nextBtn.offset(), prevBtnOffset = prevBtn.offset();
+            //计算应该移动到的标签项,并计算从第一项到这个标签项的上一项的宽度总和
+            var moveToTabItem = null, currentWidth = 0;
+            var prevBtnLeft = prevBtnOffset.left + prevBtn.outerWidth();
+            for (var i = 0, l = tabItems.length; i < l; i++)
             {
-                var currentItemLeft = -1 * btnWitdth;
-                if (i > 0)
+                var tabitem = $(tabItems[i]);  
+                var offset = tabitem.offset();
+                var start = offset.left, end = offset.left + tabitem.outerWidth();
+                if (tabid != null)
                 {
-                    currentItemLeft = parseInt(leftList[i - 1]) + $(this).prev().width() + 2;
+                    if (start < prevBtnLeft && tabitem.attr("tabid") == tabid)
+                    {
+                        moveToTabItem = tabitem;
+                        break;
+                    }
                 }
-                leftList.push(currentItemLeft);
-            });
-            var currentLeft = -1 * parseInt(g.tab.links.ul.css("left"));
-            for (var i = 0; i < leftList.length - 1; i++)
-            {
-                if (leftList[i] < currentLeft && leftList[i + 1] >= currentLeft)
+                else if (start < prevBtnLeft && end >= prevBtnLeft)
                 {
-                    g.tab.links.ul.animate({ left: -1 * parseInt(leftList[i]) });
-                    return;
+                    moveToTabItem = tabitem;
+                    break;
                 }
+                currentWidth += tabitem.outerWidth() + parseInt(tabitem.css("marginLeft"))
+                    + parseInt(tabitem.css("marginRight"));
             }
+            if (moveToTabItem == null) return false;
+            //计算出正确的移动位置
+            var left = currentWidth - prevBtn.outerWidth();
+            g.tab.links.ul.animate({ left: -1 * left });
+            return true;
         },
         //切换到下一个tab
-        moveToNextTabItem: function ()
+        moveToNextTabItem: function (tabid)
         {
             var g = this, p = this.options;
-            var btnWitdth = $(".l-tab-links-right", g.tab).width();
-            var sumwidth = 0;
-            var tabItems = $("li", g.tab.links.ul);
-            tabItems.each(function ()
-            {
-                sumwidth += $(this).width() + 2;
-            });
-            var mainwidth = g.tab.width();
-            var leftList = new Array(); //记录每个tab的left,由右到左 
-            for (var i = tabItems.length - 1; i >= 0; i--)
-            {
-                var currentItemLeft = sumwidth - mainwidth + btnWitdth + 2;
-                if (i != tabItems.length - 1)
+            var tabItems = $("> li", g.tab.links.ul),
+                nextBtn = $(".l-tab-links-right", g.tab),
+                prevBtn = $(".l-tab-links-left", g.tab);
+            if (!nextBtn.length || !prevBtn.length) return false;
+            var nextBtnOffset = nextBtn.offset(), prevBtnOffset = prevBtn.offset();
+            //计算应该移动到的标签项,并计算从第一项到这个标签项的宽度总和
+            var moveToTabItem = null, currentWidth = 0;
+            for (var i = 0, l = tabItems.length; i < l; i++)
+            { 
+                var tabitem = $(tabItems[i]);
+                currentWidth += tabitem.outerWidth()
+                    + parseInt(tabitem.css("marginLeft"))
+                    + parseInt(tabitem.css("marginRight"));
+                var offset = tabitem.offset();
+                var start = offset.left, end = offset.left + tabitem.outerWidth();
+                if (tabid != null)
                 {
-                    currentItemLeft = parseInt(leftList[tabItems.length - 2 - i]) - $(tabItems[i + 1]).width() - 2;
+                    if (end > nextBtnOffset.left && tabitem.attr("tabid") == tabid)
+                    {
+                        moveToTabItem = tabitem;
+                        break;
+                    }
                 }
-                leftList.push(currentItemLeft);
+                else if (start <= nextBtnOffset.left && end > nextBtnOffset.left)
+                {
+                    moveToTabItem = tabitem;
+                    break;
+                }
             }
-            var currentLeft = -1 * parseInt(g.tab.links.ul.css("left"));
-            for (var j = 1; j < leftList.length; j++)
+            if (moveToTabItem == null) return false;
+            //计算出正确的移动位置
+            var left = currentWidth - (nextBtnOffset.left - prevBtnOffset.left)
+                + parseInt(moveToTabItem.css("marginLeft")) + parseInt(moveToTabItem.css("marginRight"));
+            g.tab.links.ul.animate({ left: -1 * left });
+            return true;
+        },
+        //切换到指定的项目项
+        moveToTabItem: function (tabid)
+        {
+            var g = this, p = this.options;
+            if (!g.moveToPrevTabItem(tabid))
             {
-                if (leftList[j] <= currentLeft && leftList[j - 1] > currentLeft)
-                {
-                    g.tab.links.ul.animate({ left: -1 * parseInt(leftList[j - 1]) });
-                    return;
-                }
+                g.moveToNextTabItem(tabid);
             }
         },
         getTabItemCount: function ()
@@ -15570,16 +16930,12 @@
         //增加一个tab
         addTabItem: function (options)
         {
-            var g = this, p = this.options;
-            if (g.trigger('beforeAddTabItem', [tabid]) == false)
+            var g = this, p = this.options; 
+            if (g.trigger('beforeAddTabItem', [options]) == false)
                 return false;
             var tabid = options.tabid;
             if (tabid == undefined) tabid = g.getNewTabid();
-            var url = options.url;
-            var content = options.content;
-            var text = options.text;
-            var showClose = options.showClose;
-            var height = options.height;
+            var url = options.url, content = options.content, text = options.text, showClose = options.showClose, height = options.height;
             //如果已经存在
             if (g.isTabItemExist(tabid))
             {
@@ -15596,9 +16952,10 @@
                 contentitem.height(newheight);
             }
             tabitem.attr("tabid", tabid);
-            contentitem.attr("tabid", tabid);
+            contentitem.attr("tabid", tabid); 
             if (url)
             {
+                iframe[0].tab = g;//增加iframe对tab对象的引用 
                 iframe.attr("name", tabid)
                  .attr("id", tabid)
                  .attr("src", url)
@@ -15617,24 +16974,33 @@
             if (content)
             {
                 contentitem.html(content);
+                if (options.callback)
+                    options.callback();
             }
             else if (options.target)
             {
                 contentitem.append(options.target);
+                if (options.callback)
+                    options.callback();
             }
             if (showClose == undefined) showClose = true;
             if (showClose == false) $(".l-tab-links-item-close", tabitem).remove();
             if (text == undefined) text = tabid;
             if (height) contentitem.height(height);
             $("a", tabitem).text(text);
-
-            g.tab.links.ul.append(tabitem);
-            g.tab.content.append(contentitem);
-            g.selectTabItem(tabid);
-            if (g.setTabButton())
+            if ($(".l-tab-itemswitch", g.tab.links.ul).length)
             {
-                g.moveToLastTabItem();
+                tabitem.insertBefore($(".l-tab-itemswitch", g.tab.links.ul));
+            } else
+            {
+                g.tab.links.ul.append(tabitem);
             }
+            g.tab.content.append(contentitem);
+            g.selectTabItem(tabid); 
+            if (g.setTabButton())
+            { 
+                g.moveToTabItem(tabid);
+            } 
             //增加事件
             g._addTabItemEvent(tabitem);
             if (p.dragToMove && $.fn.ligerDrag)
@@ -15645,7 +17011,8 @@
                     g.drags.push(g._applyDrag(this));
                 });
             }
-            g.trigger('afterAddTabItem', [tabid]);
+            g.toggleSwitch();
+            g.trigger('afterAddTabItem', [options]);
         },
         _addTabItemEvent: function (tabitem)
         {
@@ -15810,7 +17177,7 @@
                     g.actionTabid = null;
                     break;
                 case "reload":
-                    if (g.trigger('reload') == false) return;
+                    if (g.trigger('reload', [{ tabid: g.actionTabid }]) == false) return;
                     g.selectTabItem(g.actionTabid);
                     g.reload(g.actionTabid);
                     break;
@@ -15840,11 +17207,11 @@
 
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -15947,10 +17314,17 @@
             var v = g.inputText.val() || "";
             if (p.currency) v = v.replace(/\$|\,/g, '');
             var isFloat = p.number || p.currency, isDigits = p.digits;
-            if (isFloat && !/^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(v) || isDigits && !/^\d+$/.test(v))
+            if (v != "" && isFloat && !/^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(v) || isDigits && !/^\d+$/.test(v))
             {
-                //不符合,恢复到原来的值
-                g.inputText.val(g.value || 0);
+                if (g.value != null)
+                {
+                    //不符合,恢复到原来的值
+                    g.inputText.val(g.value);
+                }
+                else
+                {
+                    g.inputText.val('');
+                }
                 p.currency && g.inputText.val(currencyFormatter(g.value));
                 return;
             }
@@ -16130,11 +17504,11 @@
     }
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 
@@ -16321,11 +17695,11 @@
         }
     });
 })(jQuery);﻿﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -16402,9 +17776,14 @@
         addItem: function (item)
         {
             var g = this, p = this.options;
-            if (item.line)
+            if (item.line || item.type == "line")
             {
                 g.toolBar.append('<div class="l-bar-separator"></div>');
+                return;
+            }
+            if (item.type == "text")
+            {
+                g.toolBar.append('<div class="l-toolbar-item l-toolbar-text"><span>' + item.text || "" + '</span></div>');
                 return;
             }
             var ditem = $('<div class="l-toolbar-item l-panel-btn"><span></span><div class="l-panel-btn-l"></div><div class="l-panel-btn-r"></div></div>');
@@ -16465,11 +17844,11 @@
     $.ligerui.controls.ToolBar.prototype.setEnable = $.ligerui.controls.ToolBar.prototype.setEnabled;
     $.ligerui.controls.ToolBar.prototype.setDisable = $.ligerui.controls.ToolBar.prototype.setDisabled;
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -16661,6 +18040,13 @@
                 nodes.push({ target: this, data: g._getDataNodeByTreeDataIndex(g.data, treedataindex) });
             });
             return nodes;
+        },
+    	//add by superzoc 12/24/2012 
+        refreshTree: function () {
+            var g = this, p = this.options;
+			$.each(this.getChecked(),function(k,v){		
+				 g._setParentCheckboxStatus($(v.target));
+			});
         },
         getSelected: function ()
         {
@@ -16983,12 +18369,20 @@
                 var treedataindex = parseInt(treeitem.attr("treedataindex"));
                 var treenodedata = g._getDataNodeByTreeDataIndex(g.data, treedataindex);
                 var treeitembody = $(">div:first", treeitem);
+                if (!treeitembody.length)
+                {
+                    treeitembody = $("li[treedataindex=" + treedataindex + "] >div:first", g.tree);
+                }
                 if (p.checkbox)
+                {
                     $(".l-checkbox", treeitembody).removeClass("l-checkbox-unchecked").addClass("l-checkbox-checked");
+                }
                 else
+                {
+                    $("div.l-selected", g.tree).removeClass("l-selected");
                     treeitembody.addClass("l-selected");
-
-                g.trigger('select', [{ data: treenodedata, target: treeitem[0] }]);
+                } 
+                g.trigger('select', [{ data: treenodedata, target: treeitembody.parent().get(0) }]);
                 return;
             }
             else
@@ -17846,11 +19240,11 @@
 
 
 })(jQuery);﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)

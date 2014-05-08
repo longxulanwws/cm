@@ -1,9 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.3
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -474,7 +474,7 @@
             else
             {
                 this.id = this.options.id || this.element.id || liger.getId(this.__idPrev());
-            }
+            } 
             //存入管理器池
             liger.add(this);
 
@@ -517,7 +517,14 @@
         {
             if (this.element)
             {
-                $(this.element).attr("ligeruiid", this.id);
+                $(this.element).attr("ligeruiid", this.id); 
+            }
+        },
+        _setCls: function (value)
+        {
+            if (this.element && value)
+            {
+                $(this.element).addClass(value);
             }
         },
         //返回要转换成ligerui参数的属性,比如['url']
@@ -590,7 +597,7 @@
         },
         resize: function (width, height)
         {
-            this.set({ width: width, height: height });
+            this.set({ width: width, height: height + 2 });
         }
     });
 
@@ -894,8 +901,12 @@
             {
                 //field in form , column in grid
                 var field = editParm.field || editParm.column, options = controlOptions || {};
+                var isInGrid = editParm.column ? true : false;
                 var p = $.extend({}, e.options);
-                var inputBody = $("<input type='" + (e.password ? "password" : "text") + "'/>");
+                var inputType = "text";
+                if ($.inArray(type, ["password", "file"]) != -1) inputType = type;
+                if (e.password) inputType = "password";
+                var inputBody = $("<input type='" + inputType + "'/>");
                 if (e.body)
                 {
                     inputBody = e.body.clone();
@@ -918,9 +929,10 @@
                     } 
                     if (!e.body)
                     {
-                        var inputName = prefixID  + txtInputName;
+                        var inputName = prefixID + txtInputName;
+                        var inputId = new Date().getTime();
                         inputBody.attr($.extend({
-                            //id: p.id,
+                            id: inputId,
                             name: inputName
                         }, field.attr));
                         if (field.cssClass)
@@ -954,9 +966,14 @@
                     var ext = field.editor.p || field.editor.ext;
                     ext = typeof (ext) == 'function' ? ext(editParm) : ext;
                     $.extend(p, ext);
-                }
+                } 
                 //返回的是ligerui对象
-                return inputBody['liger' + control](p);
+                var lobj = inputBody['liger' + control](p); 
+                if (isInGrid)
+                {
+                    setTimeout(function () { inputBody.focus(); }, 100);
+                }
+                return lobj;
             },
             getValue: function (editor, editParm)
             {

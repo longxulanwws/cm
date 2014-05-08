@@ -1,9 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -195,6 +195,13 @@
                 nodes.push({ target: this, data: g._getDataNodeByTreeDataIndex(g.data, treedataindex) });
             });
             return nodes;
+        },
+    	//add by superzoc 12/24/2012 
+        refreshTree: function () {
+            var g = this, p = this.options;
+			$.each(this.getChecked(),function(k,v){		
+				 g._setParentCheckboxStatus($(v.target));
+			});
         },
         getSelected: function ()
         {
@@ -517,12 +524,20 @@
                 var treedataindex = parseInt(treeitem.attr("treedataindex"));
                 var treenodedata = g._getDataNodeByTreeDataIndex(g.data, treedataindex);
                 var treeitembody = $(">div:first", treeitem);
+                if (!treeitembody.length)
+                {
+                    treeitembody = $("li[treedataindex=" + treedataindex + "] >div:first", g.tree);
+                }
                 if (p.checkbox)
+                {
                     $(".l-checkbox", treeitembody).removeClass("l-checkbox-unchecked").addClass("l-checkbox-checked");
+                }
                 else
+                {
+                    $("div.l-selected", g.tree).removeClass("l-selected");
                     treeitembody.addClass("l-selected");
-
-                g.trigger('select', [{ data: treenodedata, target: treeitem[0] }]);
+                } 
+                g.trigger('select', [{ data: treenodedata, target: treeitembody.parent().get(0) }]);
                 return;
             }
             else
