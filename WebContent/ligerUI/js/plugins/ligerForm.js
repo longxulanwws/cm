@@ -1,9 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -23,6 +23,7 @@
 
     $.ligerDefaults = $.ligerDefaults || {};
     $.ligerDefaults.Form = {
+        width: null,    // 表单的宽度
         //控件宽度
         inputWidth: 180,
         //标签宽度
@@ -61,7 +62,8 @@
         //验证
         validate: null,
         //不设置validate属性到inuput
-        unSetValidateAttr : false
+        unSetValidateAttr: false,
+        tab: null
     };
 
     $.ligerDefaults.FormString = {
@@ -137,6 +139,9 @@
         type: null,             //表单类型
         editor: null,           //编辑器扩展类型
         label: null,            //Label
+        hideSpace: true,
+        hideLabel: true,
+        rightToken: null,      // ： 
         newline: true,          //换行显示
         op: null,               //操作符 附加到input
         vt: null,               //值类型 附加到input
@@ -234,7 +239,7 @@
         _init: function ()
         {
             var g = this, p = this.options;
-            $.ligerui.controls.Form.base._init.call(this);
+            $.ligerui.controls.Form.base._init.call(this); 
             //编辑构造器初始化
             for (var type in liger.editors)
             {
@@ -258,6 +263,7 @@
                 p.editorBulider.call(g, $(this));
             });
             g.set(p);
+            g.initValidate();
             if (p.buttons)
             {
                 var jbuttons = $('<ul class="l-form-buttons"></ul>').appendTo(jform);
@@ -290,6 +296,11 @@
                 }
             });
         },
+        _setWidth: function (value)
+        {
+            var g = this, p = this.options;
+            if (value) g.form.width(value);
+        },
         getEditor: function (name)
         {
             var g = this, p = this.options;
@@ -317,8 +328,10 @@
             {
                 var name = field.name, textField = field.textField, editor = g.editors[fieldIndex];
                 if (!editor || !name) return;
-                var value = editor.editor.getValue(editor.control)
-                if (value)
+                var value = editor.editor.getValue(editor.control, {
+                    field: field
+                });
+                if (value != null && value !== "")
                 {
                     conditions.push({
                         op: field.operator || "like",
@@ -330,11 +343,11 @@
             });
             return conditions;
         },
-        //预处理字段 , 排序和分组
+        //预处理字段 , 处理分组
         _preSetFields: function (fields)
         {
             var g = this, p = this.options, lastVisitedGroup = null, lastVisitedGroupIcon = null;
-            //分组： 先填充没有设置分组的字段，然后按照分组排序
+            //分组： 先填充没有设置分组的字段
             $(p.fields).each(function (i, field)
             {
                 if (p.readonly || field.readonly || (field.editor && field.editor.readonly))
@@ -348,8 +361,7 @@
                     field.groupicon = lastVisitedGroupIcon;
                 }
                 if (field.group)
-                {
-                    //trim
+                { 
                     field.group = field.group.toString().replace(/^\s\s*/, '').replace(/\s\s*$/, '');
                     lastVisitedGroup = field.group;
                     lastVisitedGroupIcon = field.groupicon;
@@ -373,18 +385,26 @@
         {
             var g = this, p = this.options;
             if ($.isFunction(p.prefixID)) p.prefixID = p.prefixID(g);
-            g.validate = {};
-            var jform = $(this.element);
-            $(".l-form-container", jform).remove();
-            //自动创建表单
+            var jform = $(g.element).addClass("l-form");
+            g._initFieldsValidate({
+                fields: fields
+            }); 
+            g._initFieldsHtml({
+                panel: jform,
+                fields: fields
+            });
+            g._createEditors({ 
+                fields: fields
+            }); 
+            g.trigger('afterSetFields');
+        },
+        _initFieldsValidate : function(e)
+        {
+            var g = this, p = this.options;
+            var fields = e.fields;
+            g.validate = g.validate || {};
             if (fields && fields.length)
             {
-                g._preSetFields(fields);
-                if (!jform.hasClass("l-form"))
-                    jform.addClass("l-form");
-                var out = ['<div class="l-form-container">'];
-                var appendULStartTag = false, lastVisitedGroup = null;
-                var groups = [];
                 $(fields).each(function (index, field)
                 {
                     var name = field.name,
@@ -399,8 +419,27 @@
                             g.validate.messages = g.validate.messages || {};
                             g.validate.messages[txtInputName] = field.validateMessage;
                         }
-                    }
-
+                    } 
+                });
+            }
+        },
+        _initFieldsHtml : function(e)
+        {
+            var g = this, p = this.options;
+            var jform = e.panel,
+                fields = e.fields,
+                idPrev = e.idPrev || g.id;
+            $(">.l-form-container", jform).remove();
+            var lineWidth = 0, maxWidth = 0;
+            if (fields && fields.length)
+            {
+                g._preSetFields(fields); 
+                var out = ['<div class="l-form-container">'],
+                    appendULStartTag = false,
+                    lastVisitedGroup = null,
+                    groups = [];
+                $(fields).each(function (index, field)
+                { 
                     if ($.inArray(field.group, groups) == -1)
                         groups.push(field.group);
                 });
@@ -416,13 +455,14 @@
                         if (field.type == "hidden")
                         {
                             if (!$("#" + inputName).length)
-                                out.push('<div style="display:none" id="' + (g.id + "|" + i) + '"></div>');
+                                out.push('<div style="display:none" id="' + (idPrev + "|" + i) + '"></div>');
                             return;
                         }
                         var toAppendGroupRow = field.group && field.group != lastVisitedGroup;
                         if (index == 0 || toAppendGroupRow) newline = true;
                         if (newline)
                         {
+                            lineWidth = 0;
                             if (appendULStartTag)
                             {
                                 out.push('</ul>');
@@ -450,14 +490,23 @@
                         out.push('"');
                         out.push(' fieldindex=' + index);
                         out.push('><ul>');
-                        //append label
-                        out.push(g._buliderLabelContainer(field, index));
+                        if (!field.hideLabel)
+                        {
+                            out.push(g._buliderLabelContainer(field, index));
+                        }
                         //append input 
-                        out.push(g._buliderControlContainer(field, index));
+                        out.push(g._buliderControlContainer(field, index, e.idPrev));
                         //append space
-                        out.push(g._buliderSpaceContainer(field, index));
+                        if (!field.hideSpace)
+                        {
+                            out.push(g._buliderSpaceContainer(field, index));
+                        }
                         out.push('</ul></li>');
 
+                        lineWidth += (field.width || p.inputWidth || 0);
+                        lineWidth += (field.space || p.space || 0);
+                        lineWidth += (field.labelWidth || p.labelWidth || 0);
+                        if (lineWidth > maxWidth) maxWidth = lineWidth;
                     });
                 });
                 if (appendULStartTag)
@@ -467,80 +516,120 @@
                 }
                 out.push('</div>');
                 jform.append(out.join(''));
-
+                if (!p.width || maxWidth > p.width)
+                {
+                    //jform.width(maxWidth + 10);
+                }
                 $(".l-group .togglebtn", jform).remove();
                 $(".l-group", jform).width(jform.width() * 0.95).append("<div class='togglebtn'></div>");
             }
-            (function ()
+        },
+        _createEditors : function(e)
+        {
+            var g = this, p = this.options;
+            var fields = e.fields,
+                idPrev = e.idPrev || g.id,
+                editPrev = e.editPrev || "";
+            g.editors = g.editors || {}; 
+            $(fields).each(function (fieldIndex, field)
             {
-                g.editors = g.editors || {};
-                $(fields).each(function (fieldIndex, field)
+                var container = document.getElementById(idPrev + "|" + fieldIndex),
+                    editor = p.editors[field.type],
+                    editId = editPrev + fieldIndex;
+                if (!container) return;
+                container = $(container);
+                var editorControl = g._createEditor(editor, container, {
+                    field: field
+                }, container.width(), container.height());  
+                if (!editorControl) return;
+                if (g.editors[editId] && g.editors[editId].control && g.editors[editId].control.destroy)
                 {
-                    var container = document.getElementById(g.id + "|" + fieldIndex), editor = p.editors[field.type];
-                    if (!container) return;
-                    container = $(container);
-                    var editorControl = g._createEditor(editor, container, {
-                        field: field
-                    }, container.width(), container.height());
-                    if (g.editors[fieldIndex] && g.editors[fieldIndex].control && g.editors[fieldIndex].control.destroy)
-                    {
-                        g.editors[fieldIndex].control.destroy();
-                    }
-                    g.editors[fieldIndex] = {
-                        control: editorControl,
-                        editor: editor
-                    };
-                });
-                g.initValidate();
-                g.trigger('afterSetFields');
-            })();
-            //}).ligerDefer(g, 10);
+                    g.editors[editId].control.destroy();
+                }
+                g.editors[editId] = {
+                    control: editorControl,
+                    editor: editor
+                };
+            }); 
         },
         getData: function ()
         {
             var g = this, p = this.options;
-            g.data = g.data || {};
-            $(p.fields).each(function (fieldIndex, field)
+            g.data = {};
+            getFieldValueToData(p.fields);
+            if (p.tab && p.tab.items)
+            { 
+                for (var i = 0; i < p.tab.items.length; i++)
+                {
+                    var item = p.tab.items[i];
+                    getFieldValueToData(item.fields, i);
+                }
+            }
+            function getFieldValueToData(fields, tabIndex)
             {
-                var name = field.name, textField = field.textField, editor = g.editors[fieldIndex];
-                if (!editor) return;
-                if (name)
+                $(fields).each(function (fieldIndex, field)
                 {
-                    var value = editor.editor.getValue(editor.control)
-                    g._setValueByName(g.data, name, value);
-                }
-                if (textField)
-                {
-                    var value = editor.editor.getText(editor.control)
-                    g._setValueByName(g.data, textField, value);
-                }
-            });
+                    var name = field.name,
+                        textField = field.textField,
+                        editPrev = tabIndex == null ? "" : "tab" + tabIndex + "_",
+                        editor = g.editors[editPrev + fieldIndex];
+                    if (!editor) return;
+                    if (name)
+                    {
+                        var value = editor.editor.getValue(editor.control, {
+                            field: field
+                        });
+                        g._setValueByName(g.data, name, value);
+                    }
+                    if (textField)
+                    {
+                        var value = editor.editor.getText(editor.control, {
+                            field: field
+                        });
+                        g._setValueByName(g.data, textField, value);
+                    }
+                });
+            }
             return g.data;
         },
         setData: function (data)
         {
-            var g = this, p = this.options;
-            var fields = g.get('fields');
+            var g = this, p = this.options; 
             g.data = data || {};
-            (function ()
+            setDataToFields(p.fields);
+            if (p.tab && p.tab.items)
+            {
+                for (var i = 0; i < p.tab.items.length; i++)
+                {
+                    var item = p.tab.items[i];
+                    setDataToFields(item.fields, i);
+                }
+            }
+            function setDataToFields(fields, tabIndex)
             {
                 $(fields).each(function (fieldIndex, field)
                 {
-                    var name = field.name, textField = field.textField, editor = g.editors[fieldIndex];
+                    var name = field.name,
+                        textField = field.textField,
+                        editPrev = tabIndex == null ? "" : "tab" + tabIndex + "_",
+                        editor = g.editors[editPrev + fieldIndex];
                     if (!editor) return;
                     if (name && (name in g.data))
                     {
                         var value = g._getValueByName(g.data, name);
-                        editor.editor.setValue(editor.control, value);
+                        editor.editor.setValue(editor.control, value, {
+                            field: field
+                        });
                     }
                     if (textField && (textField in g.data))
                     {
                         var text = g._getValueByName(g.data, textField);
-                        editor.editor.setText(editor.control, text);
+                        editor.editor.setText(editor.control, text, {
+                            field: field
+                        });
                     }
                 });
-            })();
-            //}).ligerDefer(g, 20);
+            }
         },
         _setValueByName: function (data, name, value)
         {
@@ -583,7 +672,7 @@
         valid: function ()
         {
             var g = this, p = this.options;
-            if (!g.form || !g.validator) return;
+            if (!g.form || !g.validator) return true;
             return g.form.valid();
         },
         //设置验证
@@ -598,7 +687,7 @@
             var validate = p.validate == true ? {} : p.validate;
             var validateOptions = $.extend({
                 errorPlacement: function (lable, element)
-                {
+                { 
                     if (!element.attr("id"))
                         element.attr("id", new Date().getTime());
                     if (element.hasClass("l-textarea"))
@@ -620,7 +709,6 @@
                 {
                     if (!lable.attr("for")) return;
                     var element = $("#" + lable.attr("for"));
-
                     if (element.hasClass("l-textarea"))
                     {
                         element.removeClass("l-textarea-invalid");
@@ -638,8 +726,8 @@
             g.validator = g.form.validate(validateOptions);
         },
         //提示 验证错误信息
-        showInvalid: function (validator)
-        {
+        showInvalid: function ()
+        { 
             var g = this, p = this.options;
             if (!g.validator) return;
             var jmessage = $('<div><div class="invalid">' + p.invalidMessage.replace('{errorCount}', g.validator.errorList.length) + '<a class="viewInvalidDetail" href="javascript:void(0)">' + p.detailMessage + '</a></div><div class="invalidDetail" style="display:none;">' + getInvalidInf(g.validator.errorList) + '</div></div>');
@@ -667,10 +755,16 @@
         _createEditor: function (editorBuilder, container, editParm, width, height)
         {
             var g = this, p = this.options;
-            var editor = editorBuilder.create.call(this, container, editParm, p);
-            if (editor && editorBuilder.resize)
-                editorBuilder.resize.call(this, editor, width, height, editParm);
-            return editor;
+            try
+            { 
+                var editor = editorBuilder.create.call(this, container, editParm, p);
+                if (editor && editorBuilder.resize)
+                    editorBuilder.resize.call(this, editor, width, height, editParm);
+                return editor;
+            } catch (e)
+            {
+                return null;
+            }
         },
         //标签部分
         _buliderLabelContainer: function (field)
@@ -679,7 +773,7 @@
             var label = field.label || field.display;
             var labelWidth = field.labelWidth || field.labelwidth || p.labelWidth;
             var labelAlign = field.labelAlign || p.labelAlign;
-            if (label) label += p.rightToken;
+            if (label) label += field.rightToken || p.rightToken;
             var out = [];
             out.push('<li');
             if (p.labelCss)
@@ -687,7 +781,11 @@
                 out.push(' class="' + p.labelCss + '"');
             }
             out.push(' style="');
-            if (labelWidth)
+            if (/px$/i.test(labelWidth) || /auto/i.test(labelWidth) || /%$/i.test(labelWidth))
+            {
+                out.push('width:' + labelWidth + ';');
+            }
+            else if (labelWidth)
             {
                 out.push('width:' + labelWidth + 'px;');
             }
@@ -705,14 +803,15 @@
             return out.join('');
         },
         //控件部分
-        _buliderControlContainer: function (field, fieldIndex)
+        _buliderControlContainer: function (field, fieldIndex,idPrev)
         {
             var g = this, p = this.options;
-            var width = field.width || p.inputWidth;
-            var align = field.align || field.textAlign || field.textalign || p.align;
-            var out = [];
+            var width = field.width || p.inputWidth,
+                align = field.align || field.textAlign || field.textalign || p.align,
+                out = [],
+                idPrev = idPrev || g.id;
             out.push('<li');
-            out.push(' id="' + (g.id + "|" + fieldIndex) + '"');
+            out.push(' id="' + (idPrev + "|" + fieldIndex) + '"');
             if (p.fieldCss)
             {
                 out.push(' class="' + p.fieldCss + '"');
@@ -726,8 +825,7 @@
             {
                 out.push('text-align:' + align + ';');
             }
-            out.push('">');
-            //out.push(g._buliderControl(field, fieldIndex));
+            out.push('">'); 
             out.push('</li>');
             return out.join('');
         },
@@ -736,6 +834,7 @@
         {
             var g = this, p = this.options;
             var spaceWidth = field.space || field.spaceWidth || p.space;
+            if (field.space === 0 || field.spaceWidth === 0) spaceWidth = 0;
             var out = [];
             out.push('<li');
             if (p.spaceCss)
@@ -743,6 +842,10 @@
                 out.push(' class="' + p.spaceCss + '"');
             }
             out.push(' style="');
+            if (/px$/i.test(spaceWidth) || /auto/i.test(spaceWidth) || /%$/i.test(spaceWidth))
+            {
+                out.push('width:' + spaceWidth + ';');
+            }
             if (spaceWidth)
             {
                 out.push('width:' + spaceWidth + 'px;');
@@ -754,51 +857,7 @@
             }
             out.push('</li>');
             return out.join('');
-        },
-        _buliderControl: function (field, fieldIndex)
-        {
-            var g = this, p = this.options;
-            var width = field.width || p.inputWidth,
-            name = field.name || field.id,
-            type = (field.type || "text").toLowerCase(),
-            readonly = (field.readonly || (field.editor && field.editor.readonly)) ? true : false;
-            var out = [];
-            if (type == "textarea" || type == "htmleditor")
-            {
-                out.push('<textarea ');
-            }
-            else if ($.inArray(type, ["checkbox", "radio", "password", "file"]) != -1)
-            {
-                out.push('<input type="' + type + '" ');
-            }
-            else if ($.inArray(type, ["select", "combobox", "autocomplete", "popup", "radiolist", "checkboxlist", "listbox"]) != -1)
-            {
-                out.push('<input type="hidden" ');
-            }
-            else
-            {
-                out.push('<input type="text" ');
-            }
-            out.push('name="' + name + '" ');
-            out.push('fieldindex="' + fieldIndex + '" ');
-            field.cssClass && out.push('class="' + field.cssClass + '" ');
-            p.appendID && out.push(' id="' + name + '" ');
-            out.push(g._getInputAttrHtml(field));
-            if (field.validate && !readonly)
-            {
-                out.push(" validate='" + p.toJSON(field.validate) + "' ");
-                g.validate = g.validate || {};
-                g.validate.rules = g.validate.rules || {};
-                g.validate.rules[name] = field.validate;
-                if (field.validateMessage)
-                {
-                    g.validate.messages = g.validate.messages || {};
-                    g.validate.messages[name] = field.validateMessage;
-                }
-            }
-            out.push(' />');
-            return out.join('');
-        },
+        }, 
         _getInputAttrHtml: function (field)
         {
             var out = [], type = (field.type || "text").toLowerCase();
@@ -818,6 +877,59 @@
                 }
             }
             return out.join('');
+        },
+        _setTab: function (tab)
+        {
+            var g = this, p = this.options;
+            if (!tab || !tab.items) return;
+            var jtab = $('<div class="l-form-tabs"></div>').appendTo(g.element);
+            var jtabNav = $('<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" original-title="">').appendTo(jtab);
+            for (var i = 0; i < tab.items.length; i++)
+            {
+                var tabItem = tab.items[i],
+                    jnavItem = $('<li class="ui-state-default ui-corner-top"><a href="javascript:void(0)"></a></li>').appendTo(jtabNav),
+                    jcontentItem = $('<div class="ui-tabs-panel ui-widget-content ui-corner-bottom">').appendTo(jtab),
+                    idPrev = g.id +"|tdb" + i;
+                jnavItem.add(jcontentItem).attr("data-index", i);
+                jnavItem.find("a:first").text(tabItem.title); 
+                g._initFieldsValidate({
+                    fields: tabItem.fields
+                });
+                g._initFieldsHtml({
+                    panel: jcontentItem,
+                    fields: tabItem.fields,
+                    idPrev: idPrev
+                }); 
+                g._createEditors({
+                    fields: tabItem.fields,
+                    idPrev: idPrev,
+                    editPrev: 'tab' + i + "_"
+                });
+            }
+            jtabNav.find("li").hover(function ()
+            {
+                $(this).addClass("ui-state-active");
+            }, function ()
+            {
+                $(this).removeClass("ui-state-active");
+            }).click(function ()
+            {
+                var index = $(this).attr("data-index");
+                g.selectTab(index);
+            }); 
+            g.selectTab(0);
+        },
+        selectTab : function (index)
+        {
+            var g = this, p = this.options;
+            var jtab = $(g.element).find(".l-form-tabs:first");
+            var links = jtab.find(".ui-tabs-nav li"), contents = jtab.find(".ui-tabs-panel");
+            links.filter("[data-index=" + index + "]")
+                .addClass("ui-tabs-selected ui-state-active ui-state-hover");
+            links.filter("[data-index!=" + index + "]")
+                .removeClass("ui-tabs-selected ui-state-active ui-state-hover"); 
+            contents.filter("[data-index=" + index + "]").show();
+            contents.filter("[data-index!=" + index + "]").hide();
         }
     });
 

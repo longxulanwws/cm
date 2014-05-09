@@ -1,9 +1,9 @@
 ﻿/**
-* jQuery ligerUI 1.2.2
+* jQuery ligerUI 1.2.4
 * 
 * http://ligerui.com
 *  
-* Author daomi 2013 [ gd_star@163.com ] 
+* Author daomi 2014 [ gd_star@163.com ] 
 * 
 */
 (function ($)
@@ -20,6 +20,7 @@
 
     $.ligerDefaults.DateEditor = {
         format: "yyyy-MM-dd hh:mm",
+        width : null,
         showTime: false,
         onChangeDate: false,
         absolute: true,  //选择框是否在附加到body,并绝对定位

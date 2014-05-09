@@ -12,6 +12,13 @@ input.diff {height:20px;line-height:20px;}
 .line-div {width:98%;height:33px;position:relative;float:left;padding:3px 0 0 10px;}
 .label-div {width:14%;height:30px;position:relative;float:left;padding:5px 0 0 0;}
 .in-div {width:36%;height:30px;position:relative;float:left;padding: 2px 0 0 0;}
-.toolbar{position:fixed;width:100%;z-index:100;}
+.toolbar{position:fixed;width:100%;height:35px;z-index:100;}
 .s-text-sort {background:none repeat scroll 0 0 #FFFFFF;border:1px solid #AECAF0;position:relative;width:80px;}
 .s-text-qCond {background:none repeat scroll 0 0 #FFFFFF;border:1px solid #AECAF0;position:relative;width:90px;}
+
+.query-line-div {width:98%;height:10%;position:relative;float:left;padding:3px 0 0 0;}
+.query-label-div {width:6%;height:10%;position:relative;float:left;padding:5px 0 0 0;}
+.query-label-div-l {width:8%;height:10%;position:relative;float:left;padding:5px 0 0 0;}
+.query-in-div {width:10%;height:10%;position:relative;float:left;padding: 2px 0 0 0;}
+.query-in-div-l {width:30%;height:10%;position:relative;float:left;padding: 2px 0 0 0;}
+.query-button-div {width:9%;height:10%;position:relative;float:left;padding: 2px 0 0 0;} 
