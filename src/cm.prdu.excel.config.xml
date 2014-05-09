@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+	<bean id="prduExcelConfig" class="com.ruisoft.cm.base.excel.util.PrduExcelConfig">
+		<!--产品相关信息 -->
+		<property name="product">
+			<!-- 设置产品相关数据的坐标 value=(2,3) -->
+			<bean id="productConfig" class="com.ruisoft.cm.base.excel.util.ProductConfig">
+				<property name="code" value="B3" />
+				<property name="name" value="C3" />
+				<!-- 规格型号 -->
+				<property name="specs" value="D3" />
+				<!-- 单位 -->
+				<property name="uom" value="E3" />
+			</bean>
+		</property>
+		<!--部件/组件 -->
+		<property name="productPart">
+			<!-- 设置‘部件/组件’相关数据的坐标 value=(2,3) -->
+			<bean id="productPartConfig" class="com.ruisoft.cm.base.excel.util.ProductPartConfig">
+				<property name="codeX" value="B" />
+				<property name="codeY" value="6" />
+				
+				<property name="nameX" value="C" />
+				<property name="nameY" value="6" />
+				<!-- 单件产品下的部件数量 -->
+				<property name="numX" value="D" />
+				<property name="numY" value="6" />
+				
+				<!--单件产品下的部件工艺路线名称 -->
+				<property name="routingNameX" value="E" />
+				<property name="routingNameY" value="6" />				
+				<!-- 单位 
+				<property name="uom" value="" />
+				-->
+			</bean>
+		</property>
+		<!--工艺路线 -->
+		<property name="routing">
+			<bean id="routingConfig" class="com.ruisoft.cm.base.excel.util.RoutingConfig">
+
+				<!-- 设置‘工艺路线’相关数据的坐标 value=(2,3) -->
+				<!-- 工艺路线 列明配置  -->
+				<property name="nameX" value="G" />
+				<property name="nameY" value="5" />
+				<!-- 工艺路线  列数，即有多少种工艺 -->
+				<property name="columnNum" value="15" />
+								
+				<!-- 工艺工时配额（分） 取值开始列-->
+				<property name="hoursX" value="G" />
+				<property name="hoursY" value="6" />
+			</bean>
+		</property>
+	</bean>
+</beans>
