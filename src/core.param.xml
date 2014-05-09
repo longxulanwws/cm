@@ -93,11 +93,11 @@
                         <property name="sql">
                             <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
                                 <property name="sql">
-                                    <value><![CDATA[SELECT task_routing_id,task_routing_code AS value, task_routing_name AS name, up_task_routing_code AS pid, Product_ID, Product_Name,task_routing_type  FROM mrp_task_routing WHERE task_routing_type <> '3']]></value>
+                                    <value><![CDATA[SELECT task_routing_id as value,task_routing_code, task_routing_name, up_task_routing_code, Product_ID, Product_Name,task_routing_type  FROM mrp_task_routing WHERE task_routing_type <> '3']]></value>
                                 </property>
                             </bean>
                         </property>
-                        <property name="treeAttr" value="pid" />
+                        <property name="treeAttr" value="up_task_routing_code" />
                     </bean>
                 </entry>  								
 			</map>

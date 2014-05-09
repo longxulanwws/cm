@@ -18,8 +18,23 @@
                     columns:[
                         {display:'任务名称',name:'task_routing_name',id:'task_routing_name',width:130,align: 'left'},
                         {display:'任务项编号',name:'task_routing_code',id:'task_routing_code',width:130,align: 'left'},
-                        {display:'工时定额',name:'task_routing_standard_hour',width:90},
-                        {display:'任务项数量',name:'task_routing_qty',width:100}
+                        {display:'任务项数量',name:'task_routing_qty',width:100,render:function(item){return item.task_routing_qty? parseFloat(item.task_routing_qty).toFixed(2) : '';}},
+                        {display:'外协',name:'waixie',width:60,align:'right',render:re_hour},
+                        {display:'备料',name:'beiliao',width:60,align:'right',render:function(item){return item.beiliao? parseFloat(item.beiliao).toFixed(2) : '';}},
+                        {display:'激光',name:'jiguang',width:60,align:'right',render:function(item){return item.jiguang? parseFloat(item.jiguang).toFixed(2) : '';}},
+                        {display:'数冲',name:'shuchong',width:60,align:'right',render:function(item){return item.shuchong? parseFloat(item.shuchong).toFixed(2) : '';}},
+                        {display:'折弯',name:'zhewan',width:60,align:'right',render:function(item){return item.zhewan ? parseFloat(item.zhewan).toFixed(2) : '';}},
+                        {display:'压铆',name:'yamao',width:60,align:'right',render:function(item){return item.yamao ? parseFloat(item.yamao).toFixed(2) : '';}},
+                        {display:'压焊',name:'yahan',width:60,align:'right',render:function(item){return item.yahan ? parseFloat(item.yahan).toFixed(2) : '';}},
+                        {display:'切割',name:'qiege',width:60,align:'right',render:function(item){return item.qiege ? parseFloat(item.qiege).toFixed(2) : '';}},
+                        {display:'打孔',name:'dakong',width:60,align:'right',render:function(item){return item.dakong ? parseFloat(item.dakong).toFixed(2) : '';}},
+                        {display:'攻丝',name:'gongsi',width:60,align:'right',render:function(item){return item.gongsi ? parseFloat(item.gongsi).toFixed(2) : '';}},
+                        {display:'焊接',name:'hanjie',width:60,align:'right',render:function(item){return item.hanjie ? parseFloat(item.hanjie).toFixed(2) : '';}},
+                        {display:'打磨',name:'damo',width:60,align:'right',render:function(item){return item.damo ? parseFloat(item.damo).toFixed(2) : '';}},
+                        {display:'拉丝',name:'lasi',width:60,align:'right',render:function(item){return item.lasi ? parseFloat(item.lasi).toFixed(2) : '';}},
+                        {display:'丝印',name:'siyin',width:60,align:'right',render:function(item){return item.siyin ? parseFloat(item.siyin).toFixed(2) : '';}},
+                        {display:'喷涂',name:'peitu',width:60,align:'right',render:function(item){return item.peitu ? parseFloat(item.peitu).toFixed(2) : '';}},
+                        {display:'组装',name:'zuzhuang',width:60,align:'right',render:function(item){return item.zuzhuang ? parseFloat(item.zuzhuang).toFixed(2) : '';}}
                     ],
                     pageSize:20,
                     usePager: true,
@@ -82,7 +97,14 @@
             });
             //新增
             function openDictDef() {
-                parent.f_addTab('new_add_production_task','新增生产任务项','./production/add_production_task.html');
+                parent.f_addTab('new_add_product_task','新增生产任务项','./production/add_task.html');
+            }
+            
+            function re_hour(item){
+                if (item.waixie==null){
+                    return item.waixie = '';
+                }
+                return item.waixie ? parseFloat(item.waixie).toFixed(2) : '';
             }
             //编辑
             function openModify() {
@@ -92,7 +114,7 @@
                     $.ligerDialog.error('请先选择生产任务项记录。','错误');
                     return;
                 }
-                parent.f_addTab('modify_production_task','生产任务项维护','./production/add_production_task.html?o=m&code='.concat(row.task_routing_code));
+                parent.f_addTab('modify_production_task','生产任务项维护','./production/add_task.html?o=m&code='.concat(row.product_id));
             }
                 //通用单据查询 界面
                 function searchRow(){
@@ -105,10 +127,38 @@
                     var stockDelID=row.code;
                     parent.f_addTab('new_search_stockS'+stockDelID,'单据明细信息('+stockDelID+')','./stock/search_stock_produce_task.html?o=s&code='.concat(row.code));
                 }
-                //删除处理 
-                function deleteRow(rowid) {
-                	
-                }
+                
+                /*  删除处理 
+                 */
+                  function deleteRow(rowid) {
+                      var row = defGrid.getSelectedRow();
+                      if (!row) {
+                          $.ligerDialog.error('请先选择任务记录。','错误');
+                          return;
+                      }               
+                         $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
+                             if (!r)
+                                 return;
+                             if (row['__status'] !== 'add')
+                                 toDel(row);
+                             defGrid.deleteRow(rowid);
+                         })
+                     }
+                // 删除处理业务处理
+                function toDel(row) {
+                    var data = JSON.stringify(reqObj('d','production.delete.mrp_task_routing.delete_id',JSON.stringify(row)));
+                       ajaxSubmit("/cm/rbac/cm.do?m=d", data, function(data) {
+                           if (data) {
+                               if (parseInt(data['status']) > 0) {
+                                     $.ligerDialog.success('删除成功');
+                                     toQuery();
+                                   }
+                                   else{
+                                     $.ligerDialog.error('删除失败');
+                                    }
+                             }
+                       });
+               }
                 //查询生产订单编号信息
                 function toQuery(item, page, pageSize) {
                     if (!page)

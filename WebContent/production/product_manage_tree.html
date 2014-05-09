@@ -35,9 +35,9 @@
 
                 productTree = $("#tree_div").ligerTree({
                     checkbox: false,
-                    textFieldName:'name',
-                    idFieldName:'value',
-                    parentIDFieldName:'pid',
+                    textFieldName:'task_routing_name',
+                    idFieldName:'task_routing_code',
+                    parentIDFieldName:'up_task_routing_code',
                     slide:false,
                     isExpand: false,
                     btnClickToToggleOnly: false,
@@ -58,16 +58,16 @@
             function onselect(node) {
             	//如果包含叶子节点，展示横向工时
                 if (treeManager.hasChildren(node.data)){
-                    tabManager.overrideSelectedTabItem({tabid:node.data.id, text:node.data.name, url:"production_task_search.html?code=".concat(node.data.id)});
+                    tabManager.overrideSelectedTabItem({tabid:node.data.task_routing_id, text:node.data.task_routing_name, url:"production_task_search.html?code=".concat(node.data.task_routing_id)});
                 } else{
                 	//当是叶子节点时，展示工序集合
-                    tabManager.overrideSelectedTabItem({tabid:node.data.id, text:node.data.name, url:"production_task_manage.html?code=".concat(node.data.id)});
+                    tabManager.overrideSelectedTabItem({tabid:node.data.task_routing_id, text:node.data.task_routing_name, url:"production_task_manage.html?code=".concat(node.data.task_routing_id)});
                 }
             }
             //右键获取树的数值事件
              function oncontextmenu(node, e)
             { 
-                actionNodeID = node.data.name;
+                actionNodeID = node.data.task_routing_name;
                 menu.show({ top: e.pageY, left: e.pageX });
                 return false;
             }

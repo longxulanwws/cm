@@ -17,18 +17,11 @@
             $(function(){
                 pTree = $("#tree_div").ligerTree({
                     nodeWidth:142,
-                    textFieldName:'name',
-                    idFieldName:'value',
-                    parentIDFieldName:'pid',
-                    isExpand:false,
+                    textFieldName:'task_routing_name',
+                    idFieldName:'task_routing_code',
+                    parentIDFieldName:'up_task_routing_code',
                     checkbox:false,
-                    single:true,
                     btnClickToToggleOnly: false,
-                    onSelect:function(data) {
-                        if (data.data && data.data.leaf == '1') {
-                            pNode = data.data.code;
-                        }
-                    },
                     data:pType
                 });
                 $("#pageloading").hide();

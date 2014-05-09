@@ -451,3 +451,25 @@ function getdiffDate(beginDate,endDate){
 	return intDay;
 }
 
+/**
+ * 根据孩子节点code，获取父节点code
+ * @param childCode 孩子节点code
+ * @returns 父节点code
+ */
+function getPid(childCode){
+	var pos=childCode.lastIndexOf("-");
+	var pidCode = childCode.substring(0,pos);
+	return pidCode;
+}
+
+/**
+ * 判断字符串中是否包含组织分隔符"-"
+ * @param str 字符串
+ * @returns {Boolean}
+ */
+function isContain(str){
+	if(str.indexOf("-") > 0){
+		return true;
+	}
+	return false;
+}
