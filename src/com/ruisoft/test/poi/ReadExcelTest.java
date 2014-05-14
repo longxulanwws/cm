@@ -44,7 +44,7 @@ public class ReadExcelTest {
 	 *            导入的excel文件
 	 * @return ProductionTaskRouting 部件信息对象list
 	 */
-	public static List<ProductionTaskRouting> readExcelData(String fileName) {
+	public static ProductionTaskRouting readExcelData(String fileName) {
 
 		// 解析配置文件 此部分在 并入 Spring web 容器时，不需要
 		ApplicationContext context = new FileSystemXmlApplicationContext("src/cm.prdu.excel.config.xml");
@@ -59,16 +59,20 @@ public class ReadExcelTest {
 		 * 定义相关数据对象实体
 		 */
 		// 产品对象
-		ProductEntiy pruductEntiy = new ProductEntiy();
+		ProductRoutingEntiy productRoutingEntiy = new ProductRoutingEntiy();
+		// 产品对象List
+		List<ProductRoutingEntiy> productRoutingEntityList = new ArrayList<ProductRoutingEntiy>();
 		// 工艺项对象
 		RoutingEntity RoutingEntity = new RoutingEntity();
 		// 工艺项的List 并初始
 		List<RoutingEntity> routingEntityList = new ArrayList<RoutingEntity>();
+		// 工艺项对象
+		TaskRoutingEntity taskRoutingEntity = new TaskRoutingEntity();
+		// 初始 产品部件项对象List
+		List<TaskRoutingEntity> taskRoutingEntityList = new ArrayList<TaskRoutingEntity>();
 
 		// 初始 产品部件项对象
-		ProductionTaskRouting taskRouting = new ProductionTaskRouting();
-		// 初始 产品部件项对象List
-		List<ProductionTaskRouting> taskRoutingList = new ArrayList<ProductionTaskRouting>();
+		ProductionTaskRouting productiontaskRouting = new ProductionTaskRouting();
 
 		/*
 		 * 开始解析excel文件，进行每sheet 每row，每cell 处理
@@ -95,6 +99,10 @@ public class ReadExcelTest {
 			HashMap<String, String> routingNameMap = new HashMap<String, String>();
 			// 进行逐行（row）处理
 			for (Row row : sheet1) {
+
+				String product_code = null;
+
+				String product_name = null;
 				// 定义使用的产品部件信息
 				// 部件编号
 				String task_routing_code = "";
@@ -112,8 +120,8 @@ public class ReadExcelTest {
 					// 获得 单元格的坐标 如 A1 ，B6等
 					CellReference cellRef = new CellReference(row.getRowNum(), cell.getColumnIndex());
 
-					 System.out.print(cellRef.formatAsString());
-					 System.out.print(" - ");
+					System.out.print(cellRef.formatAsString());
+					System.out.print(" - ");
 
 					// 按excel单元格类型进行取值
 					switch (cell.getCellType()) {
@@ -143,44 +151,41 @@ public class ReadExcelTest {
 						// System.out.println();
 					}
 
-				 System.out.println("cellValue:" + cellValue);
+					System.out.println("cellValue:" + cellValue);
 
 					/*
 					 * 产品相关信息处理
 					 */
-					// 产品编号赋值
-					String product_code = productConf.getCode().equalsIgnoreCase(cellRef.formatAsString()) ? cellValue : "";
+					String cellCoords = cellRef.formatAsString();
+					String cellCoordsX = cellCoords.substring(0, 1);
+					int cellCoordsY = Integer.valueOf(cellCoords.substring(cellCoords.length() - 1, cellCoords.length()));
 
-					// 非空时给产品对象赋值
-					if (StringUtils.isNotBlank(product_code))
-						pruductEntiy.setCode(product_code);
+					// 对excel中定义的“产品数据”区域处理
+					if (productConf.getCodeY() <= cellCoordsY) {
+						// 按设置的列进行赋值
+						// 产品编号赋值
+						if (productConf.getCodeX().equalsIgnoreCase(cellCoordsX) && StringUtils.isNotBlank(cellValue)) {
+							productRoutingEntiy.setCode(cellValue);
+							product_code = cellValue;
+						}
 
-					// 产品名称赋值
-					String product_name = productConf.getName().equalsIgnoreCase(cellRef.formatAsString()) ? cellValue : "";
-					// 非空时给产品对象赋值
-					if (StringUtils.isNotBlank(product_name))
-						pruductEntiy.setName(product_name);
+						// 产品名称赋值
+						if (productConf.getNameX().equalsIgnoreCase(cellCoordsX) && StringUtils.isNotBlank(cellValue)) {
+							productRoutingEntiy.setName(cellValue);
+							product_name = cellValue;
+						}
 
-					// 产品规格型号赋值
-					String product_specs = productConf.getSpecs().equalsIgnoreCase(cellRef.formatAsString()) ? cellValue : "";
-					// 非空时给产品对象赋值
-					if (StringUtils.isNotBlank(product_specs))
-						pruductEntiy.setSpecs(product_specs);
+						// 数量列
+						if (productConf.getSpecsX().equalsIgnoreCase(cellCoordsX))
+							productRoutingEntiy.setSpecs(cellValue);
 
-					// 产品单位赋值
-					String product_uom = productConf.getUom().equalsIgnoreCase(cellRef.formatAsString()) ? cellValue : "";
-					// 非空时给产品对象赋值
-					if (StringUtils.isNotBlank(product_uom))
-						pruductEntiy.setUom(product_uom);
+					}
 
 					/*
 					 * 部件相关信息处理
 					 */
 
 					// 部件相关信息赋值
-					String cellCoords = cellRef.formatAsString();
-					String cellCoordsX = cellCoords.substring(0, 1);
-					int cellCoordsY = Integer.valueOf(cellCoords.substring(cellCoords.length() - 1, cellCoords.length()));
 
 					// 对excel中定义的“产品部件数据”区域处理
 					if (productPartConf.getCodeY() <= cellCoordsY) {
@@ -232,37 +237,55 @@ public class ReadExcelTest {
 					}
 				}// end of rows
 					// 一行处理结束后处理
-					// 按每行（row）生成一个产品部件数据对象处理
-				if (StringUtils.isNotBlank(task_routing_code))
-					taskRouting.setTask_routing_code(task_routing_code);
-
-				if (StringUtils.isNotBlank(task_routing_name))
-					taskRouting.setTask_routing_name(task_routing_name);
-
-				if (StringUtils.isNotBlank(task_routing_qty))
-					taskRouting.setTask_routing_qty(task_routing_qty);
-
-				if (StringUtils.isNotBlank(task_routing_routingName))
-					taskRouting.setTask_routing_qty(task_routing_routingName);
-
-				// 设置产品对象
-				taskRouting.setPruductEntiy(pruductEntiy);
-				// 设置单个部件的工艺路线数据list对象
-				taskRouting.setRoutingEntityList(routingEntityList);
-				// 清空 工艺路线数据list对象
-				routingEntityList.clear();
 
 				// 若部件项code\name不为空，则部件list增加部件对象
 				if (StringUtils.isNotBlank(task_routing_name)) {
-					taskRoutingList.add(taskRouting);
+					// 按每行（row）生成一个产品部件数据对象处理
+					if (StringUtils.isNotBlank(task_routing_code))
+						taskRoutingEntity.setTask_routing_code(task_routing_code);
+
+					if (StringUtils.isNotBlank(task_routing_name))
+						taskRoutingEntity.setTask_routing_name(task_routing_name);
+
+					if (StringUtils.isNotBlank(task_routing_qty))
+						taskRoutingEntity.setTask_routing_qty(task_routing_qty);
+
+					if (StringUtils.isNotBlank(task_routing_routingName))
+						taskRoutingEntity.setTask_routing_qty(task_routing_routingName);
+
+					// 设置单个部件的工艺路线数据list对象
+					taskRoutingEntity.setRoutingEntityList(routingEntityList);
+					
+					if (StringUtils.isNotBlank(product_code))
+						taskRoutingEntity.setProduct_code(product_code);
+					if (StringUtils.isNotBlank(product_name))
+						taskRoutingEntity.setProduct_name(product_name);
+
+					taskRoutingEntityList.add(taskRoutingEntity);
+					
+					productiontaskRouting.setProductOrParts("parts");
 
 					System.out.println("task_routing_code:" + task_routing_code);
 					System.out.println("task_routing_name:" + task_routing_name);
 					System.out.println("task_routing_qty:" + task_routing_qty);
 					System.out.println("task_routing_routingName:" + task_routing_routingName);
+					
+					
+				} else {
+					// 设置单个产品的工艺路线数据list对象
+					productRoutingEntiy.setRoutingEntityList(routingEntityList);
+					// 单品时处理
+					productRoutingEntityList.add(productRoutingEntiy);
+					
+					productiontaskRouting.setProductOrParts("product");
 				}
 
-			}// end of sheets for loop
+				// 清空 工艺路线数据list对象
+				routingEntityList.clear();
+
+			}// end of row for loop
+			productiontaskRouting.setProductRoutingEntityList(productRoutingEntityList);
+			productiontaskRouting.setTaskRoutingEntityList(taskRoutingEntityList);
 
 			// close file input stream
 			fis.close();
@@ -271,14 +294,14 @@ public class ReadExcelTest {
 			e.printStackTrace();
 		}
 
-		return taskRoutingList;
+		return productiontaskRouting;
 	}
 
 	public static void main(String args[]) {
 
 		// readExcelData("src/com/ruisoft/test/poi/Sample.xlsx");
-		List<ProductionTaskRouting> list = readExcelData("src/com/ruisoft/test/poi/XX公司XX产品工艺工时定额导入模板 .xls");
-		System.out.println("ProductionTaskRouting List\n" + list);
+		ProductionTaskRouting productionTaskRouting  = readExcelData("src/com/ruisoft/test/poi/XX公司XX产品工艺工时定额导入模板 .xls");
+		System.out.println("ProductionTaskRouting List\n" + productionTaskRouting);
 
 	}
 

@@ -1,41 +1,51 @@
 package com.ruisoft.cm.base.excel.util;
 
 public class ProductConfig {
-	private String code = null;
-	private String name = null;
-	private String uom = null;
-	private String specs = null;
-
-	public String getCode() {
-		return code;
+	private String codeX = null;
+	private String nameX = null;
+	private String specsX = null;
+	private int codeY = 0;
+	private int nameY = 0;
+	private int specsY = 0;
+	public String getCodeX() {
+		return codeX;
+	}
+	public void setCodeX(String codeX) {
+		this.codeX = codeX;
+	}
+	public String getNameX() {
+		return nameX;
+	}
+	public void setNameX(String nameX) {
+		this.nameX = nameX;
 	}
 
-	public void setCode(String code) {
-		this.code = code;
+	public int getCodeY() {
+		return codeY;
+	}
+	public void setCodeY(int codeY) {
+		this.codeY = codeY;
+	}
+	public int getNameY() {
+		return nameY;
+	}
+	public void setNameY(int nameY) {
+		this.nameY = nameY;
+	}
+	public String getSpecsX() {
+		return specsX;
+	}
+	public void setSpecsX(String specsX) {
+		this.specsX = specsX;
+	}
+	public int getSpecsY() {
+		return specsY;
+	}
+	public void setSpecsY(int specsY) {
+		this.specsY = specsY;
 	}
 
-	public String getName() {
-		return name;
-	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
 
-	public String getUom() {
-		return uom;
-	}
-
-	public void setUom(String uom) {
-		this.uom = uom;
-	}
-
-	public String getSpecs() {
-		return specs;
-	}
-
-	public void setSpecs(String specs) {
-		this.specs = specs;
-	}
 
 }
