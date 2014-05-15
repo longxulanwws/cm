@@ -256,13 +256,16 @@ function toTree(data) {
  * @param action Function 按钮的onclick事件
  * @param title String 鼠标指向该按钮时的提示信息
  */
-function appendBtnForGridToolbar(divStyle, btnStyle, action, title) {
+function appendBtnForGridToolbar(divStyle, btnStyle, action, title,btnName) {
 	if (!divStyle && !btnStyle)
 		return;
-	
+	var showBtNameStr='';
+	if(btnName)
+		showBtNameStr='<div><span>' + btnName	+ '</span></div>';
+		
 	$(".l-panel-bbar-inner .l-clear").before('<div class="l-bar-group"><div class="l-bar-button '
 			+ divStyle + '"><span class="' + btnStyle + '" title="' + title
-			+ '"></span></div></div><div class="l-bar-separator"></div>');
+			+ '"></span></div>'+showBtNameStr+'</div><div class="l-bar-separator"></div>');
 	var s = "div.l-bar-button";
 	if (divStyle)
 		s = s.concat(".").concat(divStyle);
@@ -282,10 +285,10 @@ function appendBtnForGridToolbar(divStyle, btnStyle, action, title) {
  * @param action Function 按钮的onclick事件
  * @param title String 鼠标指向该按钮时的提示信息
  */
-function appendAddBtn(action, title) {
+function appendAddBtn(action, title,btnName) {
 	if (!title)
 		title = "新增";
-	appendBtnForGridToolbar("l-bar-btnadd", "l-icon-add", action, title);
+	appendBtnForGridToolbar("l-bar-btnadd", "l-icon-add", action, title,btnName);
 }
 /**
  * 向Grid组件中的Toolbar中添加“修改”按钮
