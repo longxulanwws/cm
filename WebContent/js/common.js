@@ -261,7 +261,7 @@ function appendBtnForGridToolbar(divStyle, btnStyle, action, title,btnName) {
 		return;
 	var showBtNameStr='';
 	if(btnName)
-		showBtNameStr='<div><span>' + btnName	+ '</span></div>';
+		showBtNameStr='<div style="color: #2C4D79;width:100px;height: 22px;line-height:22px;text-align:center;"><span>' + btnName	+ '</span></div>';
 		
 	$(".l-panel-bbar-inner .l-clear").before('<div class="l-bar-group"><div class="l-bar-button '
 			+ divStyle + '"><span class="' + btnStyle + '" title="' + title
@@ -285,10 +285,14 @@ function appendBtnForGridToolbar(divStyle, btnStyle, action, title,btnName) {
  * @param action Function 按钮的onclick事件
  * @param title String 鼠标指向该按钮时的提示信息
  */
-function appendAddBtn(action, title,btnName) {
+function appendAddBtn(action, title,btnName,buttonId) {
 	if (!title)
 		title = "新增";
-	appendBtnForGridToolbar("l-bar-btnadd", "l-icon-add", action, title,btnName);
+	if(!buttonId)
+		buttonId = "l-bar-btnadd";
+	else
+		buttonId = "l-bar-btnadd-"+buttonId;
+	appendBtnForGridToolbar(buttonId, "l-icon-add", action, title,btnName);
 }
 /**
  * 向Grid组件中的Toolbar中添加“修改”按钮

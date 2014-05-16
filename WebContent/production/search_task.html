@@ -16,25 +16,26 @@
             $(function(){
                 defGrid = $("#query_list").ligerGrid({
                     columns:[
+                        {display:'产品编号',name:'product_code',id:'product_code',width:130,align: 'left'},  
                         {display:'任务名称',name:'task_routing_name',id:'task_routing_name',width:130,align: 'left'},
-                        {display:'任务项编号',name:'task_routing_code',id:'task_routing_code',width:130,align: 'left'},
-                        {display:'任务项数量',name:'task_routing_qty',width:100,render:function(item){return item.task_routing_qty? parseFloat(item.task_routing_qty).toFixed(2) : '';}},
+                        {display:'任务项编号',name:'task_routing_code_display',id:'task_routing_code_display',width:130,align: 'left'},
+                        {display:'任务项数量',name:'task_routing_qty',width:100,render:function(item){return item.task_routing_qty&&item.task_routing_qty!='null'? parseFloat(item.task_routing_qty).toFixed(2) : '';}},
                         {display:'外协',name:'waixie',width:60,align:'right',render:re_hour},
-                        {display:'备料',name:'beiliao',width:60,align:'right',render:function(item){return item.beiliao? parseFloat(item.beiliao).toFixed(2) : '';}},
-                        {display:'激光',name:'jiguang',width:60,align:'right',render:function(item){return item.jiguang? parseFloat(item.jiguang).toFixed(2) : '';}},
-                        {display:'数冲',name:'shuchong',width:60,align:'right',render:function(item){return item.shuchong? parseFloat(item.shuchong).toFixed(2) : '';}},
-                        {display:'折弯',name:'zhewan',width:60,align:'right',render:function(item){return item.zhewan ? parseFloat(item.zhewan).toFixed(2) : '';}},
-                        {display:'压铆',name:'yamao',width:60,align:'right',render:function(item){return item.yamao ? parseFloat(item.yamao).toFixed(2) : '';}},
-                        {display:'压焊',name:'yahan',width:60,align:'right',render:function(item){return item.yahan ? parseFloat(item.yahan).toFixed(2) : '';}},
-                        {display:'切割',name:'qiege',width:60,align:'right',render:function(item){return item.qiege ? parseFloat(item.qiege).toFixed(2) : '';}},
-                        {display:'打孔',name:'dakong',width:60,align:'right',render:function(item){return item.dakong ? parseFloat(item.dakong).toFixed(2) : '';}},
-                        {display:'攻丝',name:'gongsi',width:60,align:'right',render:function(item){return item.gongsi ? parseFloat(item.gongsi).toFixed(2) : '';}},
-                        {display:'焊接',name:'hanjie',width:60,align:'right',render:function(item){return item.hanjie ? parseFloat(item.hanjie).toFixed(2) : '';}},
-                        {display:'打磨',name:'damo',width:60,align:'right',render:function(item){return item.damo ? parseFloat(item.damo).toFixed(2) : '';}},
-                        {display:'拉丝',name:'lasi',width:60,align:'right',render:function(item){return item.lasi ? parseFloat(item.lasi).toFixed(2) : '';}},
-                        {display:'丝印',name:'siyin',width:60,align:'right',render:function(item){return item.siyin ? parseFloat(item.siyin).toFixed(2) : '';}},
-                        {display:'喷涂',name:'peitu',width:60,align:'right',render:function(item){return item.peitu ? parseFloat(item.peitu).toFixed(2) : '';}},
-                        {display:'组装',name:'zuzhuang',width:60,align:'right',render:function(item){return item.zuzhuang ? parseFloat(item.zuzhuang).toFixed(2) : '';}}
+                        {display:'备料',name:'beiliao',width:60,align:'right',render:function(item){return item.beiliao&&item.beiliao!='null'? parseFloat(item.beiliao).toFixed(2) : '';}},
+                        {display:'激光',name:'jiguang',width:60,align:'right',render:function(item){return item.jiguang&&item.jiguang!='null'? parseFloat(item.jiguang).toFixed(2) : '';}},
+                        {display:'数冲',name:'shuchong',width:60,align:'right',render:function(item){return item.shuchong&&item.shuchong!='null'? parseFloat(item.shuchong).toFixed(2) : '';}},
+                        {display:'折弯',name:'zhewan',width:60,align:'right',render:function(item){return item.zhewan&&item.zhewan!='null' ? parseFloat(item.zhewan).toFixed(2) : '';}},
+                        {display:'压铆',name:'yamao',width:60,align:'right',render:function(item){return item.yamao&&item.yamao!='null'? parseFloat(item.yamao).toFixed(2) : '';}},
+                        {display:'压焊',name:'yahan',width:60,align:'right',render:function(item){return item.yahan&&item.yahan!='null' ? parseFloat(item.yahan).toFixed(2) : '';}},
+                        {display:'切割',name:'qiege',width:60,align:'right',render:function(item){return item.qiege&&item.qiege!='null' ? parseFloat(item.qiege).toFixed(2) : '';}},
+                        {display:'打孔',name:'dakong',width:60,align:'right',render:function(item){return item.dakong&&item.dakong!='null' ? parseFloat(item.dakong).toFixed(2) : '';}},
+                        {display:'攻丝',name:'gongsi',width:60,align:'right',render:function(item){return item.gongsi&&item.gongsi!='null' ? parseFloat(item.gongsi).toFixed(2) : '';}},
+                        {display:'焊接',name:'hanjie',width:60,align:'right',render:function(item){return item.hanjie&&item.hanjie!='null' ? parseFloat(item.hanjie).toFixed(2) : '';}},
+                        {display:'打磨',name:'damo',width:60,align:'right',render:function(item){return item.damo&&item.damo!='null' ? parseFloat(item.damo).toFixed(2) : '';}},
+                        {display:'拉丝',name:'lasi',width:60,align:'right',render:function(item){return item.lasi&&item.lasi!='null' ? parseFloat(item.lasi).toFixed(2) : '';}},
+                        {display:'丝印',name:'siyin',width:60,align:'right',render:function(item){return item.siyin&&item.siyin!='null' ? parseFloat(item.siyin).toFixed(2) : '';}},
+                        {display:'喷涂',name:'peitu',width:60,align:'right',render:function(item){return item.peitu&&item.peitu!='null' ? parseFloat(item.peitu).toFixed(2) : '';}},
+                        {display:'组装',name:'zuzhuang',width:60,align:'right',render:function(item){return item.zuzhuang&&item.zuzhuang!='null' ? parseFloat(item.zuzhuang).toFixed(2) : '';}}
                     ],
                     pageSize:20,
                     usePager: true,
@@ -51,6 +52,7 @@
                     clickToEdit:false,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     alternatingRow: false, 
+                    isShowDetailToggle:true,
                     tree: { columnId: 'task_routing_name',
                             idField: 'task_routing_code',
                             parentIDField: 'up_task_routing_code' },
@@ -86,10 +88,11 @@
                         toQuery(item, cp);
                     },
                 });
-                appendAddBtn(openDictDef, "添加生产任务项");
+                appendAddBtn(openDictDef, '复杂产品','复杂产品','first');
+                appendAddBtn(openDictDefTask, '单品','单品','second');
                 appendDeleteBtn(deleteRow, "删除生产任务项");
                 appendModifyBtn(openModify, "编辑生产任务项目");
-                appendSearchBtn(searchRow, "查看生产任务项信息");
+               // appendSearchBtn(searchRow, "查看生产任务项信息");
                 $("#pageloading").hide();
                 //默认查询全部数据 
                 toQuery();
@@ -99,13 +102,17 @@
             function openDictDef() {
                 parent.f_addTab('new_add_product_task','新增生产任务项','./production/add_task.html');
             }
-            
+            //新增单品
+            function openDictDefTask(){
+            	parent.f_addTab('new_add_product_task_gongyi','新增工艺路线','./production/add_task_gongyi.html');
+            }
             function re_hour(item){
-                if (item.waixie==null){
+                if (item.waixie=='null'){
                     return item.waixie = '';
                 }
                 return item.waixie ? parseFloat(item.waixie).toFixed(2) : '';
             }
+            
             //编辑
             function openModify() {
                 
@@ -114,7 +121,13 @@
                     $.ligerDialog.error('请先选择生产任务项记录。','错误');
                     return;
                 }
-                parent.f_addTab('modify_production_task','生产任务项维护','./production/add_task.html?o=m&code='.concat(row.product_id));
+                var type = row.task_routing_level;
+                if (type=='0'){
+                	parent.f_addTab('modify_production_task','生产任务项维护','./production/add_task.html?o=m&code='.concat(row.product_id));
+                }else{
+                	parent.f_addTab('modify_production_task_gongyi','工艺路线维护','./production/add_task_gongyi.html?o=m&code='.concat(row.product_id));
+                }
+                
             }
                 //通用单据查询 界面
                 function searchRow(){
@@ -184,7 +197,30 @@
                         defGrid.set({data: data['data']});
                     });
                 }
-        
+                //导入验证和处理机制
+                function OK() { //点击确定按钮的时候
+                      var filename = ($("#FileUpload").val());
+                      alert(document.getElementByIdx_x('upload').files.item(0).getAsDataURL());
+                        if (filename == "") {
+                        $.messager.alert('系统提示', '请选择将要上传的文件!');
+                        document.forms[0].submit();
+                        }
+                       else {
+                       var stuff = filename.substring( filename.lastIndexOf('.')+1 );
+                       alert(stuff);
+                       if (stuff != 'xls' && stuff != 'xlsx') {
+                       alert('文件类型不正确，请选择.xls或者.xlsx文件!');
+                       document.forms[0].submit();
+                       }
+                       else {
+                    	   var data = {file:filename};
+                           ajaxSubmit("/cm/rbac/cm.do?m=excel", data, function(data) {
+                        	   alert(data);
+                          }); 
+                     }
+                 }
+                }
+ 
         </script>
         <style type="text/css">
             label{margin: 5px 20px 5px 15px;}
@@ -196,6 +232,7 @@
             .dplD {width:36%;position:relative;float:left;}
             .title{font-size:14px;font-weight:bold;background-position:left;padding-left:18px;}
             .l-dialog-content-nopadding{padding:0 !important;}
+            .tx1 { width: 250px;border: 1px solid; background: White}
         </style>
     </head>
     <body style="padding:0;">
@@ -207,6 +244,11 @@
                      <label>任务项名称</label><input type="text" class="s-text-qCond txt-def" id="task_routing_nameQ" />
                     <input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
                     <input type="button" value="清空" onclick="toReset('#query_cond input,select,textarea');" />
+                </div>
+                <div class="fields">
+                    <label>文件导入  </label>
+                    <input type="file" id="fileBrowser" name="fileBrowser" size="50" onchange="readFile(this)" />
+                    <input type="button" value="导入" onclick="OK()" />
                 </div>
                 <div id="query_list"></div>
             </div>

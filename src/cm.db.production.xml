@@ -17,7 +17,9 @@
                         <property name="sql">
                             <value>
 <![CDATA[SELECT * FROM 
-(select * from mrp_task_routing  WHERE mrp_task_routing.task_routing_type <> '3') AS a
+(select m.*,CASE task_routing_type WHEN '1' THEN Product_ID ELSE ''END AS product_code,
+ CASE task_routing_type WHEN '2' THEN task_routing_code ELSE ''END AS task_routing_code_display
+  from mrp_task_routing AS m  WHERE m.task_routing_type <> '3') AS a
 LEFT JOIN
 (SELECT up_task_routing_code AS up_task_code ,
 max(CASE task_routing_code WHEN '001' THEN task_routing_standard_hour ELSE '' END) AS waixie  ,
@@ -36,7 +38,7 @@ max(CASE task_routing_code WHEN '013' THEN task_routing_standard_hour ELSE '' EN
 max(CASE task_routing_code WHEN '014' THEN task_routing_standard_hour ELSE '' END) AS siyin   ,
 max(CASE task_routing_code WHEN '015' THEN task_routing_standard_hour ELSE '' END) AS peitu   ,
 max(CASE task_routing_code WHEN '016' THEN task_routing_standard_hour ELSE '' END) AS zuzhuang 
-FROM mrp_task_routing GROUP BY  up_task_routing_code)  AS B ON A.task_routing_code =B.up_task_code ]]>
+FROM mrp_task_routing GROUP BY  up_task_routing_code)  AS B ON A.task_routing_code =B.up_task_code  ]]>
                             </value>
                         </property>
                         <property name="conditions">
@@ -64,6 +66,16 @@ where A.task_routing_code = B.Code AND A.task_routing_code = {product_id}]]>
                         <property name="sql">
                             <value>
 <![CDATA[select * from mrp_task_routing where FIND_IN_SET(task_routing_code, getChildLst({product_id})) AND task_routing_code <> {product_id} and task_routing_type <> '3' AND Product_ID ={product_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>  
+                 <!--单品工艺路线查询  -->
+                 <entry key="mrp_task_routing_gongyi.select">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[select * from mrp_task_routing where FIND_IN_SET(task_routing_code, getChildLst({product_id})) AND task_routing_code <> {product_id} AND Product_ID ={product_id}]]>
                             </value>
                         </property>
                     </bean>

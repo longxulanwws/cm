@@ -13,7 +13,7 @@
         <script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
         <script src="../js/common.js" type="text/javascript"></script>
         <script type="text/javascript">
-            var pGrid, c_row, opt, c_code,detailDialog,c_product_name;
+            var pGrid, c_row, opt, c_code,detailDialog;
             $(function(){   
                 $("#layout_main").ligerLayout({
                     bottomHeight: "55%",
@@ -33,17 +33,11 @@
                 ]});
                 pGrid = $("#p-div").ligerGrid({
                     columns:[
-                             {display:'操作',name:'operation',isSort:false,width:130,render:function(rowdata,rowindex,value) {
-                                 var h = ""; 
-                                 var row = pGrid.getRow(rowindex);
-                                 h += "<a href='javascript:void(0);' id='toConfirm' class='opt-link' onclick='manageRow(" + rowindex + ")'>维护</a> ";
-                                 return h; 
-                             },frozen:true},
-                             {display:'任务编号',name:'task_routing_code',width:160,align:'left',editor:{type:'string'}},
-                             {display:'任务名称',name:'task_routing_name',width:160,align:'left',editor:{type:'string'}},
-                             {display:'数量',name:'task_routing_qty',width:100,align:'right',editor:{type:'string'},render:function(item){return item.task_routing_qty ? parseFloat(item.task_routing_qty).toFixed(2) : '';}},
-                             {display:'备注',name:'note',width:160,align:'right',editor:{type:'string'}}
-                             ],
+                        {display:'工艺路线名称',name:'task_routing_code',type:'string',width:160,render:function(item){return paramRender(item,'gongyi_luxian',item.task_routing_code);}
+                           ,editor:{type:'select',data:getData('gongyi_luxian'),valueField:'value',textField:'name'}},
+                        {display:'计划工时',name:'task_routing_standard_hour',width: 100, editor:{type:'string'},render:function(item){return item.task_routing_standard_hour ? parseFloat(item.task_routing_standard_hour).toFixed(2) : '';}},
+                        {display:'备注',name:'note',width:160,editor:{type:'string'}}
+                    ],
                     pageSize:20,
                     usePager: true,
                     width:'100%',
@@ -57,7 +51,7 @@
                     enabledEdit:true,
                     clickToEdit:true,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
-                    onReload: reloadPage,
+                    onReload: reloadPage
                 });
                 // 添加任务明细行
                 appendAddBtn(addRow, "添加产品明细");
@@ -69,8 +63,6 @@
                 if (opt) {
                     c_code = query.code;
                     if (opt === 'm') {
-                    	 //操作列显示
-                        pGrid.toggleCol('operation', true);
                         var param = {product_id:c_code};
                         var data = JSON.stringify(reqObj('q','production.select.mrp_task_routing_modify.query',JSON.stringify(param)));
                         ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
@@ -78,7 +70,7 @@
                         }, null, false);
                         
                         param = {product_id:c_code};
-                        data = JSON.stringify(reqObj('q','production.select.mrp_task_routing_modify.select',JSON.stringify(param)));
+                        data = JSON.stringify(reqObj('q','production.select.mrp_task_routing_gongyi.select',JSON.stringify(param)));
                         ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
                             pGrid.set({data: data['data']});
                         }, null, false);
@@ -94,8 +86,6 @@
                         $('#createUserCodeS').val(data['uid']);
                         $("#createDateS").val(data['date']);
                     }, null, false);
-                   //操作列隐藏
-                    pGrid.toggleCol('operation', false);
                 }
                 $("#pageloading").hide();
             });
@@ -118,12 +108,8 @@
                         result = '任务编号不能为空！';
                         break;
                     }
-                    if (!r.task_routing_name) {
-                        result = '任务名称不能为空！';
-                        break;
-                    }
-                    if (!r.task_routing_qty > 0) {
-                        result = '数量不能小于零！';
+                    if (!r.task_routing_standard_hour > 0) {
+                        result = '计划工时不能小于零！';
                         break;
                     }
                 }
@@ -132,16 +118,6 @@
                     return false;
                 }
                 return true;
-            }
-            //日常信息维护
-            function manageRow(rowid){
-                var row = pGrid.getRow(rowid);
-                var task_code = row.task_routing_code;
-                var product_id = $('#product_codeS').val();
-                detailDialog = $.ligerDialog.open({id:'add_task_manage',height:450,width:800,isResize:true,
-                    url:'./add_task_manage.html?o=m&task_code='.concat(task_code)+'&product_id='.concat(product_id),
-                    title:"新增任务项明细"
-            });
             }
             //重置处理
             function resetArea() {
@@ -176,7 +152,6 @@
                     data = data.Rows[0];
                     $('#product_codeS').val(data.code);
                     $('#product_nameS').val(data.name);
-                    c_product_name = data.name;
                     $('#specs').val(data.specs);
                     $('#uom_idS').val(paramRender(null,'uom',data.uom_id));
                     $('#noteS').val(data.note);
@@ -201,13 +176,13 @@
                 if (!validate())
                     return;
                 var param = {
-                		task_routing_code:$("#product_codeS").val(),
-                		task_routing_name:$("#product_nameS").val(),
-                		product_id:$("#product_codeS").val(),
-                		product_name:$("#product_nameS").val(),
-                		note:$("#noteS").val(),
-                		task_routing_type:"1",
-                		task_routing_level:"0"
+                        task_routing_code:$("#product_codeS").val(),
+                        task_routing_name:$("#product_nameS").val(),
+                        product_id:$("#product_codeS").val(),
+                        product_name:$("#product_nameS").val(),
+                        note:$("#noteS").val(),
+                        task_routing_type:"1",
+                        task_routing_level:"1"
                 };
                 var en = 'production.add.mrp_task_routing.add', optType = 'a';
                 if (opt === 'm') {
@@ -228,25 +203,27 @@
                 var ar = 0, br = 0,cr = 0;
                 var data = JSON.stringify(reqObj(optType,en,JSON.stringify(param)));
                 ajaxSubmit("/cm/rbac/cm.do?m=c", data,function(result) {
-                	cr = result['status'];
+                    cr = result['status'];
                 }, null, false);
                 //任务项增加
                 var rows = pGrid.rows;
                 c_code = $("#product_codeS").val();
                 if (opt === 'm') {
-                	 var addRows = [], updateRows = [];
+                     var addRows = [], updateRows = [];
                      for (var i = 0; i < rows.length; i++) {
                           if (rows[i].__status === 'add') {
-                        	  rows[i].up_task_routing_code = isContain(rows[i].task_routing_code)?getPid(rows[i].task_routing_code):$('#product_codeS').val();
+                        	  rows[i].task_routing_name = paramRender(null,'gongyi_luxian',rows[i].task_routing_code);
+                              rows[i].up_task_routing_code = isContain(rows[i].task_routing_code)?getPid(rows[i].task_routing_code):$('#product_codeS').val();
                               rows[i].product_id = $('#product_codeS').val();
                               rows[i].product_name = $('#product_nameS').val();
-                              rows[i].task_routing_type="2";
-                              rows[i].task_routing_level = "0";
+                              rows[i].task_routing_type="3";
+                              rows[i].task_routing_level = "1";
                               rows[i].createuser = $("#createUserCodeS").val();
                               rows[i].createdate = $("#createDateS").val();
                               addRows.push(rows[i]);
                           } else if (rows[i].__status === 'update') {
-                        	  rows[i].up_task_routing_code = isContain(rows[i].task_routing_code)?getPid(rows[i].task_routing_code):$('#product_codeS').val();
+                        	  rows[i].task_routing_name = paramRender(null,'gongyi_luxian',rows[i].task_routing_code);
+                              rows[i].up_task_routing_code = isContain(rows[i].task_routing_code)?getPid(rows[i].task_routing_code):$('#product_codeS').val();
                               rows[i].product_id = $('#product_codeS').val();
                               rows[i].product_name = $('#product_nameS').val();
                               rows[i].writeuser=$('#WriteUserCodeS').val();
@@ -278,11 +255,12 @@
                     } else {
                         // 新增处理
                         for (var i = 0; i < rows.length; i++) {
+                        	rows[i].task_routing_name = paramRender(null,'gongyi_luxian',rows[i].task_routing_code);
                             rows[i].up_task_routing_code = isContain(rows[i].task_routing_code)?getPid(rows[i].task_routing_code):$('#product_codeS').val();
                             rows[i].product_id = $('#product_codeS').val();
                             rows[i].product_name = $('#product_nameS').val();
-                            rows[i].task_routing_type = "2";
-                            rows[i].task_routing_level = "0";
+                            rows[i].task_routing_type = "3";
+                            rows[i].task_routing_level = "1";
                             rows[i].createuser = $("#createUserCodeS").val();
                             rows[i].createdate = $("#createDateS").val();
                         }
@@ -296,7 +274,7 @@
             }
             //重新加载页面 ，在保存时调用
              function reloadPage() {
-                    window.location = './add_task.html?o=m&code='.concat(c_code);
+                    window.location = './add_task_gongyi.html?o=m&code='.concat(c_code);
                 }
             
             /*  删除处理 
@@ -317,7 +295,7 @@
                  }
              // 删除处理业务处理
               function toDel(row) {
-            	    var param = new Object();
+                    var param = new Object();
                     param.task_routing_code = row.task_routing_code;
                     param.product_id = $('#product_codeS').val();
                   var data = JSON.stringify(reqObj('d','production.delete.mrp_task_routing.delete_id',JSON.stringify(param)));

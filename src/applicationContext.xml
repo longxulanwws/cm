@@ -31,4 +31,5 @@
 	<import resource="/cm.*.xml"/>
 	<import resource="/core.*.xml"/>
 	<import resource="/sys.config.xml" />
+	<import resource="/cm.prdu.excel.config.xml" />
 </beans>
