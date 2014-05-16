@@ -240,9 +240,13 @@
             function toBack()
             {
                 //关闭修改界面
-                parent.tabManager.removeTabItem("modify_stock_production");
+
+                //modify_production_plan
+                parent.tabManager.removeTabItem("modify_production_plan");
                 //关闭新增界面
-                parent.tabManager.removeTabItem("new_add_stock_production");
+
+
+                parent.tabManager.removeTabItem("add_production_plan");
              }
             // 保存业务处理
             function toAdd() {
@@ -303,7 +307,11 @@
                                 rows[i].plan_datestart=getFormatDate(new Date(rows[i].plan_datestart),'yyyy-MM-dd');
                                 rows[i].plan_dateend=getFormatDate(new Date(rows[i].plan_dateend),'yyyy-MM-dd');
                                 rows[i].plan_cycle=getdiffDate(getFormatDate(new Date(rows[i].plan_datestart),'yyyy-MM-dd'),getFormatDate(new Date(rows[i].plan_dateend),'yyyy-MM-dd')).toString();
-                                //修改人
+                               
+                                rows[i].date_start=getFormatDate(new Date(rows[i].plan_datestart),'yyyy-MM-dd');
+                                rows[i].date_end=getFormatDate(new Date(rows[i].plan_dateend),'yyyy-MM-dd');
+                                rows[i].cycle=getdiffDate(getFormatDate(new Date(rows[i].plan_datestart),'yyyy-MM-dd'),getFormatDate(new Date(rows[i].plan_dateend),'yyyy-MM-dd')).toString();
+                               //修改人
                                 rows[i].writeuser=$('#WriteUserCodeS').val();
                                 //修改日期
                                 rows[i].writedate=$('#WriteDateS').val();

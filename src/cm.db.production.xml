@@ -175,8 +175,8 @@ CreateUser, CreateDate FROM mrp_task_routing]]>
                         <property name="dmlType" value="cond" />
                         <property name="sql">
                             <value>
-<![CDATA[SELECT task_plan_id, Company_ID, Dept_ID, BusiOrg_ID, pdc_plan_code, plan_type, exec_dept, plan_dateStart, 
-plan_dateEnd, plan_cycle, plan_trackState, plan_note, State, Flow_State, CreateUser, CreateDate, WriteDate, WriteUser FROM mrp_plan_task]]>
+<![CDATA[SELECT task_plan_id, Company_ID, Dept_ID, BusiOrg_ID, pdc_plan_code, plan_type, exec_dept,
+plan_dateStart,plan_dateEnd, plan_cycle,date_start, date_end, cycle, plan_trackState, plan_note, State, Flow_State, CreateUser, CreateDate, WriteDate, WriteUser FROM mrp_plan_task]]>
                             </value>
                         </property>
                         <property name="conditions">
@@ -304,9 +304,9 @@ VALUES ({#uuid}, {company_id}, {dept_id}, {busiorg_id}, {#production.pdc_plan_co
                         <property name="sql">
                             <value>
 <![CDATA[INSERT INTO mrp_plan_task (task_plan_id, Company_ID, Dept_ID, BusiOrg_ID, pdc_plan_code, plan_type, exec_dept, plan_dateStart, 
-plan_dateEnd, plan_cycle, plan_trackState, plan_note, State, Flow_State, CreateUser, CreateDate, WriteDate, WriteUser)
-VALUES ({#uuid}, {company_id}, {dept_id}, {busiorg_id}, {pdc_plan_code}, {plan_type}, {exec_dept}, {plan_datestart}, 
-{plan_dateend}, {plan_cycle}, {plan_trackstate}, {plan_note}, {state}, {flow_state}, {createuser}, {createdate}, {writedate}, {writeuser})]]>
+plan_dateEnd, plan_cycle, date_start, date_end, cycle,plan_trackState, plan_note, State, Flow_State, CreateUser, CreateDate, WriteDate, WriteUser)
+VALUES ({#uuid}, {company_id}, {dept_id}, {busiorg_id}, {pdc_plan_code}, {plan_type}, {exec_dept}, 
+{plan_datestart}, {plan_dateend}, {plan_cycle},{plan_datestart}, {plan_dateend}, {plan_cycle}, {plan_trackstate}, {plan_note}, {state}, {flow_state}, {createuser}, {createdate}, {writedate}, {writeuser})]]>
                             </value>
                         </property>
                     </bean>
@@ -383,8 +383,9 @@ cycle_total = {cycle_total},user_id = {user_id},Note = {note},WriteDate = {write
                     <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
                         <property name="sql">
                             <value>
-<![CDATA[UPDATE mrp_plan_task SET task_plan_id = {task_plan_id},plan_type = {plan_type},exec_dept = {exec_dept},plan_dateStart = {plan_datestart},
-plan_dateEnd = {plan_dateend},plan_cycle = {plan_cycle},plan_trackState = {plan_trackstate},plan_note = {plan_note},WriteDate = {writedate},
+<![CDATA[UPDATE mrp_plan_task SET task_plan_id = {task_plan_id},plan_type = {plan_type},exec_dept = {exec_dept},
+plan_dateStart = {plan_datestart},plan_dateEnd = {plan_dateend},plan_cycle = {plan_cycle},
+date_start = {date_start},date_end = {date_end},cycle = {cycle},plan_trackState = {plan_trackstate},plan_note = {plan_note},WriteDate = {writedate},
 WriteUser = {writeuser} WHERE task_plan_id = {task_plan_id}]]>
                             </value>
                         </property>

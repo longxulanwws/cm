@@ -38,9 +38,12 @@
                         ,editor:{type:'select',data:getData('task_type'),valueField:'value',textField:'name'}},
                         {display:'执行部门',name:'exec_dept',type:'string',width:160,render:function(item){return paramRender(item,'org_list',item.exec_dept);}
                         ,editor:{type:'select',data:getData('org_list'),valueField:'value',textField:'name'}},
-                        {display:'计划开始日期',name:'plan_datestart',type: 'date', format:'yyyy-MM-dd', width: 100, editor: { type: 'date'}},
-                        {display:'计划结束日期',name:'plan_dateend',type: 'date', format:'yyyy-MM-dd', width: 100, editor: { type: 'date'}},
+                        {display:'计划开始日期',name:'plan_datestart',type: 'date', format:'yyyy-MM-dd', width: 100},
+                        {display:'计划结束日期',name:'plan_dateend',type: 'date', format:'yyyy-MM-dd', width: 100},
                         {display:'计划周期',name:'plan_cycle',type: 'string',width: 100},
+                        {display:'实际开始日期',name:'date_start',type: 'date', format:'yyyy-MM-dd', width: 100, editor: { type: 'date'}},
+                        {display:'实际结束日期',name:'date_end',type: 'date', format:'yyyy-MM-dd', width: 100, editor: { type: 'date'}},
+                        {display:'实际周期',name:'cycle',type: 'string',width: 100},
                         {display:'计划执行情况',name:'plan_trackstate',type: 'string',width: 100,render:function(item){return paramRender(item,'production.state',item.plan_trackstate);}
                         ,editor:{type:'select',data:getData('production.state'),valueField:'value',textField:'name'}},
                         {display:'计划执行情况备注',name:'plan_note',type: 'string',width: 350,editor:{type:'string'}}
@@ -101,6 +104,12 @@
                         result = '计划结束日期不能早于计划开始日期！';
                         break;
                     }
+                    var realStartTime = new Date(r.date_start);
+                    var realStopTime = new Date(r.date_end);
+                    if (Date.parse(realStartTime) > Date.parse(realStopTime)) {
+                        result = '实际结束日期不能早于实际开始日期！';
+                        break;
+                    }
                 }
 
                 if (result) {
@@ -152,6 +161,10 @@
                                 rows[i].plan_datestart=getFormatDate(new Date(rows[i].plan_datestart),'yyyy-MM-dd');
                                 rows[i].plan_dateend=getFormatDate(new Date(rows[i].plan_dateend),'yyyy-MM-dd');
                                 rows[i].plan_cycle=getdiffDate(getFormatDate(new Date(rows[i].plan_datestart),'yyyy-MM-dd'),getFormatDate(new Date(rows[i].plan_dateend),'yyyy-MM-dd')).toString();
+                                rows[i].date_start=getFormatDate(new Date(rows[i].date_start),'yyyy-MM-dd');
+                                rows[i].date_end=getFormatDate(new Date(rows[i].date_end),'yyyy-MM-dd');
+                                rows[i].cycle=getdiffDate(getFormatDate(new Date(rows[i].date_start),'yyyy-MM-dd'),getFormatDate(new Date(rows[i].date_end),'yyyy-MM-dd')).toString();
+                                
                                 //修改人
                                 rows[i].writeuser=$('#WriteUserCodeS').val();
                                 //修改日期
@@ -176,7 +189,7 @@
 
             //重新加载页面 ，在保存时调用
              function reloadPage() {
-                    window.location = './manage_prodction_plan.html?o=m&code='.concat(c_code);
+                    window.location = './manage_production_plan.html?o=m&code='.concat(c_code);
                 }
         </script>
         <style type="text/css">
