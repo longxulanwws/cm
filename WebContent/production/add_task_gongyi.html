@@ -100,14 +100,28 @@
                     }
                 });
                 if (!valid) return false;
+                var pro_id = $('#product_codeS').val();
+                var param = {product_id:pro_id};
+                var count = 0;
+                data = JSON.stringify(reqObj('q','production.select.mrp_task_routing_add.check',JSON.stringify(param)));
+                ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+                    count = data['data'].Rows[0].count_num;
+                }, null, false);
+                if(count > 0){
+                    $.ligerDialog.error('此产品编号已经存在！', '数据错误');
+                    count = 0 ;
+                    return false;
+                }
                 var r, result;
                 var i = 0;
+                var arrayObj = new Array();　//创建一个数组
                 for (; i < pGrid.rows.length; i++) {
                     r = pGrid.rows[i];
                     if (!r.task_routing_code) {
                         result = '任务编号不能为空！';
                         break;
                     }
+                    arrayObj[i] = r.task_routing_code;
                     if (!r.task_routing_standard_hour > 0) {
                         result = '计划工时不能小于零！';
                         break;
@@ -116,6 +130,14 @@
                 if (result) {
                     $.ligerDialog.error('任务产品明细列表第[' + (++i) + ']行存在错误<br/>原因：'.concat(result), '数据错误');
                     return false;
+                }
+                var newary = arrayObj.sort();
+                for(var j=0;j<newary.length;j++){
+                if (newary[j]==newary[j+1]){
+                	var gongyiname = paramRender(null,'gongyi_luxian',newary[j]);
+                	$.ligerDialog.error('工艺明细中有重复数据，重复工艺名称为'.concat(gongyiname), '数据错误');
+                	return false;
+                 }
                 }
                 return true;
             }
@@ -279,7 +301,7 @@
             
             /*  删除处理 
              */
-              function deleteRow(rowid) {
+              function deleteRow() {
                   var row = pGrid.getSelectedRow();
                   if (!row) {
                       $.ligerDialog.error('请先选择任务记录。','错误');
@@ -290,7 +312,7 @@
                              return;
                          if (row['__status'] !== 'add')
                              toDel(row);
-                         pGrid.deleteRow(rowid);
+                         pGrid.deleteRow(row);
                      })
                  }
              // 删除处理业务处理

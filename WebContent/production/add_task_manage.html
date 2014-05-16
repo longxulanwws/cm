@@ -107,12 +107,14 @@
                 }
                 var r, result;
                 var i = 0;
+                var arrayObj = new Array();　//创建一个数组
                 for (; i < pGrid.rows.length; i++) {
                     r = pGrid.rows[i];
                     if (!r.task_routing_code) {
                         result = '任务编号不能为空';
                         break;
                     }
+                    arrayObj[i] = r.task_routing_code;
                     if (!r.task_routing_standard_hour || parseInt(r.task_routing_standard_hour) < 0) {
                         result = '计划工时必须大于0';
                         break;
@@ -121,6 +123,14 @@
                 if (result) {
                     $.ligerDialog.error('任务明细列表第[' + (++i) + ']行存在错误<br/>原因：'.concat(result), '数据错误');
                     return false;
+                }
+                var newary = arrayObj.sort();
+                for(var j=0;j<newary.length;j++){
+                if (newary[j]==newary[j+1]){
+                    var gongyiname = paramRender(null,'gongyi_luxian',newary[j]);
+                    $.ligerDialog.error('工艺明细中有重复数据，重复工艺名称为'.concat(gongyiname), '数据错误');
+                    return false;
+                 }
                 }
                 return true;
             }
