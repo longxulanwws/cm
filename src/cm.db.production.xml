@@ -60,6 +60,16 @@ where A.task_routing_code = B.Code AND A.task_routing_code = {product_id}]]>
                         </property>
                     </bean>
                 </entry>
+                 <!--产品增加校验查询  -->
+                 <entry key="mrp_task_routing_add.check">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT count(*) AS count_num FROM mrp_task_routing WHERE Product_ID = {product_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
                  <!--产品项目查询  -->
                  <entry key="mrp_task_routing_modify.select">
                     <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
