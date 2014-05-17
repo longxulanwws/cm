@@ -97,12 +97,11 @@ public class ReadExcelTest {
 
 			// 将此excel 中全部的工艺项放入临时 map 中
 			HashMap<String, String> routingNameMap = new HashMap<String, String>();
+			
+			String product_code = null;
+			String product_name = null;
 			// 进行逐行（row）处理
 			for (Row row : sheet1) {
-
-				String product_code = null;
-
-				String product_name = null;
 				// 定义使用的产品部件信息
 				// 部件编号
 				String task_routing_code = "";
@@ -115,6 +114,9 @@ public class ReadExcelTest {
 				String task_routing_routingName = "";
 
 				// 进行逐单元格（cell）处理
+				
+				routingEntityList = new ArrayList<RoutingEntity>();
+				
 				for (Cell cell : row) {
 
 					// 获得 单元格的坐标 如 A1 ，B6等
@@ -137,6 +139,7 @@ public class ReadExcelTest {
 							cellValue = String.valueOf(cell.getNumericCellValue());
 							// System.out.println(cell.getNumericCellValue());
 						}
+						
 						break;
 					case Cell.CELL_TYPE_BOOLEAN:
 						cellValue = String.valueOf(cell.getBooleanCellValue());
@@ -164,9 +167,20 @@ public class ReadExcelTest {
 					if (productConf.getCodeY() <= cellCoordsY) {
 						// 按设置的列进行赋值
 						// 产品编号赋值
+						//System.out.println("对excel中定义的“产品数据”区域处理"+cellValue);
+						System.out.println("对excel中定义的“产品数据”区域处理产品编号赋值"+product_code);
 						if (productConf.getCodeX().equalsIgnoreCase(cellCoordsX) && StringUtils.isNotBlank(cellValue)) {
+							System.out.println("对excel中定义的“产品数据”区域处理?????"+cellValue);
 							productRoutingEntiy.setCode(cellValue);
+							//有多个产品code,说明是多个单品
+							if(StringUtils.isNotBlank(product_code)&&!StringUtils.equals(cellValue, product_code)){
+								productiontaskRouting.setProductOrParts("products");
+							}else{
+								productiontaskRouting.setProductOrParts("parts");
+							}
+							
 							product_code = cellValue;
+ 
 						}
 
 						// 产品名称赋值
@@ -180,7 +194,7 @@ public class ReadExcelTest {
 							productRoutingEntiy.setSpecs(cellValue);
 
 					}
-
+					
 					/*
 					 * 部件相关信息处理
 					 */
@@ -219,6 +233,7 @@ public class ReadExcelTest {
 					String routing_hours = "";
 					// 从 工艺工时数据区域开始处理
 					if (routingConf.getHoursY() <= cellCoordsY) {
+						RoutingEntity = new RoutingEntity();
 						// 通过excel中设置的工艺项列map 要从那些cell中取工时定额数据
 						if (StringUtils.isNotBlank(routingNameMap.get(cellCoordsX))) {
 							RoutingEntity.setName(routingNameMap.get(cellCoordsX));
@@ -239,7 +254,7 @@ public class ReadExcelTest {
 					// 一行处理结束后处理
 
 				// 若部件项code\name不为空，则部件list增加部件对象
-				if (StringUtils.isNotBlank(task_routing_name)) {
+				if (StringUtils.isNotBlank(task_routing_code)&&StringUtils.isNotBlank(task_routing_name)) {
 					// 按每行（row）生成一个产品部件数据对象处理
 					if (StringUtils.isNotBlank(task_routing_code))
 						taskRoutingEntity.setTask_routing_code(task_routing_code);
@@ -263,7 +278,7 @@ public class ReadExcelTest {
 
 					taskRoutingEntityList.add(taskRoutingEntity);
 					
-					productiontaskRouting.setProductOrParts("parts");
+					//productiontaskRouting.setProductOrParts("parts");
 
 					System.out.println("task_routing_code:" + task_routing_code);
 					System.out.println("task_routing_name:" + task_routing_name);
@@ -271,17 +286,22 @@ public class ReadExcelTest {
 					System.out.println("task_routing_routingName:" + task_routing_routingName);
 					
 					
-				} else {
+				}
+				
+				if(StringUtils.equals(productiontaskRouting.getProductOrParts(), "products")){
 					// 设置单个产品的工艺路线数据list对象
 					productRoutingEntiy.setRoutingEntityList(routingEntityList);
 					// 单品时处理
 					productRoutingEntityList.add(productRoutingEntiy);
-					
-					productiontaskRouting.setProductOrParts("product");
-				}
 
-				// 清空 工艺路线数据list对象
-				routingEntityList.clear();
+				}
+				
+				// 初始 工艺路线数据list对象 及 相关实体;
+				taskRoutingEntity = new TaskRoutingEntity();
+				productRoutingEntiy = new ProductRoutingEntiy();
+				routingEntityList = new ArrayList<RoutingEntity>();
+
+
 
 			}// end of row for loop
 			productiontaskRouting.setProductRoutingEntityList(productRoutingEntityList);
@@ -300,7 +320,8 @@ public class ReadExcelTest {
 	public static void main(String args[]) {
 
 		// readExcelData("src/com/ruisoft/test/poi/Sample.xlsx");
-		ProductionTaskRouting productionTaskRouting  = readExcelData("src/com/ruisoft/test/poi/XX公司XX产品工艺工时定额导入模板 .xls");
+		//ProductionTaskRouting productionTaskRouting  = readExcelData("src/com/ruisoft/test/poi/XX公司XX产品工艺工时定额导入模板 .xls");
+		ProductionTaskRouting productionTaskRouting  = readExcelData("src/com/ruisoft/test/poi/2XX公司XX产品工艺工时定额导入模板.xls");
 		System.out.println("ProductionTaskRouting List\n" + productionTaskRouting);
 
 	}
