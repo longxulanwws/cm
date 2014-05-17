@@ -13,8 +13,13 @@
 		<script src="../js/json2.js" type="text/javascript"></script>
 		<script type="text/javascript">
 			var defGrid;
+			var opt ;
+			var query = getQueryString(window.location.toString());
+			opt = query.m;
 			$(function(){
-				var opt = window.location.toString().replace(/^[^?]+\?o=/, ''); 
+				//var opt = window.location.toString().replace(/^[^?]+\?o=/, '');
+
+				
                	defGrid = $("#query_list").ligerGrid({
                     columns:[
  						{display:'编号',name:'code',width:80,minWidth:60},
@@ -90,6 +95,11 @@
 				param.name = $("#nameQ").val();
 				param.specs = $("#specsQ").val(); 
 // 				param.product_product.type=$("#typeQ"),val();
+				var ProCateg=query.ProCateg;				
+				//alert(ProCateg);
+				if(ProCateg=='0501'){
+					param.Categ_ID='0501';
+				}
             	var data = JSON.stringify(reqObj('q','stock.select.product.stock.qty.query',JSON.stringify(param),'l',true,page,pageSize));
 				ajaxSubmit("/cm/rbac/cm.do?m=q", data, function(data) {
                     //wws 2014-2-23 增加分页信息 start 

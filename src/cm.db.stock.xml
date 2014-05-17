@@ -480,7 +480,7 @@ LEFT JOIN (SELECT Code, sum((CASE WHEN (Type = '1') THEN Product_Qty ELSE 0 END 
 								<entry key="code" value=":like(lr)" />
 								<entry key="name" value=":like(lr)" />
 								<entry key="specs" value=":like(lr)" />
-								<entry key="type" value=""/>
+								<entry key="Categ_ID" value=""/>
 							</map>
 						</property>
 					</bean>
