@@ -92,9 +92,13 @@
                     param_partner:'partner_list'
                 });
                 alert("opt:"+opt);
+                // 订单计划跟踪菜单
                 if(opt=='mng'){
                 	appendSearchBtn(searchRow, "查看订单计划信息");	
                 	appendManageBtn(manageRow, "日常信息维护");
+                //订单计划查询
+                }else if(opt=='qy'){
+                	appendSearchBtn(searchRow, "查看订单计划信息");	
                 }else{
                     appendAddBtn(openDictDef, "添加订单计划");
                     appendModifyBtn(openModify, "编辑订单计划");
