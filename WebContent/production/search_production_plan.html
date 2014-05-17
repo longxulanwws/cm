@@ -12,7 +12,9 @@
         <script src="../js/common.js" type="text/javascript"></script>
         <script src="../js/json2.js" type="text/javascript"></script>
         <script type="text/javascript">
-            var defGrid;
+            var defGrid,opt;
+			var query = getQueryString(window.location.toString());
+			opt = query.m;
             $(function(){
                 defGrid = $("#query_list").ligerGrid({
                     columns:[
@@ -89,11 +91,22 @@
                     //自定义客户变量（core.param.xml）
                     param_partner:'partner_list'
                 });
-                appendAddBtn(openDictDef, "添加订单计划");
-                appendModifyBtn(openModify, "编辑订单计划");
-                appendDeleteBtn(deleteRow, "删除订单计划");
-                appendSearchBtn(searchRow, "查看订单计划信息");
-                appendManageBtn(manageRow, "日常信息维护")
+                //alert("opt:"+opt);
+                // 订单计划跟踪菜单
+                if(opt=='mng'){
+                	appendSearchBtn(searchRow, "查看订单计划信息");	
+                	appendManageBtn(manageRow, "日常信息维护");
+                //订单计划查询
+                }else if(opt=='qy'){
+                	appendSearchBtn(searchRow, "查看订单计划信息");	
+                }else{
+                    appendAddBtn(openDictDef, "添加订单计划");
+                    appendModifyBtn(openModify, "编辑订单计划");
+                    appendDeleteBtn(deleteRow, "删除订单计划");
+                    appendSearchBtn(searchRow, "查看订单计划信息");
+                }
+                
+                
                 $("#pageloading").hide();
                 //默认查询全部数据 
                 toQuery();

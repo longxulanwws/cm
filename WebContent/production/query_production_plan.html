@@ -39,6 +39,9 @@
                         {display:'计划开始日期',name:'plan_datestart',type: 'date', format:'yyyy-MM-dd', width: 100},
                         {display:'计划结束日期',name:'plan_dateend',type: 'date', format:'yyyy-MM-dd', width: 100},
                         {display:'计划周期',name:'plan_cycle',type: 'string',width: 100},
+                        {display:'实际开始日期',name:'date_start',type: 'date', format:'yyyy-MM-dd', width: 100},
+                        {display:'实际结束日期',name:'date_end',type: 'date', format:'yyyy-MM-dd', width: 100},
+                        {display:'实际周期',name:'cycle',type: 'string',width: 100},
                         {display:'计划执行情况',name:'plan_trackstate',type: 'string',width: 100,render:function(item){return paramRender(item,'production.state',item.plan_trackstate);}},
                         {display:'计划执行情况备注',name:'plan_note',type: 'string',width: 350}
                     ],
