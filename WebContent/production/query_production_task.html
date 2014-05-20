@@ -14,7 +14,7 @@
         <script src="../js/common.js" type="text/javascript"></script>
         <script type="text/javascript">
             var pGrid, c_row, opt, c_code;
-            var udata;
+            var udata;			
             $(function(){   
                 udata = getData('user',{orgid:$("#deptCodeS").val()},false);
                 $("#layout_main").ligerLayout({
@@ -31,12 +31,15 @@
                 ]});
                 pGrid = $("#p-div").ligerGrid({
                     columns:[
-                        {display:'操作',isSort:false,width:130,render:function(rowdata,rowindex,value) {
+                        // 订单计划跟踪菜单
+                     
+                        {display:'操作',name:'mngCol',isSort:false,width:130,render:function(rowdata,rowindex,value) {
                             var h = ""; 
                             var row = pGrid.getRow(rowindex);
-                            h += "<a href='javascript:void(0);' id='toConfirm' class='opt-link' onclick='manageRow(" + rowindex + ")'>维护</a> ";
+                            h += "<a href='javascript:void(0);' id='toConfirm' class='opt-link' onclick='manageRow(" + rowindex + ")'>工时跟踪维护</a> ";
                             return h; 
                         },frozen:true},
+                        
                         {display:'产品编号',name:'product_id',width:80},
                         {display:'产品名称',name:'product_name',width:160},
                         {display:'数量',name:'production_product_qty',width:100,align:'right',render:function(item){return item.production_product_qty ? parseFloat(item.production_product_qty).toFixed(2) : '';}},
@@ -56,6 +59,7 @@
                     clickToEdit:true,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                 });
+               
                 var query = getQueryString(window.location.toString());
                 opt = query.o;
                 if (opt) {
@@ -72,9 +76,21 @@
                        pGrid.set({data: data['data']});
                        }, null, false);
                 }
+
+                // 通过调用的URL 参数控制是否显示 操作列
+                 var mpt = query.m;
+                if(mpt!="mng"){
+                 	f_hideMngCol();
+                 }  
+                 
+                 function f_hideMngCol()
+                 { 
+                 	pGrid.toggleCol('mngCol', false);
+                 }
                 $("#pageloading").hide();
             });
-            // 查询时数据值绑定  应该可以抽象为公共的功能
+
+           // // 查询时数据值绑定  应该可以抽象为公共的功能
             function bindVal(data) {
                 if (data.Rows && data.Rows.length === 1) {
                     data = data.Rows[0];
@@ -103,6 +119,7 @@
             {
                 //关闭修改界面
                 parent.tabManager.removeTabItem("modify_production_task");
+                parent.tabManager.removeTabItem("new_query_productionS"+$('#production_task_codeS').val());
              }
             //日常信息维护
             function manageRow(rowid){
