@@ -44,11 +44,11 @@ public class ReadExcelTest {
 	 *            导入的excel文件
 	 * @return ProductionTaskRouting 部件信息对象list
 	 */
-	public static ProductionTaskRouting readExcelData(String fileName) {
+	public static ProductionTaskRouting readExcelData(String fileName,PrduExcelConfig prduExcelConfig) {
 
 		// 解析配置文件 此部分在 并入 Spring web 容器时，不需要
-		ApplicationContext context = new FileSystemXmlApplicationContext("src/cm.prdu.excel.config.xml");
-		PrduExcelConfig prduExcelConfig = (PrduExcelConfig) context.getBean("prduExcelConfig");
+//		ApplicationContext context = new FileSystemXmlApplicationContext("src/cm.prdu.excel.config.xml");
+//		PrduExcelConfig prduExcelConfig = (PrduExcelConfig) context.getBean("prduExcelConfig");
 
 		//
 		productConf = prduExcelConfig.getProduct();
@@ -136,7 +136,7 @@ public class ReadExcelTest {
 							cellValue = cell.getDateCellValue().toString();
 							// System.out.println(cell.getDateCellValue());
 						} else {
-							cellValue = String.valueOf(cell.getNumericCellValue());
+							cellValue = String.valueOf(Math.round(cell.getNumericCellValue()));
 							// System.out.println(cell.getNumericCellValue());
 						}
 						
@@ -161,7 +161,7 @@ public class ReadExcelTest {
 					 */
 					String cellCoords = cellRef.formatAsString();
 					String cellCoordsX = cellCoords.substring(0, 1);
-					int cellCoordsY = Integer.valueOf(cellCoords.substring(cellCoords.length() - 1, cellCoords.length()));
+					int cellCoordsY = Integer.valueOf(cellCoords.substring(1, cellCoords.length()));
 
 					// 对excel中定义的“产品数据”区域处理
 					if (productConf.getCodeY() <= cellCoordsY) {
@@ -265,9 +265,6 @@ public class ReadExcelTest {
 					if (StringUtils.isNotBlank(task_routing_qty))
 						taskRoutingEntity.setTask_routing_qty(task_routing_qty);
 
-					if (StringUtils.isNotBlank(task_routing_routingName))
-						taskRoutingEntity.setTask_routing_qty(task_routing_routingName);
-
 					// 设置单个部件的工艺路线数据list对象
 					taskRoutingEntity.setRoutingEntityList(routingEntityList);
 					
@@ -288,7 +285,7 @@ public class ReadExcelTest {
 					
 				}
 				
-				if(StringUtils.equals(productiontaskRouting.getProductOrParts(), "products")){
+				if(StringUtils.isNotBlank(productRoutingEntiy.getCode())&&StringUtils.isNotBlank(productRoutingEntiy.getName())){
 					// 设置单个产品的工艺路线数据list对象
 					productRoutingEntiy.setRoutingEntityList(routingEntityList);
 					// 单品时处理
@@ -317,13 +314,13 @@ public class ReadExcelTest {
 		return productiontaskRouting;
 	}
 
-	public static void main(String args[]) {
-
-		// readExcelData("src/com/ruisoft/test/poi/Sample.xlsx");
-		//ProductionTaskRouting productionTaskRouting  = readExcelData("src/com/ruisoft/test/poi/XX公司XX产品工艺工时定额导入模板 .xls");
-		ProductionTaskRouting productionTaskRouting  = readExcelData("src/com/ruisoft/test/poi/2XX公司XX产品工艺工时定额导入模板.xls");
-		System.out.println("ProductionTaskRouting List\n" + productionTaskRouting);
-
-	}
+//	public static void main(String args[]) {
+//
+//		// readExcelData("src/com/ruisoft/test/poi/Sample.xlsx");
+//		//ProductionTaskRouting productionTaskRouting  = readExcelData("src/com/ruisoft/test/poi/XX公司XX产品工艺工时定额导入模板 .xls");
+//		ProductionTaskRouting productionTaskRouting  = readExcelData("src/com/ruisoft/test/poi/2XX公司XX产品工艺工时定额导入模板.xls");
+//		System.out.println("ProductionTaskRouting List\n" + productionTaskRouting);
+//
+//	}
 
 }

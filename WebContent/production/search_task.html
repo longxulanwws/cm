@@ -8,6 +8,7 @@
         <link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
         <link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
         <script src="../js/jquery.js" type="text/javascript"></script>
+        <script src="../js/ajaxfileupload.js" type="text/javascript"></script>
         <script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
         <script src="../js/common.js" type="text/javascript"></script>
         <script src="../js/json2.js" type="text/javascript"></script>
@@ -37,7 +38,7 @@
                         {display:'喷涂',name:'peitu',width:60,align:'right',render:function(item){return item.peitu&&item.peitu!='null' ? parseFloat(item.peitu).toFixed(2) : '';}},
                         {display:'组装',name:'zuzhuang',width:60,align:'right',render:function(item){return item.zuzhuang&&item.zuzhuang!='null' ? parseFloat(item.zuzhuang).toFixed(2) : '';}}
                     ],
-                    pageSize:20,
+                    pageSize:50,
                     usePager: true,
                     dataAction:'server', 
                     url: '../common/q.jsp', 
@@ -199,8 +200,8 @@
                 }
                 //导入验证和处理机制
                 function OK() { //点击确定按钮的时候
-                      var filename = ($("#FileUpload").val());
-                      alert(document.getElementByIdx_x('upload').files.item(0).getAsDataURL());
+                      var filename = ($("#nwOfficeId").val());
+                alert(filename);
                         if (filename == "") {
                         $.messager.alert('系统提示', '请选择将要上传的文件!');
                         document.forms[0].submit();
@@ -214,13 +215,32 @@
                        }
                        else {
                     	   var data = {file:filename};
-                           ajaxSubmit("/cm/rbac/cm.do?m=excel", data, function(data) {
+                           ajaxSubmit("/cm/rbac/impExcel.do?method=impExcel", data, function(data) {
                         	   alert(data);
                           }); 
                      }
                  }
                 }
- 
+                
+                function importExcel(){  
+                        var upfileId = jQuery('#fileUpload')[0].value;
+                        alert(upfileId);
+                        
+                        $.ajaxFileUpload({  
+                            url:'/cm/rbac/impExcel.do?method=impExcel',             //需要链接到服务器地址  
+                            secureuri:false,  
+                            fileElementId:'fileUpload',                   //文件选择框的id属性  
+                            dataType: 'text',                             //服务器返回的格式，可以是json  
+                            data:{upfileId:upfileId},  
+                            success: function (data, status) {     
+                                 $('#result').html(data).attr("class",'error');  
+                            },  
+                            error: function (data, status, e){  
+                                 $('#result').html("上传失败!").attr("class",'error');  
+                            }  
+                          }  
+                        );  
+                }  
         </script>
         <style type="text/css">
             label{margin: 5px 20px 5px 15px;}
@@ -247,9 +267,10 @@
                 </div>
                 <div class="fields">
                     <label>文件导入  </label>
-                    <input type="file" id="fileBrowser" name="fileBrowser" size="50" onchange="readFile(this)" />
-                    <input type="button" value="导入" onclick="OK()" />
+                    <input type="file" id="fileUpload" name="fileUpload" size="50" />
+                    <input type="button" value="导入" onclick="importExcel()" />
                 </div>
+                <div id="result"></div>
                 <div id="query_list"></div>
             </div>
         </div>
