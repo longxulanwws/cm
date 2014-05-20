@@ -91,7 +91,7 @@
 
                 //生产任务，每日工时跟踪
                 if(opt=='mng'){
-                	appendSearchBtn(searchRow, "查看生产任务单");
+                	//appendSearchBtn(manageRow, "每日工时跟踪",);
                 	appendManageBtn(manageRow, "每日工时跟踪");
                 }else if(opt=='qy'){
                 //
@@ -108,7 +108,16 @@
                 toQuery();
                 
             });
-            
+            function manageRow(){
+                var row = defGrid.getSelectedRow();
+                if (!row) {
+                    $.ligerDialog.error('请先选择要查看的单据！','错误');
+                    return;
+                }
+                var stockDelID=row.production_task_code;
+                parent.f_addTab('new_query_productionS'+stockDelID,'单据明细信息('+stockDelID+')','./production/query_production_task.html?o=m&m=mng&code='.concat(row.production_task_code));
+            	
+            }
             //通用单据查询 界面
             function searchRow(){
                 var row = defGrid.getSelectedRow();

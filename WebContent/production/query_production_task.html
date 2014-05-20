@@ -36,7 +36,7 @@
                         {display:'操作',name:'mngCol',isSort:false,width:130,render:function(rowdata,rowindex,value) {
                             var h = ""; 
                             var row = pGrid.getRow(rowindex);
-                            h += "<a href='javascript:void(0);' id='toConfirm' class='opt-link' onclick='manageRow(" + rowindex + ")'>维护</a> ";
+                            h += "<a href='javascript:void(0);' id='toConfirm' class='opt-link' onclick='manageRow(" + rowindex + ")'>工时跟踪维护</a> ";
                             return h; 
                         },frozen:true},
                         
@@ -79,7 +79,7 @@
 
                 // 通过调用的URL 参数控制是否显示 操作列
                  var mpt = query.m;
-                if(mpt=="mng"){
+                if(mpt!="mng"){
                  	f_hideMngCol();
                  }  
                  
