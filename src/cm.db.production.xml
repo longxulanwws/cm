@@ -44,8 +44,8 @@ FROM mrp_task_routing GROUP BY  up_task_routing_code)  AS B ON A.task_routing_co
                         <property name="order" value="a.product_id,a.task_routing_code"/>
                         <property name="conditions">
                             <map>
-                                <entry key="task_routing_name" value=":like(lr)" />
-                                <entry key="task_routing_code" value=":like(r)" />
+                                <entry key="product_name" value=":like(lr)" />
+                                <entry key="product_id" value=":like(r)" />
                             </map>
                         </property>
                     </bean>
