@@ -92,12 +92,18 @@
                     <bean class="com.ruisoft.core.param.SQLParamEntity">
                         <property name="sql">
                             <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
-                                <property name="sql">
-                                    <value><![CDATA[SELECT task_routing_id as value,task_routing_code, task_routing_name, up_task_routing_code, Product_ID, Product_Name,task_routing_type  FROM mrp_task_routing WHERE task_routing_type <> '3']]></value>
+                             <property name="sql">
+                                    <value><![CDATA[SELECT * FROM (SELECT task_routing_id as value,task_routing_code, task_routing_name, up_task_routing_code, Product_ID, Product_Name,task_routing_type  FROM mrp_task_routing WHERE task_routing_type <> '3') AS A]]></value>
                                 </property>
+                             <property name="conditions">
+                             <map>
+                               <entry key="product_id" value="" />
+                                <entry key="product_name" value="" />
+                             </map>
+                        </property>
                             </bean>
                         </property>
-                        <property name="treeAttr" value="up_task_routing_code" />
+       
                     </bean>
                 </entry>  								
 			</map>

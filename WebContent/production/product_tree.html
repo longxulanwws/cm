@@ -13,8 +13,9 @@
         <script src="../js/json2.js" type="text/javascript"></script>
         <script type="text/javascript">
             var pTree;
-            var pType = getData('prodctive_tree');
+            var pType;
             $(function(){
+            	toQuery();
                 pTree = $("#tree_div").ligerTree({
                     nodeWidth:142,
                     textFieldName:'task_routing_name',
@@ -31,7 +32,16 @@
                 var note = pTree.getSelected(); 
                 return note;
             }
-
+            function toQuery()
+            {
+            	alert(11111111111);
+            //	var param = new Object();
+         //      param.product_id = "05010003";
+            //   param.product_name = $('#product_nameQ').val();
+            //   alert(param.product_id);
+               pType = getData('prodctive_tree',{product_id:"05010003"},false);
+         
+            }
         </script>
         <style type="text/css">
             label{margin: 5px 20px 5px 15px;}
@@ -43,12 +53,20 @@
             .dplD {width:36%;position:relative;float:left;}
             .title{font-size:14px;font-weight:bold;background-position:left;padding-left:18px;}
             .l-dialog-content-nopadding{padding:0 !important;}
+            .tx1 { width: 250px;border: 1px solid; background: White}
         </style>
     </head>
     <body style="padding:0;">
         <div id="pageloading"></div>  
         <div id="layout_main">
-           <div id="tree_div"></div>
+               <div position="center" id="a_center" title="生产任务清单查询">
+                <div id="query_cond" class="fields">
+                     <label>产品编号</label><input type="text" class="s-text-qCond txt-def" id="product_codeQ" />
+                     <label>产品名称</label><input type="text" class="s-text-qCond txt-def" id="product_nameQ" />
+                    <input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
+                    <input type="button" value="清空" onclick="toReset('#query_cond input,select,textarea');" />
+                </div>
+                <div id="tree_div"></div>
             </div>
         </div>
     </body>
