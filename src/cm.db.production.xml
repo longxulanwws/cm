@@ -41,6 +41,7 @@ max(CASE task_routing_code WHEN '016' THEN task_routing_standard_hour ELSE '' EN
 FROM mrp_task_routing GROUP BY  up_task_routing_code)  AS B ON A.task_routing_code =B.up_task_code  ]]>
                             </value>
                         </property>
+                        <property name="order" value="a.product_id,a.task_routing_code"/>
                         <property name="conditions">
                             <map>
                                 <entry key="task_routing_name" value=":like(lr)" />

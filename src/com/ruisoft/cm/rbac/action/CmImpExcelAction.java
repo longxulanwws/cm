@@ -70,9 +70,22 @@ public class CmImpExcelAction extends BaseAction{
 		for (Iterator it = multipartRequest.getFileNames(); it.hasNext();) {  
 			String key = (String) it.next();  
 			MultipartFile imgFile = multipartRequest.getFile(key);  
-			if (imgFile.getOriginalFilename().length() > 0) {  
-				String fileName = imgFile.getOriginalFilename();  
+			if (imgFile.getOriginalFilename().length() > 0) {
+				
+				String fileName = imgFile.getOriginalFilename(); 
+				
 				String uploadFileUrl = multipartRequest.getSession().getServletContext().getRealPath("\\upload");  
+				
+				/*
+				 * 判断文件夹是否存在，不存在则创建
+				 */
+				File file =new File(uploadFileUrl);  
+				//如果文件夹不存在则创建  
+				if  (!file.exists() && !file.isDirectory()){     
+				    //不存在时,自动建立
+				    file.mkdir();  
+				} 
+				
 				File _apkFile = saveFileFromInputStream(imgFile.getInputStream(), uploadFileUrl, fileName);  
 				if (_apkFile.exists()) {
 					//上传成功
