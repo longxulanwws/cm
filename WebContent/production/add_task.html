@@ -112,6 +112,7 @@
                 if (!valid) return false;
                 var pro_id = $('#product_codeS').val();
                 var param = {product_id:pro_id};
+                if(opt != 'm'){
                 var count = 0;
                 data = JSON.stringify(reqObj('q','production.select.mrp_task_routing_add.check',JSON.stringify(param)));
                 ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
@@ -121,6 +122,7 @@
                 	$.ligerDialog.error('此产品编号已经存在！', '数据错误');
                 	count = 0 ;
                 	return false;
+                 }
                 }
                 var r, result;
                 var i = 0;
@@ -170,7 +172,11 @@
             }
             //产品明细选择
             function product_buttonclick() {
-                var pop = $.ligerDialog.open({height:400,width:850,isResize:true,url:'../sysmgt/product_query2.html?o=s&ProCateg=0501',title:'选择商品',
+            	if(opt == 'm'){
+            		 $.ligerDialog.warn('产品编号不允许修改！');
+            		return false;
+            	}else{
+                var pop = $.ligerDialog.open({height:400,width:700,isResize:true,url:'../sysmgt/product_query2.html?o=s&ProCateg=0501',title:'选择商品',
                     buttons: [
                         {text:'确定',onclick: function(item, dialog){
                             var data = dialog.frame.getSelectedRow();
@@ -189,6 +195,7 @@
                         }}
                 ]});
                 return false;
+                }
             }
             
             // 查询时数据值绑定 

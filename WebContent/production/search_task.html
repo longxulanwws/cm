@@ -17,10 +17,10 @@
             $(function(){
                 defGrid = $("#query_list").ligerGrid({
                     columns:[
-                        {display:'产品编号',name:'product_code',id:'product_code',width:130,align: 'left'},  
-                        {display:'任务名称',name:'task_routing_name',id:'task_routing_name',width:130,align: 'left'},
-                        {display:'任务项编号',name:'task_routing_code_display',id:'task_routing_code_display',width:130,align: 'left'},
-                        {display:'任务项数量',name:'task_routing_qty',width:100,render:function(item){return item.task_routing_qty&&item.task_routing_qty!='null'? parseFloat(item.task_routing_qty).toFixed(2) : '';}},
+                        {display:'产品编码',name:'product_code',id:'product_code',width:130,align: 'left'},  
+                        {display:'产品名称',name:'task_routing_name',id:'task_routing_name',width:130,align: 'left'},
+                        {display:'部件/零件编号',name:'task_routing_code_display',id:'task_routing_code_display',width:130,align: 'left'},
+                        {display:'部件/零件数量',name:'task_routing_qty',width:100,render:function(item){return item.task_routing_qty&&item.task_routing_qty!='null'? parseFloat(item.task_routing_qty).toFixed(2) : '';}},
                         {display:'外协',name:'waixie',width:60,align:'right',render:re_hour},
                         {display:'备料',name:'beiliao',width:60,align:'right',render:function(item){return item.beiliao&&item.beiliao!='null'? parseFloat(item.beiliao).toFixed(2) : '';}},
                         {display:'激光',name:'jiguang',width:60,align:'right',render:function(item){return item.jiguang&&item.jiguang!='null'? parseFloat(item.jiguang).toFixed(2) : '';}},

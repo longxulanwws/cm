@@ -79,6 +79,7 @@ where A.task_routing_code = B.Code AND A.task_routing_code = {product_id}]]>
 <![CDATA[select * from mrp_task_routing where FIND_IN_SET(task_routing_code, getChildLst({product_id})) AND task_routing_code <> {product_id} and task_routing_type <> '3' AND Product_ID ={product_id}]]>
                             </value>
                         </property>
+                        <property name="order" value="task_routing_code"/>
                     </bean>
                 </entry>  
                  <!--单品工艺路线查询  -->
