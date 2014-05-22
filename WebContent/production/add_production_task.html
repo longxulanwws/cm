@@ -36,7 +36,7 @@
                 ]});
                 pGrid = $("#p-div").ligerGrid({
                     columns:[
-                        {display:'产品编号',name:'product_code',width:80,editor:{type:'popup',onButtonClick:f_buttonclick},textField:'code',valueField:'categ_id'},
+                        {display:'产品编号',name:'product_id',width:80,editor:{type:'popup',onButtonClick:f_buttonclick},textField:'code',valueField:'categ_id'},
                         {display:'产品名称',name:'product_name',width:160},
                         {display:'部件编号',name:'task_routing_code',width:80},
                         {display:'部件名称',name:'task_routing_name',width:160},
@@ -44,7 +44,6 @@
                         {display:'计量单位',name:'product_uom',width:80,render:function(item){return paramRender(item,'uom',item.product_uom);}
                         ,editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}},
                         {display:'工艺路线',columns:getProductRoutingColumns()},
-                       {display:'产品ID',name:'product_id',width:1, hide: true},
                        {display:'部件ID',name:'task_routing_id',width:1, hide: true},                                                 
                                                                           
                    ],
@@ -164,14 +163,17 @@
                                 $.ligerDialog.warn('请选择产品!');
                                 return;
                             }
-                            alert(JSON.stringify(data));
                             pGrid.endEdit();
-                            pGrid.updateCell('product_id', data.product_id, pGrid.getSelected());
-                            pGrid.updateCell('product_code', data.product_code, pGrid.getSelected());
-                            pGrid.updateCell('product_name', data.product_name, pGrid.getSelected());
-                            pGrid.updateCell('task_routing_id',data.task_routing_id, pGrid.getSelected());
-                            pGrid.updateCell('task_routing_code',data.task_routing_code, pGrid.getSelected());
-                            pGrid.updateCell('task_routing_name',data.task_routing_name, pGrid.getSelected());
+                            var selected = pGrid.getSelected();
+                            var pro_type = data.task_routing_type;
+                            if(pro_type!='1'){
+                              pGrid.updateCell('task_routing_code',data.task_routing_code_display,selected);
+                              pGrid.updateCell('task_routing_name',data.task_routing_name, selected);
+                            }
+                            pGrid.updateCell('product_id', data.product_id, selected);                            
+                            pGrid.updateCell('product_name', data.product_name, selected);
+                            pGrid.updateCell('task_routing_id',data.task_routing_id,selected);
+                         
                             dialog.close();
                         }},
                         {text:'取消',onclick: function(item, dialog){

@@ -13,7 +13,7 @@
         <script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
         <script src="../js/common.js" type="text/javascript"></script>
         <script type="text/javascript">
-            var pGrid, c_row, opt,c_code,task_routing_id,production_task_code,product_id;
+            var pGrid, c_row, opt,c_code,task_routing_id,production_task_code,product_id,task_routing_code;
             var udata,uerid,pdata,plan_hour;
             $(function(){   
                 udata = getData('user',{orgid:$("#deptCodeS").val()},false);
@@ -68,7 +68,7 @@
                 	task_routing_id = query.task_routing_id;
                 	production_task_code = query.production_task_code;
                 	product_id = query.product_id;
-                    
+                	task_routing_code = query.task_routing_code;
                     ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
                         uerid = data['uid'];
                         $("#genz_dataS").val(data['date']);
@@ -80,7 +80,7 @@
                         bindVal(data['data']);
                         }, null, false);
                     
-                    param = {task_routing_id:task_routing_id,production_task_code:production_task_code,product_id:product_id};
+                    param = {task_routing_id:task_routing_id,production_task_code:production_task_code,product_id:product_id,task_routing_code:task_routing_code};
                     data = JSON.stringify(reqObj('q','production.select.mrp_production_task_rel.manageQuery',JSON.stringify(param)));
                     ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
                        pGrid.set({data: data['data']});

@@ -43,6 +43,8 @@
                         
                         {display:'产品编号',name:'product_id',width:80},
                         {display:'产品名称',name:'product_name',width:160},
+                        {display:'部件编号',name:'task_routing_code',width:80},
+                        {display:'部件名称',name:'task_routing_name',width:160},
                         {display:'数量',name:'production_product_qty',width:100,align:'right',render:function(item){return item.production_product_qty ? parseFloat(item.production_product_qty).toFixed(2) : '';}},
                         {display:'计量单位',name:'product_uom',width:80,render:function(item){return paramRender(item,'uom',item.product_uom);}},
                         {display:'工艺路线',columns:getProductRoutingColumns()},  
@@ -134,9 +136,14 @@
             function manageRow(rowid){
             	var row = pGrid.getRow(rowid);
                 var product_code = row.product_id;
+                var task_routing_code = row.task_routing_code;
+                if(task_routing_code == null || task_routing_code == ''){
+                	task_routing_code = row.product_id;
+                }
                 parent.f_addTab('new_manage_productionS'+product_code,'维护单据明细信息('+product_code+')',
                 		'./production/manage_production_task.html?o=m&production_task_code='.concat(row.production_task_code)+
-                				'&task_routing_id='.concat(row.task_routing_id)+'&product_id='.concat(row.product_id));
+                				'&task_routing_id='.concat(row.task_routing_id)+'&product_id='.concat(row.product_id)+
+                				'&task_routing_code='.concat(task_routing_code));
             }
         </script>
         <style type="text/css">

@@ -140,9 +140,15 @@ CreateUser, CreateDate FROM mrp_task_routing]]>
                         <property name="dmlType" value="cond" />
                         <property name="sql">
                             <value>
-<![CDATA[SELECT production_task_rel_id, production_task_code, task_routing_id, Product_ID,Product_name, Product_Uom, production_product_qty FROM mrp_production_task_rel]]>
+<![CDATA[SELECT * FROM (
+SELECT A.production_task_rel_id, A.production_task_code, A.task_routing_id, A.Product_ID,A.Product_name, A.Product_Uom,
+A.production_product_qty,CASE B.task_routing_type WHEN '1' THEN '' ELSE B.task_routing_code END AS task_routing_code,
+CASE B.task_routing_type WHEN '1' THEN '' ELSE B.task_routing_name END AS task_routing_name,
+B.task_routing_type,B.up_task_routing_code FROM mrp_production_task_rel AS A ,mrp_task_routing AS B
+WHERE A.task_routing_id=B.task_routing_id) AS C]]>
                             </value>
                         </property>
+                        <property name="order" value="product_id,task_routing_code"/>
                         <property name="conditions">
                             <map>
                                 <entry key="production_task_code" value=":like(lr)" />
@@ -231,7 +237,7 @@ AND B.task_routing_id ={task_routing_id} AND A.production_task_code = {productio
                             <value>
 <![CDATA[SELECT * FROM(
 select task_routing_id, task_routing_code, task_routing_name, task_routing_type, up_task_routing_code, Product_ID, Product_Name, task_routing_qty AS task_routingQty, task_routing_standard_hour, 
-task_routing_level, Note, WriteUser, WriteDate, CreateUser, CreateDate from mrp_task_routing where FIND_IN_SET(task_routing_code, getChildLst({product_id}))) AS A 
+task_routing_level, Note, WriteUser, WriteDate, CreateUser, CreateDate from mrp_task_routing where FIND_IN_SET(task_routing_code, getChildLst({task_routing_code})) AND Product_ID = {product_id}) AS A 
 LEFT JOIN mrp_production_task_track AS B
 ON A.task_routing_id =B.task_routing_id
 WHERE B.production_task_track_date = 
