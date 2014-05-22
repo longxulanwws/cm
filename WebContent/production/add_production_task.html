@@ -12,14 +12,15 @@
         <script src="../js/validate/messages_zh.js" type="text/javascript"></script>
         <script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
         <script src="../js/common.js" type="text/javascript"></script>
+        <script src="product_common.js" type="text/javascript"></script>
         <script type="text/javascript">
             var pGrid, c_row, opt, c_code;
             var udata;
             $(function(){   
                 udata = getData('user',{orgid:$("#deptCodeS").val()},false);
                 $("#layout_main").ligerLayout({
-                    bottomHeight: "35%",
-                    allowBottomResize:false
+                    bottomHeight: "40%", 
+                    allowBottomResize:true
                 });
                 $("form").ligerForm();
                 $(".l-textarea").each(function(index){
@@ -35,13 +36,18 @@
                 ]});
                 pGrid = $("#p-div").ligerGrid({
                     columns:[
-                        {display:'编号',name:'task_routing_id'},
-                        {display:'产品编号',name:'product_id',width:80,editor:{type:'popup',onButtonClick:f_buttonclick},textField:'code',valueField:'categ_id'},
+                        {display:'产品编号',name:'product_code',width:80,editor:{type:'popup',onButtonClick:f_buttonclick},textField:'code',valueField:'categ_id'},
                         {display:'产品名称',name:'product_name',width:160},
+                        {display:'部件编号',name:'task_routing_code',width:80},
+                        {display:'部件名称',name:'task_routing_name',width:160},
                         {display:'数量',name:'production_product_qty',width:100,align:'right',editor:{type:'string'},render:function(item){return item.production_product_qty ? parseFloat(item.production_product_qty).toFixed(2) : '';}},
                         {display:'计量单位',name:'product_uom',width:80,render:function(item){return paramRender(item,'uom',item.product_uom);}
-                        ,editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}}
-                    ],
+                        ,editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}},
+                        {display:'工艺路线',columns:getProductRoutingColumns()},
+                       {display:'产品ID',name:'product_id',width:1, hide: true},
+                       {display:'部件ID',name:'task_routing_id',width:1, hide: true},                                                 
+                                                                          
+                   ],
                     pageSize:20,
                     usePager: true,
                     width:'100%',
@@ -148,18 +154,24 @@
             }
             // 选择产品 处理
             function f_buttonclick() {
-                var pop = $.ligerDialog.open({height:400,width:650,isResize:true,url:'../production/product_tree.html',title:'选择产品',
+                var pop = $.ligerDialog.open({height:400,width:650,isResize:true,url:'../production/search_product_task_help.html',title:'选择产品',
                     buttons: [
                         {text:'确定',onclick: function(item, dialog){
-                            var note = dialog.frame.getSelected();
-                            if (!note) {
+                            var data = dialog.frame.getSelectedRow();
+					         
+                            
+                            if (!data) {
                                 $.ligerDialog.warn('请选择产品!');
                                 return;
                             }
+                            alert(JSON.stringify(data));
                             pGrid.endEdit();
-                            pGrid.updateCell('product_id', note.data.product_id, pGrid.getSelected());
-                            pGrid.updateCell('product_name', note.data.task_routing_name, pGrid.getSelected());
-                            pGrid.updateCell('task_routing_id', note.data.value, pGrid.getSelected());
+                            pGrid.updateCell('product_id', data.product_id, pGrid.getSelected());
+                            pGrid.updateCell('product_code', data.product_code, pGrid.getSelected());
+                            pGrid.updateCell('product_name', data.product_name, pGrid.getSelected());
+                            pGrid.updateCell('task_routing_id',data.task_routing_id, pGrid.getSelected());
+                            pGrid.updateCell('task_routing_code',data.task_routing_code, pGrid.getSelected());
+                            pGrid.updateCell('task_routing_name',data.task_routing_name, pGrid.getSelected());
                             dialog.close();
                         }},
                         {text:'取消',onclick: function(item, dialog){
