@@ -14,6 +14,7 @@ import java.util.UUID;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.context.ApplicationContext;
@@ -23,7 +24,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.mysql.jdbc.StringUtils;
 import com.ruisoft.cm.base.excel.util.PrduExcelConfig;
 import com.ruisoft.cm.rbac.dao.BaseDAO;
 import com.ruisoft.cm.rbac.dao.CmImpDAO;
@@ -185,7 +185,7 @@ public class CmImpExcelAction extends BaseAction{
 				ProductRoutingEntiy productRoutingEntiy = productRoutingEntityList.get(i);
 				String code = productRoutingEntiy.getCode();
 				String name = productRoutingEntiy.getName();
-				if(!StringUtils.isNullOrEmpty(code)&&!StringUtils.isNullOrEmpty(name)){
+				if(!StringUtils.isNotBlank(code)&&!StringUtils.isNotBlank(name)){
 					Object pro_data[] = new Object[12];
 					//task_routing_id
 					pro_data[0] = UUID.randomUUID().toString();
@@ -220,7 +220,7 @@ public class CmImpExcelAction extends BaseAction{
 							RoutingEntity routingEntity = routingEntityList.get(j);
 							if(routingEntity != null){
 								String routing_name =  routingEntity.getName();
-								if(!StringUtils.isNullOrEmpty(routing_name)){
+								if(!StringUtils.isNotBlank(routing_name)){
 									Object routing_data[] = new Object[12];
 									//task_routing_id
 									routing_data[0] = UUID.randomUUID().toString();
@@ -275,7 +275,7 @@ public class CmImpExcelAction extends BaseAction{
 			ProductRoutingEntiy productRoutingEntiy = productRoutingEntityList.get(0);
 			code = productRoutingEntiy.getCode();
 			name = productRoutingEntiy.getName();
-			if(!StringUtils.isNullOrEmpty(code)&&!StringUtils.isNullOrEmpty(name)){
+			if(!StringUtils.isNotBlank(code)&&!StringUtils.isNotBlank(name)){
 				Object pro_data[] = new Object[12];
 				//task_routing_id
 				pro_data[0] = UUID.randomUUID().toString();
@@ -312,7 +312,11 @@ public class CmImpExcelAction extends BaseAction{
 					String task_routing_code = taskRoutingEntity.getTask_routing_code();
 					String task_routing_name = taskRoutingEntity.getTask_routing_name();
 					String task_routing_qty = taskRoutingEntity.getTask_routing_qty();
-					if(!StringUtils.isNullOrEmpty(task_routing_code)&&!StringUtils.isNullOrEmpty(task_routing_name)){
+					//ÊýÁ¿×Ö¶Î·Ç¿ÕÅÐ¶Ï
+					if(StringUtils.isNotBlank(task_routing_qty)){
+						task_routing_qty="0";
+					}
+					if(!StringUtils.isNotBlank(task_routing_code)&&!StringUtils.isNotBlank(task_routing_name)){
 						Object task_data[] = new Object[12];
 						//task_routing_id
 						task_data[0] = UUID.randomUUID().toString();
@@ -347,7 +351,7 @@ public class CmImpExcelAction extends BaseAction{
 								RoutingEntity routingEntity = routingEntityList.get(j);
 								if(routingEntity!=null){
 									String routing_name =  routingEntity.getName();
-									if(!StringUtils.isNullOrEmpty(routing_name)){
+									if(!StringUtils.isNotBlank(routing_name)){
 										Object routing_data[] = new Object[12];
 										//task_routing_id
 										routing_data[0] = UUID.randomUUID().toString();

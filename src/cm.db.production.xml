@@ -16,32 +16,97 @@
                         <property name="dmlType" value="cond" />
                         <property name="sql">
                             <value>
-<![CDATA[SELECT * FROM 
-(select m.*,CASE task_routing_type WHEN '1' THEN Product_ID ELSE ''END AS product_code,
- CASE task_routing_type WHEN '2' THEN task_routing_code ELSE ''END AS task_routing_code_display
-  from mrp_task_routing AS m  WHERE m.task_routing_type <> '3') AS a
-LEFT JOIN
-(SELECT up_task_routing_code AS up_task_code ,
-max(CASE task_routing_code WHEN '001' THEN task_routing_standard_hour ELSE '' END) AS waixie  ,
-max(CASE task_routing_code WHEN '002' THEN task_routing_standard_hour ELSE '' END) AS beiliao ,
-max(CASE task_routing_code WHEN '003' THEN task_routing_standard_hour ELSE '' END) AS jiguang ,
-max(CASE task_routing_code WHEN '004' THEN task_routing_standard_hour ELSE '' END) AS shuchong,
-max(CASE task_routing_code WHEN '005' THEN task_routing_standard_hour ELSE '' END) AS zhewan  ,
-max(CASE task_routing_code WHEN '006' THEN task_routing_standard_hour ELSE '' END) AS yamao   ,
-max(CASE task_routing_code WHEN '007' THEN task_routing_standard_hour ELSE '' END) AS yahan   ,
-max(CASE task_routing_code WHEN '008' THEN task_routing_standard_hour ELSE '' END) AS qiege   ,
-max(CASE task_routing_code WHEN '009' THEN task_routing_standard_hour ELSE '' END) AS dakong  ,
-max(CASE task_routing_code WHEN '010' THEN task_routing_standard_hour ELSE '' END) AS gongsi  ,
-max(CASE task_routing_code WHEN '011' THEN task_routing_standard_hour ELSE '' END) AS hanjie  ,
-max(CASE task_routing_code WHEN '012' THEN task_routing_standard_hour ELSE '' END) AS damo    ,
-max(CASE task_routing_code WHEN '013' THEN task_routing_standard_hour ELSE '' END) AS lasi    ,
-max(CASE task_routing_code WHEN '014' THEN task_routing_standard_hour ELSE '' END) AS siyin   ,
-max(CASE task_routing_code WHEN '015' THEN task_routing_standard_hour ELSE '' END) AS peitu   ,
-max(CASE task_routing_code WHEN '016' THEN task_routing_standard_hour ELSE '' END) AS zuzhuang 
-FROM mrp_task_routing GROUP BY  up_task_routing_code)  AS B ON A.task_routing_code =B.up_task_code  ]]>
+<![CDATA[SELECT m.*, CASE task_routing_type WHEN '1' THEN Product_ID ELSE ''END AS product_code
+    , CASE task_routing_type WHEN '2' THEN task_routing_code ELSE ''END AS task_routing_code_display
+FROM (
+	 SELECT a. *
+    , p_task_num * beiliao AS beiliao
+    , p_task_num * jiguang AS jiguang
+    , p_task_num * shuchong AS shuchong
+    , p_task_num * zhewan AS zhewan
+    , p_task_num * yamao AS yamao
+    , p_task_num * yahan AS yahan
+    , p_task_num * qiege AS qiege
+    , p_task_num * dakong AS dakong
+    , p_task_num * gongsi AS gongsi
+    , p_task_num * hanjie AS hanjie
+    , p_task_num * damo AS damo
+    , p_task_num * lasi AS lasi
+    , p_task_num * siyin AS siyin
+    , p_task_num * peitu AS peitu
+    , p_task_num * zuzhuang AS zuzhuang     
+FROM (SELECT *
+      FROM mrp_task_routing AS m
+      WHERE m.task_routing_type = '1') AS a
+    LEFT JOIN (SELECT product_id
+                   , sum(CASE task_routing_code WHEN '001' THEN task_routing_standard_hour ELSE '' END) AS waixie
+                   , sum(CASE task_routing_code WHEN '002' THEN task_routing_standard_hour ELSE '' END) AS beiliao
+                   , sum(CASE task_routing_code WHEN '003' THEN task_routing_standard_hour ELSE '' END) AS jiguang
+                   , sum(CASE task_routing_code WHEN '004' THEN task_routing_standard_hour ELSE '' END) AS shuchong
+                   , sum(CASE task_routing_code WHEN '005' THEN task_routing_standard_hour ELSE '' END) AS zhewan
+                   , sum(CASE task_routing_code WHEN '006' THEN task_routing_standard_hour ELSE '' END) AS yamao
+                   , sum(CASE task_routing_code WHEN '007' THEN task_routing_standard_hour ELSE '' END) AS yahan
+                   , sum(CASE task_routing_code WHEN '008' THEN task_routing_standard_hour ELSE '' END) AS qiege
+                   , sum(CASE task_routing_code WHEN '009' THEN task_routing_standard_hour ELSE '' END) AS dakong
+                   , sum(CASE task_routing_code WHEN '010' THEN task_routing_standard_hour ELSE '' END) AS gongsi
+                   , sum(CASE task_routing_code WHEN '011' THEN task_routing_standard_hour ELSE '' END) AS hanjie
+                   , sum(CASE task_routing_code WHEN '012' THEN task_routing_standard_hour ELSE '' END) AS damo
+                   , sum(CASE task_routing_code WHEN '013' THEN task_routing_standard_hour ELSE '' END) AS lasi
+                   , sum(CASE task_routing_code WHEN '014' THEN task_routing_standard_hour ELSE '' END) AS siyin
+                   , sum(CASE task_routing_code WHEN '015' THEN task_routing_standard_hour ELSE '' END) AS peitu
+                   , sum(CASE task_routing_code WHEN '016' THEN task_routing_standard_hour ELSE '' END) AS zuzhuang
+               FROM mrp_task_routing
+               WHERE task_routing_type = '3'
+               GROUP BY product_id) AS B ON a.product_id = B.product_id
+    LEFT JOIN (SELECT Product_ID
+                   , sum(task_routing_qty) AS p_task_num
+               FROM mrp_task_routing
+               GROUP BY Product_ID) AS tkm ON tkm.product_id = a.product_id
+UNION
+
+SELECT a. *
+    , a.task_routing_qty * beiliao AS beiliao
+    , a.task_routing_qty * jiguang AS jiguang
+    , a.task_routing_qty * shuchong AS shuchong
+    , a.task_routing_qty * zhewan AS zhewan
+    , a.task_routing_qty * yamao AS yamao
+    , a.task_routing_qty * yahan AS yahan
+    , a.task_routing_qty * qiege AS qiege
+    , a.task_routing_qty * dakong AS dakong
+    , a.task_routing_qty * gongsi AS gongsi
+    , a.task_routing_qty * hanjie AS hanjie
+    , a.task_routing_qty * damo AS damo
+    , a.task_routing_qty * lasi AS lasi
+    , a.task_routing_qty * siyin AS siyin
+    , a.task_routing_qty * peitu AS peitu
+    , a.task_routing_qty * zuzhuang AS zuzhuang
+    FROM (SELECT *
+      FROM mrp_task_routing AS m
+      WHERE m.task_routing_type = '2') AS a
+    LEFT JOIN (SELECT product_id
+                   , up_task_routing_code AS up_task_code
+                   , sum(CASE task_routing_code WHEN '001' THEN task_routing_standard_hour ELSE '' END) AS waixie
+                   , sum(CASE task_routing_code WHEN '002' THEN task_routing_standard_hour ELSE '' END) AS beiliao
+                   , sum(CASE task_routing_code WHEN '003' THEN task_routing_standard_hour ELSE '' END) AS jiguang
+                   , sum(CASE task_routing_code WHEN '004' THEN task_routing_standard_hour ELSE '' END) AS shuchong
+                   , sum(CASE task_routing_code WHEN '005' THEN task_routing_standard_hour ELSE '' END) AS zhewan
+                   , sum(CASE task_routing_code WHEN '006' THEN task_routing_standard_hour ELSE '' END) AS yamao
+                   , sum(CASE task_routing_code WHEN '007' THEN task_routing_standard_hour ELSE '' END) AS yahan
+                   , sum(CASE task_routing_code WHEN '008' THEN task_routing_standard_hour ELSE '' END) AS qiege
+                   , sum(CASE task_routing_code WHEN '009' THEN task_routing_standard_hour ELSE '' END) AS dakong
+                   , sum(CASE task_routing_code WHEN '010' THEN task_routing_standard_hour ELSE '' END) AS gongsi
+                   , sum(CASE task_routing_code WHEN '011' THEN task_routing_standard_hour ELSE '' END) AS hanjie
+                   , sum(CASE task_routing_code WHEN '012' THEN task_routing_standard_hour ELSE '' END) AS damo
+                   , sum(CASE task_routing_code WHEN '013' THEN task_routing_standard_hour ELSE '' END) AS lasi
+                   , sum(CASE task_routing_code WHEN '014' THEN task_routing_standard_hour ELSE '' END) AS siyin
+                   , sum(CASE task_routing_code WHEN '015' THEN task_routing_standard_hour ELSE '' END) AS peitu
+                   , sum(CASE task_routing_code WHEN '016' THEN task_routing_standard_hour ELSE '' END) AS zuzhuang
+               FROM mrp_task_routing
+               WHERE task_routing_type = '3'
+               GROUP BY product_id, up_task_routing_code) AS B ON A.task_routing_code = B.up_task_code AND a.product_id = B.product_id ) as m ]]>
                             </value>
                         </property>
-                        <property name="order" value="a.product_id,a.task_routing_code"/>
+                        <property name="order" value="product_id,task_routing_code"/>
                         <property name="conditions">
                             <map>
                                 <entry key="product_name" value=":like(lr)" />
