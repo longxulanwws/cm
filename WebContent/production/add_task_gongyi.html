@@ -147,6 +147,10 @@
             }
             //产品明细选择
             function product_buttonclick() {
+                if(opt == 'm'){
+                    $.ligerDialog.warn('产品编号不允许修改！');
+                   return false;
+               }else{
                 var pop = $.ligerDialog.open({height:400,width:850,isResize:true,url:'../sysmgt/product_query2.html?o=s',title:'选择商品',
                     buttons: [
                         {text:'确定',onclick: function(item, dialog){
@@ -166,6 +170,7 @@
                         }}
                 ]});
                 return false;
+               }
             }
             
             // 查询时数据值绑定 
@@ -188,9 +193,9 @@
             function toBack()
             {
                 //关闭修改界面
-                parent.tabManager.removeTabItem("modify_production_task");
+                parent.tabManager.removeTabItem("modify_production_task_gongyi");
                 //关闭新增界面
-                parent.tabManager.removeTabItem("add_production_task");
+                parent.tabManager.removeTabItem("new_add_product_task_gongyi");
              }
             // 保存业务处理
             function toAdd() {
@@ -204,7 +209,8 @@
                         product_name:$("#product_nameS").val(),
                         note:$("#noteS").val(),
                         task_routing_type:"1",
-                        task_routing_level:"1"
+                        task_routing_level:"1",
+                        task_routing_qty:"1"
                 };
                 var en = 'production.add.mrp_task_routing.add', optType = 'a';
                 if (opt === 'm') {

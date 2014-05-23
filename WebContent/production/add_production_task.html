@@ -40,7 +40,7 @@
                         {display:'产品名称',name:'product_name',width:160},
                         {display:'部件编号',name:'task_routing_code',width:80},
                         {display:'部件名称',name:'task_routing_name',width:160},
-                        {display:'数量',name:'production_product_qty',width:100,align:'right',render:function(item){return item.production_product_qty ? parseFloat(item.production_product_qty).toFixed(2) : '';}},
+                        {display:'数量',name:'production_product_qty',width:100,align:'right',editor:{type:'string'},render:function(item){return item.production_product_qty ? parseFloat(item.production_product_qty).toFixed(2) : '';}},
                         {display:'计量单位',name:'product_uom',width:80,render:function(item){return paramRender(item,'uom',item.product_uom);}
                         ,editor:{type:'select',data:getData('uom'),valueField:'value',textField:'name'}},
                         {display:'工艺路线',columns:getProductRoutingColumns()},
