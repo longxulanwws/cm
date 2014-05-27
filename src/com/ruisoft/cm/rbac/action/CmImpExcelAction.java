@@ -145,7 +145,7 @@ public class CmImpExcelAction extends BaseAction{
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//可以方便地修改日期格式
 		//当前日期
 		String createdate = dateFormat.format( now ); 
-		System.out.println(createdate); 
+		System.out.println("wws"+createdate); 
 		//获取context对象
 		ApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(session.getServletContext());  
 		PrduExcelConfig prduExcelConfig = (PrduExcelConfig) ctx.getBean("prduExcelConfig"); 
@@ -220,7 +220,7 @@ public class CmImpExcelAction extends BaseAction{
 							RoutingEntity routingEntity = routingEntityList.get(j);
 							if(routingEntity != null){
 								String routing_name =  routingEntity.getName();
-								if(!StringUtils.isNotBlank(routing_name)){
+								if(StringUtils.isNotBlank(routing_name)){
 									Object routing_data[] = new Object[12];
 									//task_routing_id
 									routing_data[0] = UUID.randomUUID().toString();
@@ -275,7 +275,7 @@ public class CmImpExcelAction extends BaseAction{
 			ProductRoutingEntiy productRoutingEntiy = productRoutingEntityList.get(0);
 			code = productRoutingEntiy.getCode();
 			name = productRoutingEntiy.getName();
-			if(!StringUtils.isNotBlank(code)&&!StringUtils.isNotBlank(name)){
+			if(StringUtils.isNotBlank(code)&&StringUtils.isNotBlank(name)){
 				Object pro_data[] = new Object[12];
 				//task_routing_id
 				pro_data[0] = UUID.randomUUID().toString();
@@ -316,7 +316,7 @@ public class CmImpExcelAction extends BaseAction{
 					if(StringUtils.isNotBlank(task_routing_qty)){
 						task_routing_qty="0";
 					}
-					if(!StringUtils.isNotBlank(task_routing_code)&&!StringUtils.isNotBlank(task_routing_name)){
+					if(StringUtils.isNotBlank(task_routing_code)&&StringUtils.isNotBlank(task_routing_name)){
 						Object task_data[] = new Object[12];
 						//task_routing_id
 						task_data[0] = UUID.randomUUID().toString();
@@ -351,7 +351,7 @@ public class CmImpExcelAction extends BaseAction{
 								RoutingEntity routingEntity = routingEntityList.get(j);
 								if(routingEntity!=null){
 									String routing_name =  routingEntity.getName();
-									if(!StringUtils.isNotBlank(routing_name)){
+									if(StringUtils.isNotBlank(routing_name)){
 										Object routing_data[] = new Object[12];
 										//task_routing_id
 										routing_data[0] = UUID.randomUUID().toString();
