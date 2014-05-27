@@ -6,9 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -90,7 +95,6 @@ public class CmImpExcelAction extends BaseAction{
 				if (_apkFile.exists()) {
 					//上传成功
 					FullfileName = _apkFile.getAbsolutePath();
-					//FileInputStream fis = new FileInputStream(_apkFile);  
 				} else{
 					//上传失败
 					FullfileName = "fasle";
@@ -98,11 +102,11 @@ public class CmImpExcelAction extends BaseAction{
 			}  
 		}  
 		//把文件内容导入数据库存储
-		boolean result = ImportDbData(FullfileName,createuser);
-		if(result){
+		Map reMap = ImportDbData(FullfileName,createuser);
+		if("true".equals(reMap.get("result"))){
 			out.print("导入成功！");
 		}else {
-			out.print("导入失败，请检查模板数据格式！");
+			out.print(reMap.get("message"));
 		}
 	}
 
@@ -137,15 +141,15 @@ public class CmImpExcelAction extends BaseAction{
 	 * @param createuser
 	 * @return
 	 */
-	private boolean ImportDbData(String FullfileName,String createuser){
+	private Map ImportDbData(String FullfileName,String createuser){
+		Map resultMap = new HashMap();
 		boolean result = false;
+		String message = "";
 		//当前用户ID
-//		String createuser = (String) request.getSession().getAttribute(SysConstants.USER_INFO.toString());
 		Date now = new Date(); 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//可以方便地修改日期格式
 		//当前日期
 		String createdate = dateFormat.format( now ); 
-		System.out.println("wws"+createdate); 
 		//获取context对象
 		ApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(session.getServletContext());  
 		PrduExcelConfig prduExcelConfig = (PrduExcelConfig) ctx.getBean("prduExcelConfig"); 
@@ -159,15 +163,363 @@ public class CmImpExcelAction extends BaseAction{
 			List<ProductRoutingEntiy> productRoutingEntityList = productiontaskRouting.getProductRoutingEntityList();
 			//工艺路线对象List
 			List<TaskRoutingEntity> taskRoutingEntityList = productiontaskRouting.getTaskRoutingEntityList();
-			//复杂产品的导入
-			if("parts".equals(productOrParts)){
-				result = partsImport(createuser,createdate,productRoutingEntityList,taskRoutingEntityList);
-			} else if ("products".equals(productOrParts)){
-				//单品导入
-				result = productImport(createuser,createdate,productRoutingEntityList);
+			//产品是否存在check
+			resultMap = isExistProduct(productRoutingEntityList,productOrParts);
+			if("true".equals(resultMap.get("result"))){
+				resultMap = new HashMap();
+				//产品是否导入check
+				resultMap = isExistProductByTree(productRoutingEntityList,productOrParts);
+				if("true".equals(resultMap.get("result"))){
+					resultMap = new HashMap();
+					//复杂产品的导入
+					if("parts".equals(productOrParts)){
+						resultMap = checkProQty(taskRoutingEntityList);
+						if("true".equals(resultMap.get("result"))){
+							resultMap = new HashMap();
+							resultMap = checkGongyiParts(taskRoutingEntityList);
+							if("true".equals(resultMap.get("result"))){
+								resultMap = new HashMap();
+								result = partsImport(createuser,createdate,productRoutingEntityList,taskRoutingEntityList);
+								if(!result){
+									message = "导入失败！";
+									resultMap.put("result", "false");
+									//message内容
+									resultMap.put("message", message);
+								}else{
+									message = "导入成功！";
+									resultMap.put("result", "true");
+									//message内容
+									resultMap.put("message", message);
+								}
+							}
+						}
+						
+					} else if ("products".equals(productOrParts)){
+						resultMap = checkProductCode(productRoutingEntityList);
+						if("true".equals(resultMap.get("result"))){
+							resultMap = new HashMap();
+							resultMap = checkGongyiProducts(productRoutingEntityList);
+							if("true".equals(resultMap.get("result"))){
+								resultMap = new HashMap();
+								//单品导入
+								result = productImport(createuser,createdate,productRoutingEntityList);
+								if(!result){
+									message = "导入失败！";
+									resultMap.put("result", "false");
+									//message内容
+									resultMap.put("message", message);
+								}else{
+									message = "导入成功！";
+									resultMap.put("result", "true");
+									//message内容
+									resultMap.put("message", message);
+								}
+							}
+						}
+					}
+				}
+			}
+		}else{
+			message = "文件上传失败！";
+			resultMap.put("result", "false");
+			//message内容
+			resultMap.put("message", message);
+		}
+		return resultMap;
+	}
+	
+//	1、产品及部件工时定额维护：
+//	1) excel 导入校验：
+//	验证产品编码、产品名称、规格型号是否与商品物料数据是否一致。
+//	验证工艺路线是否已在系统中定义
+//	产品+多部件 时，部件数量不能为空,或为0，
+//	部件编号要满足分级规则：1-1-1。有分级时，上级必须存在
+//	2）excel 导入控制
+//	不能重复导入同一产品的工时定额数据
+	
+	/**
+	 * 验证单品的工艺路线是否已在系统中定义
+	 * @param taskRoutingEntityList
+	 * @return
+	 */
+	private Map checkGongyiParts(List<TaskRoutingEntity> taskRoutingEntityList){
+		Map resultMap = new HashMap();
+		Set set=new HashSet();
+		String result = "true";
+		StringBuffer message = new StringBuffer();
+		for (int i = 0; i < taskRoutingEntityList.size(); i++)
+		{
+			TaskRoutingEntity taskRoutingEntity = taskRoutingEntityList.get(i);
+			if(taskRoutingEntity!=null){
+				List<RoutingEntity> routingEntityList = taskRoutingEntity.getRoutingEntityList();
+				for (int j = 0; j < routingEntityList.size(); j++){
+					RoutingEntity routingEntity = routingEntityList.get(j);
+					if(routingEntity!=null){
+						String routing_name = routingEntity.getName();
+						int count = cmImpDAO.queryIsCode(routing_name);
+						if(count <= 0){
+							result = "false";
+							set.add(routing_name);
+						}
+					}
+				}
 			}
 		}
-		return result;
+		//check结果
+		if("false".equals(result)){
+			message.append("以下这些工艺路线名称未定义，请检查工艺路线名称：");
+			for(Iterator it=set.iterator();it.hasNext();)
+			  {
+				message.append(it.next()).append(",");
+			  }
+			System.out.println("错误信息："+message);
+		}
+		//check结果
+		resultMap.put("result", result);
+		//message内容
+		resultMap.put("message", message);
+		return resultMap;
+	}
+	
+	/**
+	 * 验证复杂产品的工艺路线是否已在系统中定义
+	 * @param taskRoutingEntityList
+	 * @return
+	 */
+	private Map checkGongyiProducts(List<ProductRoutingEntiy> productRoutingEntityList ){
+		Map resultMap = new HashMap();
+		Set set=new HashSet();
+		String result = "true";
+		StringBuffer message = new StringBuffer();
+		for (int i = 0; i < productRoutingEntityList.size(); i++)
+		{
+			ProductRoutingEntiy productRoutingEntiy = productRoutingEntityList.get(i);
+			if(productRoutingEntiy!=null){
+				List<RoutingEntity> routingEntityList = productRoutingEntiy.getRoutingEntityList();
+				for (int j = 0; j < routingEntityList.size(); j++){
+					RoutingEntity routingEntity = routingEntityList.get(j);
+					if(routingEntity!=null){
+						String routing_name = routingEntity.getName();
+						int count = cmImpDAO.queryIsCode(routing_name);
+						if(count <= 0){
+							result = "false";
+							set.add(routing_name);
+						}
+					}
+				}
+			}
+		}
+		//check结果
+		if("false".equals(result)){
+			message.append("以下这些工艺路线名称未定义，请检查工艺路线名称：");
+			for(Iterator it=set.iterator();it.hasNext();)
+			  {
+				message.append(it.next()).append(",");
+			  }
+			System.out.println("错误信息："+message);
+		}
+		//check结果
+		resultMap.put("result", result);
+		//message内容
+		resultMap.put("message", message);
+		return resultMap;
+	}
+	
+	/**
+	 * 产品+多部件 时，部件数量不能为空,或为0
+	 * @param taskRoutingEntityList
+	 * @return
+	 */
+	private Map checkProQty(List<TaskRoutingEntity> taskRoutingEntityList){
+		Map resultMap = new HashMap();
+		List repeatData = new ArrayList();
+		String result = "true";
+		StringBuffer message = new StringBuffer();
+		for (int i = 0; i < taskRoutingEntityList.size(); i++)
+		{
+			TaskRoutingEntity taskRoutingEntity = taskRoutingEntityList.get(i);
+			if(taskRoutingEntity!=null){
+				//部件数量
+				String task_routing_qty = taskRoutingEntity.getTask_routing_qty();
+				//部件code
+				String task_routing_code = taskRoutingEntity.getTask_routing_code();
+				if(StringUtils.isBlank(task_routing_qty) ||Float.parseFloat(task_routing_qty) <= 0){
+					repeatData.add(task_routing_code);
+					result = "false";
+				}
+			}
+		}
+		//check结果
+		if("false".equals(result)){
+			message.append("以下这些部件数量存在空数据，请检查以下部件编号的数量：");
+			for(int j = 0; j < repeatData.size()-1; j++){
+				message.append(repeatData.get(j)).append(",");
+			}
+			message.append(repeatData.get(repeatData.size()-1));
+			System.out.println("错误信息："+message);
+		}
+		//check结果
+		resultMap.put("result", result);
+		//message内容
+		resultMap.put("message", message);
+		return resultMap;
+	}
+	/**
+	 * 单品excel内部数据中产品编号重复check
+	 * @param productRoutingEntityList
+	 * @return
+	 */
+	private Map checkProductCode(List<ProductRoutingEntiy>  productRoutingEntityList){
+		Map resultMap = new HashMap();
+		List repeatData = new ArrayList();
+		String result = "true";
+		StringBuffer message = new StringBuffer();
+		//单品check
+		for (int i = 0; i < productRoutingEntityList.size() - 1; i++)
+		{
+			ProductRoutingEntiy productRoutingEntiy = productRoutingEntityList.get(i);
+			//产品编号
+			String code = productRoutingEntiy.getCode();
+			for (int j = i + 1; j < productRoutingEntityList.size(); j++)
+			{
+				ProductRoutingEntiy productRoutingTwo = productRoutingEntityList.get(j);
+				//产品编号
+				String pro_code = productRoutingTwo.getCode();
+				if (code.equals(pro_code))
+				{
+					repeatData.add(code);
+					result = "false";
+					
+				}
+			}
+		}
+		//check结果
+		if("false".equals(result)){
+			message.append("EXCEL中产品编码存在重复数据，请检查以下产品编号：");
+			for(int j = 0; j < repeatData.size()-1; j++){
+				message.append(repeatData.get(j)).append(",");
+			}
+			message.append(repeatData.get(repeatData.size()-1));
+			System.out.println("错误信息："+message);
+		}
+		//check结果
+		resultMap.put("result", result);
+		//message内容
+		resultMap.put("message", message);
+		return resultMap;
+	}
+	
+	/**
+	 * 单品判断产品在组织树中是否已经存在
+	 * @param productRoutingEntityList
+	 * @return
+	 */
+	private Map isExistProductByTree(List<ProductRoutingEntiy>  productRoutingEntityList,String productOrParts){
+		System.out.println("判断产品是否已经存在开始");
+		Map resultMap = new HashMap();
+		List repeatData = new ArrayList();
+		String result = "true";
+		StringBuffer message = new StringBuffer();
+		//单品check
+		if ("products".equals(productOrParts)){
+			for (int i = 0; i < productRoutingEntityList.size(); i++)
+			{
+				ProductRoutingEntiy productRoutingEntiy = productRoutingEntityList.get(i);
+				//产品编号
+				String code = productRoutingEntiy.getCode();
+				System.out.println("产品编号"+code);
+				int count = cmImpDAO.queryProCode(code);
+				//如果产品已经存在
+				if(count > 0){
+					repeatData.add(code);
+					result = "false";
+				}
+			}
+		}else{
+			//复杂产品check
+			ProductRoutingEntiy productRoutingEntiy = productRoutingEntityList.get(0);
+			//产品编号
+			String code = productRoutingEntiy.getCode();
+			int count = cmImpDAO.queryProCode(code);
+			//如果产品已经存在
+			if(count > 0){
+				repeatData.add(code);
+				result = "false";
+			}
+		}
+		//check结果
+		if("false".equals(result)){
+			message.append("以下这些产品已经被导入！产品编号为：");
+			for(int j = 0; j < repeatData.size()-1; j++){
+				message.append(repeatData.get(j)).append(",");
+			}
+			message.append(repeatData.get(repeatData.size()-1));
+			System.out.println("错误信息："+message);
+		}
+		//message内容
+		resultMap.put("message", message);
+		//check结果
+		resultMap.put("result", result);
+		return resultMap;
+	}
+	
+	/**
+	 * 单品判断产品是否已经存在
+	 * @param productRoutingEntityList
+	 * @return
+	 */
+	private Map isExistProduct(List<ProductRoutingEntiy>  productRoutingEntityList,String productOrParts){
+		Map resultMap = new HashMap();
+		List repeatData = new ArrayList();
+		String result = "true";
+		StringBuffer message = new StringBuffer();
+		if("products".equals(productOrParts)){
+			for (int i = 0; i < productRoutingEntityList.size(); i++)
+			{
+				ProductRoutingEntiy productRoutingEntiy = productRoutingEntityList.get(i);
+				//产品编号
+				String code = productRoutingEntiy.getCode();
+				//产品名称
+				String name = productRoutingEntiy.getName();
+				//产品规格
+				String specs = productRoutingEntiy.getSpecs();
+				System.out.println("产品编号"+code);
+				int count = cmImpDAO.queryIsProCode(code,name,specs);
+				//如果产品已经存在
+				if(count <= 0){
+					repeatData.add(code);
+					result = "false";
+				}
+			}
+		}else{
+			ProductRoutingEntiy productRoutingEntiy = productRoutingEntityList.get(0);
+			//产品编号
+			String code = productRoutingEntiy.getCode();
+			//产品名称
+			String name = productRoutingEntiy.getName();
+			//产品规格
+			String specs = productRoutingEntiy.getSpecs();
+			System.out.println("产品编号"+code);
+			int count = cmImpDAO.queryIsProCode(code,name,specs);
+			//如果产品已经存在
+			if(count <= 0){
+				repeatData.add(code);
+				result = "false";
+			}
+		}
+		//check结果
+		if("false".equals(result)){
+			message.append("以下这些产品在商品信息中不存在，请检查这些产品的产品编号，产品名称，产品规格！产品编号为：");
+			for(int j = 0; j < repeatData.size()-1; j++){
+				message.append(repeatData.get(j)).append(",");
+			}
+			message.append(repeatData.get(repeatData.size()-1));
+			System.out.println("错误信息："+message);
+		}
+		//check结果
+		resultMap.put("result", result);
+		resultMap.put("message", message);
+		return resultMap;
 	}
 	
 	/**
@@ -185,7 +537,7 @@ public class CmImpExcelAction extends BaseAction{
 				ProductRoutingEntiy productRoutingEntiy = productRoutingEntityList.get(i);
 				String code = productRoutingEntiy.getCode();
 				String name = productRoutingEntiy.getName();
-				if(!StringUtils.isNotBlank(code)&&!StringUtils.isNotBlank(name)){
+				if(StringUtils.isNotBlank(code)&&StringUtils.isNotBlank(name)){
 					Object pro_data[] = new Object[12];
 					//task_routing_id
 					pro_data[0] = UUID.randomUUID().toString();
@@ -202,7 +554,7 @@ public class CmImpExcelAction extends BaseAction{
 					//Product_Name
 					pro_data[6] = name;
 					//task_routing_qty
-					pro_data[7] = null;
+					pro_data[7] = 1;
 					//task_routing_standard_hour
 					pro_data[8] = null;
 					//task_routing_level
@@ -313,7 +665,7 @@ public class CmImpExcelAction extends BaseAction{
 					String task_routing_name = taskRoutingEntity.getTask_routing_name();
 					String task_routing_qty = taskRoutingEntity.getTask_routing_qty();
 					//数量字段非空判断
-					if(StringUtils.isNotBlank(task_routing_qty)){
+					if(StringUtils.isBlank(task_routing_qty)){
 						task_routing_qty="0";
 					}
 					if(StringUtils.isNotBlank(task_routing_code)&&StringUtils.isNotBlank(task_routing_name)){
