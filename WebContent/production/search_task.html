@@ -42,7 +42,8 @@
                     isShowDetailToggle:true,
                     tree: { columnId: 'task_routing_name',
                             idField: 'task_routing_code',
-                            parentIDField: 'up_task_routing_code' },
+                            parentIDField: 'up_task_routing_code',
+                            },
                     onReload: toQuery,
                   //第一页
                     onToFirst: function(item) {
@@ -78,12 +79,20 @@
                 appendAddBtn(openDictDef, '复杂产品','复杂产品','first');
                 appendAddBtn(openDictDefTask, '单品','单品','second');
                 appendDeleteBtn(deleteRow, "删除产品部件项");
-                appendModifyBtn(openModify, "编辑产品部件项");
+                appendModifyBtn(openModify, "编辑产品部件项");                 
                 $("#pageloading").hide();
                 //默认查询全部数据 
-                toQuery();
-                
-            });
+                toQuery();  
+            }); 
+            //收缩全部树
+            function collapseAll() {
+            	defGrid.collapseAll();
+            }
+          	//展开全部树
+            function expandAll()
+            {
+            	defGrid.expandAll();
+            }
             //新增
             function openDictDef() {
                 parent.f_addTab('new_add_product_task','新增产品部件项维护','./production/add_task.html');
@@ -181,7 +190,7 @@
                         defGrid.data = data['data'];
                          //增加分页信息  end 
                         defGrid.set({data: data['data']});
-                    });
+                    });  
                 }
                 //导入验证和处理机制
                 function OK() { //点击确定按钮的时候
@@ -254,7 +263,11 @@
                     <label>文件导入  </label>
                     <input type="file" id="fileUpload" name="fileUpload" size="50" />
                     <input type="button" value="导入" onclick="importExcel()" />
+                    <a class="l-button" style="width:120px;float:left; margin-left:10px;" onclick="collapseAll()">收缩/展开全部</a>
                 </div>
+                <div> 
+ 
+				</div>
                 <div id="result"></div>
                 <div id="query_list"></div>
             </div>
