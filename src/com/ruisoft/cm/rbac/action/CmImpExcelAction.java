@@ -179,21 +179,25 @@ public class CmImpExcelAction extends BaseAction{
 							resultMap = checkGongyiParts(taskRoutingEntityList);
 							if("true".equals(resultMap.get("result"))){
 								resultMap = new HashMap();
-								result = partsImport(createuser,createdate,productRoutingEntityList,taskRoutingEntityList);
-								if(!result){
-									message = "导入失败！";
-									resultMap.put("result", "false");
-									//message内容
-									resultMap.put("message", message);
-								}else{
-									message = "导入成功！";
-									resultMap.put("result", "true");
-									//message内容
-									resultMap.put("message", message);
+								resultMap = checkTaskLevel(taskRoutingEntityList);
+								if("true".equals(resultMap.get("result"))){
+									resultMap = new HashMap();
+									result = partsImport(createuser,createdate,productRoutingEntityList,taskRoutingEntityList);
+									if(!result){
+										message = "导入失败！";
+										resultMap.put("result", "false");
+										//message内容
+										resultMap.put("message", message);
+									}else{
+										message = "导入成功！";
+										resultMap.put("result", "true");
+										//message内容
+										resultMap.put("message", message);
+									}
 								}
 							}
 						}
-						
+
 					} else if ("products".equals(productOrParts)){
 						resultMap = checkProductCode(productRoutingEntityList);
 						if("true".equals(resultMap.get("result"))){
@@ -237,6 +241,49 @@ public class CmImpExcelAction extends BaseAction{
 //	2）excel 导入控制
 //	不能重复导入同一产品的工时定额数据
 	
+	private Map checkTaskLevel(List<TaskRoutingEntity> taskRoutingEntityList){
+		Map resultMap = new HashMap();
+		Set set=new HashSet();
+		List leveList = new ArrayList();
+		String result = "true";
+		StringBuffer message = new StringBuffer();
+		for (int i = 0; i < taskRoutingEntityList.size(); i++)
+		{
+			TaskRoutingEntity taskRoutingEntity = taskRoutingEntityList.get(i);
+			if(taskRoutingEntity!=null){
+				String task_routing_code = taskRoutingEntity.getTask_routing_code();
+				int level = strLevel(task_routing_code);
+				set.add(level);
+			}
+		}
+		for(Iterator it=set.iterator();it.hasNext();)
+		  {
+			leveList.add(it.next());
+		  }
+		for(int i = 0; i < leveList.size(); i++){
+			boolean resu = false;
+			for(int j = 0; j < leveList.size(); j++){
+				if(i == (Integer)leveList.get(j)){
+					resu = true;
+					break;
+				}
+			}
+			if(!resu){
+				result = "false";
+				message.append((i+1)+"层，");
+			}
+		}
+		//check结果
+		if("false".equals(result)){
+			message.append("以上这些层的数据不存在，请检查部件的层级关系！");
+			System.out.println("错误信息："+message);
+		}
+		//check结果
+		resultMap.put("result", result);
+		//message内容
+		resultMap.put("message", message);
+		return resultMap;
+	}
 	/**
 	 * 验证单品的工艺路线是否已在系统中定义
 	 * @param taskRoutingEntityList
@@ -762,5 +809,37 @@ public class CmImpExcelAction extends BaseAction{
 			pid = task_code.substring(0, cn2Num);
 		}
 		return pid;
+	}
+	
+	/**
+	 * 查询部件code的层级数
+	 * @param task_code
+	 * @return
+	 */
+	private int strLevel(String task_code){
+		String str1 = "-";		
+		String str2 = "—";	
+		String str3 = "－";	
+		int count = 0;
+		int count1 = 0;
+		int count2 = 0;
+		int count3 = 0;
+		int start1 = 0;
+		int start2 = 0;
+		int start3 = 0;
+		while (task_code.indexOf(str1, start1) >= 0 && start1 < task_code.length()) {	
+			count1++;			
+			start1 = task_code.indexOf(str1, start1) + str1.length();
+		}
+		while (task_code.indexOf(str2, start2) >= 0 && start2 < task_code.length()) {	
+			count2++;			
+			start2 = task_code.indexOf(str2, start2) + str2.length();
+		}
+		while (task_code.indexOf(str3, start3) >= 0 && start3 < task_code.length()) {	
+			count3++;			
+			start3 = task_code.indexOf(str3, start3) + str3.length();
+		}
+		count = count1 + count2 + count3;
+		return count;
 	}
 }

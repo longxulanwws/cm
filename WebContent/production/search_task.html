@@ -154,7 +154,7 @@
                      }
                 // 删除处理业务处理
                 function toDel(row) {
-                    var data = JSON.stringify(reqObj('d','production.delete.mrp_task_routing.delete_id',JSON.stringify(row)));
+                    var data = JSON.stringify(reqObj('d','production.delete.mrp_task_routing.product_id',JSON.stringify(row)));
                        ajaxSubmit("/cm/rbac/cm.do?m=d", data, function(data) {
                            if (data) {
                                if (parseInt(data['status']) > 0) {
@@ -229,8 +229,10 @@
                             success: function (data, status) {     
                                  $('#result').html(data).attr("class",'error');  
                             },  
-                            error: function (data, status, e){  
-                                 $('#result').html("上传失败!").attr("class",'error');  
+                            error: function (data, status, e){ 
+                            	alert($('#result').html(data));
+                                 $('#result').html("上传失败!").attr("class",'error'); 
+                                 
                             }  
                           }  
                         );  

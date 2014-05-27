@@ -583,6 +583,16 @@ Product_ID = {product_id},Product_name = {product_name},Product_Uom = {product_u
                         </property>
                     </bean>
                 </entry>
+                 <!-- 产品项目删除SQL -->
+                 <entry key="mrp_task_routing.product_id">
+                    <bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[DELETE from mrp_task_routing where Product_ID = {product_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
             </map>
         </property>
     </bean>
