@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-        <title>生产任务项目维护</title>
+        <title>工艺路线项维护</title>
         
         <link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
         <link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
@@ -38,7 +38,7 @@
                     columns:[
                         {display:'工艺路线名称',name:'task_routing_code',type:'string',width:160,render:function(item){return paramRender(item,'gongyi_luxian',item.task_routing_code);}
                            ,editor:{type:'select',data:getData('gongyi_luxian'),valueField:'value',textField:'name'}},
-                        {display:'计划工时',name:'task_routing_standard_hour',width: 100, editor:{type:'string'},render:function(item){return item.task_routing_standard_hour ? parseFloat(item.task_routing_standard_hour).toFixed(2) : '';}},
+                        {display:'工时定额',name:'task_routing_standard_hour',width: 100, editor:{type:'string'},render:function(item){return item.task_routing_standard_hour ? parseFloat(item.task_routing_standard_hour).toFixed(2) : '';}},
                         {display:'备注',name:'note',width:160,editor:{type:'string'}}
                     ],
                     pageSize:20,
@@ -102,7 +102,7 @@
                 });
                 if (!valid) return false;
                 if (pGrid.rows.length === 0) {
-                    $.ligerDialog.error('请添加任务明细。','错误');
+                    $.ligerDialog.error('请添加工艺路线明细。','错误');
                     return false;
                 }
                 var r, result;
@@ -111,17 +111,17 @@
                 for (; i < pGrid.rows.length; i++) {
                     r = pGrid.rows[i];
                     if (!r.task_routing_code) {
-                        result = '任务编号不能为空';
+                        result = '工艺路线名称不能为空';
                         break;
                     }
                     arrayObj[i] = r.task_routing_code;
                     if (!r.task_routing_standard_hour || parseInt(r.task_routing_standard_hour) < 0) {
-                        result = '计划工时必须大于0';
+                        result = '工时定额必须大于0';
                         break;
                     }
                 }
                 if (result) {
-                    $.ligerDialog.error('任务明细列表第[' + (++i) + ']行存在错误<br/>原因：'.concat(result), '数据错误');
+                    $.ligerDialog.error('工艺明细列表第[' + (++i) + ']行存在错误<br/>原因：'.concat(result), '数据错误');
                     return false;
                 }
                 var newary = arrayObj.sort();
@@ -260,13 +260,13 @@
                 <div style="height:25px;"></div>
                 <form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
                     <div class="line-div">
-                        <div class="label-div"><label>任务项编号</label></div>
+                        <div class="label-div"><label>部件项编号</label></div>
                         <div class="in-div"><input type="text" id="task_routing_codeS" ltype="text" class="readonly diff" readonly="readonly" /></div>
-                        <div class="label-div"><label>任务项名称</label></div>
+                        <div class="label-div"><label>部件项名称</label></div>
                         <div class="in-div"><input type="text" id="task_routing_nameS" ltype="text" class="readonly diff" readonly="readonly" /></div>
                     </div>
                      <div class="line-div">
-                        <div class="label-div"><label>数量</label></div>
+                        <div class="label-div"><label>部件数量</label></div>
                         <div class="in-div"><input type="text" id="task_routing_qtyS" ltype="text" class="readonly diff" readonly="readonly" /></div>
                         <div class="label-div"><label>备注</label></div>
                         <div class="in-div"><input type="text" id="noteS" ltype="text" class="readonly diff" readonly="readonly" /></div>
@@ -277,7 +277,7 @@
                     </div>
                 </form>
             </div>
-            <div position="bottom" id="a_right" title="任务选择列表">
+            <div position="bottom" id="a_right" title="工艺路线项列表">
                 <div id="p-div"></div>
             </div>
         </div>

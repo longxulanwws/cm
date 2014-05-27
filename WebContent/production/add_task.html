@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-        <title>增加产品任务项</title>
+        <title>产品部件工时维护</title>
         <link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
         <link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
         <link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
@@ -36,12 +36,12 @@
                              {display:'操作',name:'operation',isSort:false,width:130,render:function(rowdata,rowindex,value) {
                                  var h = ""; 
                                  var row = pGrid.getRow(rowindex);
-                                 h += "<a href='javascript:void(0);' id='toConfirm' class='opt-link' onclick='manageRow(" + rowindex + ")'>维护</a> ";
+                                 h += "<a href='javascript:void(0);' id='toConfirm' class='opt-link' onclick='manageRow(" + rowindex + ")'>工艺路线维护</a> ";
                                  return h; 
                              },frozen:true},
-                             {display:'任务编号',name:'task_routing_code',width:160,align:'left',editor:{type:'string'}},
-                             {display:'任务名称',name:'task_routing_name',width:160,align:'left',editor:{type:'string'}},
-                             {display:'数量',name:'task_routing_qty',width:100,align:'right',editor:{type:'string'},render:function(item){return item.task_routing_qty ? parseFloat(item.task_routing_qty).toFixed(2) : '';}},
+                             {display:'部件编号',name:'task_routing_code',width:160,align:'left',editor:{type:'string'}},
+                             {display:'部件名称',name:'task_routing_name',width:160,align:'left',editor:{type:'string'}},
+                             {display:'部件数量',name:'task_routing_qty',width:100,align:'right',editor:{type:'string'},render:function(item){return item.task_routing_qty ? parseFloat(item.task_routing_qty).toFixed(2) : '';}},
                              {display:'备注',name:'note',width:160,align:'right',editor:{type:'string'}}
                              ],
                     pageSize:20,
@@ -60,10 +60,10 @@
                     onReload: reloadPage,
                 });
                 // 添加任务明细行
-                appendAddBtn(addRow, "添加产品明细");
+                appendAddBtn(addRow, "添加部件明细");
                 
                 //删除任务明细行
-                appendDeleteBtn(deleteRow, "删除产品明细");
+                appendDeleteBtn(deleteRow, "删除部件明细");
                 var query = getQueryString(window.location.toString());
                 opt = query.o;
                 if (opt) {
@@ -130,27 +130,27 @@
                 for (; i < pGrid.rows.length; i++) {
                     r = pGrid.rows[i];
                     if (!r.task_routing_code) {
-                        result = '任务编号不能为空！';
+                        result = '部件编号不能为空！';
                         break;
                     }
                     arrayObj[i] = r.task_routing_code;
                     if (!r.task_routing_name) {
-                        result = '任务名称不能为空！';
+                        result = '部件名称不能为空！';
                         break;
                     }
                     if (!r.task_routing_qty > 0) {
-                        result = '数量不能小于零！';
+                        result = '部件数量不能小于零！';
                         break;
                     }
                 }
                 if (result) {
-                    $.ligerDialog.error('任务产品明细列表第[' + (++i) + ']行存在错误<br/>原因：'.concat(result), '数据错误');
+                    $.ligerDialog.error('产品部件明细列表第[' + (++i) + ']行存在错误<br/>原因：'.concat(result), '数据错误');
                     return false;
                 }
                 var newary = arrayObj.sort();
                 for(var j=0;j<newary.length;j++){
                 if (newary[j]==newary[j+1]){
-                    $.ligerDialog.error('任务编号中有重复数据，重复编号为'.concat(newary[j]), '数据错误');
+                    $.ligerDialog.error('部件编号中有重复数据，重复编号为'.concat(newary[j]), '数据错误');
                     return false;
                  }
                 }
@@ -163,7 +163,7 @@
                 var product_id = $('#product_codeS').val();
                 detailDialog = $.ligerDialog.open({id:'add_task_manage',height:450,width:800,isResize:true,
                     url:'./add_task_manage.html?o=m&task_code='.concat(task_code)+'&product_id='.concat(product_id),
-                    title:"新增任务项明细"
+                    title:"工艺路线维护"
             });
             }
             //重置处理
@@ -332,7 +332,7 @@
               function deleteRow() {
                   var row = pGrid.getSelectedRow();
                   if (!row) {
-                      $.ligerDialog.error('请先选择任务记录。','错误');
+                      $.ligerDialog.error('请先选择部件记录。','错误');
                       return;
                   }               
                      $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
@@ -412,7 +412,7 @@
                     </div>
                 </form>
             </div>
-            <div position="bottom" id="a_right" title="产品明细选择列表">
+            <div position="bottom" id="a_right" title="产品部件明细列表">
                 <div id="p-div"></div>
             </div>
         </div>

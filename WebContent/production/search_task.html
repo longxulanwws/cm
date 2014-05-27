@@ -77,9 +77,8 @@
                 });
                 appendAddBtn(openDictDef, '复杂产品','复杂产品','first');
                 appendAddBtn(openDictDefTask, '单品','单品','second');
-                appendDeleteBtn(deleteRow, "删除生产任务项");
-                appendModifyBtn(openModify, "编辑生产任务项目");
-               // appendSearchBtn(searchRow, "查看生产任务项信息");
+                appendDeleteBtn(deleteRow, "删除产品部件项");
+                appendModifyBtn(openModify, "编辑产品部件项");
                 $("#pageloading").hide();
                 //默认查询全部数据 
                 toQuery();
@@ -87,11 +86,11 @@
             });
             //新增
             function openDictDef() {
-                parent.f_addTab('new_add_product_task','新增生产任务项','./production/add_task.html');
+                parent.f_addTab('new_add_product_task','新增产品部件项维护','./production/add_task.html');
             }
             //新增单品
             function openDictDefTask(){
-            	parent.f_addTab('new_add_product_task_gongyi','新增工艺路线','./production/add_task_gongyi.html');
+            	parent.f_addTab('new_add_product_task_gongyi','新增产品工艺路线维护','./production/add_task_gongyi.html');
             }
             function re_hour(item){
                 if (item.waixie=='null'){
@@ -105,14 +104,14 @@
                 
                 var row = defGrid.getSelectedRow();
                 if (!row) {
-                    $.ligerDialog.error('请先选择生产任务项记录。','错误');
+                    $.ligerDialog.error('请先选择产品部件项记录。','错误');
                     return;
                 }
                 var type = row.task_routing_level;
                 if (type=='0'){
-                	parent.f_addTab('modify_production_task','生产任务项维护','./production/add_task.html?o=m&code='.concat(row.product_id));
+                	parent.f_addTab('modify_production_task','产品部件项维护','./production/add_task.html?o=m&code='.concat(row.product_id));
                 }else{
-                	parent.f_addTab('modify_production_task_gongyi','工艺路线维护','./production/add_task_gongyi.html?o=m&code='.concat(row.product_id));
+                	parent.f_addTab('modify_production_task_gongyi','产品工艺路线维护','./production/add_task_gongyi.html?o=m&code='.concat(row.product_id));
                 }
                 
             }
@@ -133,7 +132,7 @@
                   function deleteRow(rowid) {
                       var row = defGrid.getSelectedRow();
                       if (!row) {
-                          $.ligerDialog.error('请先选择任务记录。','错误');
+                          $.ligerDialog.error('请先选择产品部件项记录。','错误');
                           return;
                       }               
                          $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
@@ -244,7 +243,7 @@
     <body style="padding:0;">
         <div id="pageloading"></div>  
         <div id="layout_main">
-            <div position="center" id="a_center" title="生产任务清单查询">
+            <div position="center" id="a_center" title="产品工时定额查询">
                 <div id="query_cond" class="fields">
                      <label>产品编号</label><input type="text" class="s-text-qCond txt-def" id="task_routing_codeQ" />
                      <label>产品名称</label><input type="text" class="s-text-qCond txt-def" id="task_routing_nameQ" />
