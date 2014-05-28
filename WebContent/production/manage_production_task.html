@@ -19,7 +19,7 @@
                 udata = getData('user',{orgid:$("#deptCodeS").val()},false);
                 $("#layout_main").ligerLayout({
                     bottomHeight: "50%",
-                    allowBottomResize:false
+                    allowBottomResize:true
                 });
                 $("form").ligerForm();
                 $(".l-textarea").each(function(index){
@@ -32,9 +32,10 @@
                 ]});
                 pGrid = $("#p-div").ligerGrid({
                     columns:[
-                        {display:'产品名称',name:'task_routing_name',id:'task_routing_name',width:160,align: 'left'},
-                        {display:'产品编号',name:'task_routing_code',id:'task_routing_code',width:80,align: 'left'},
-                        {display:'任务项类别',name:'task_routing_type',width:80,render:function(item){return paramRender(item,'product.task_type',item.task_routing_type);}},
+                        {display:'产品/部件名称',name:'task_name_dis',id:'task_name_dis',width:160,align: 'left'},
+                        {display:'产品/部件编号',name:'task_routing_code',id:'task_routing_code',width:80,align: 'left'},
+						{display:'工艺名称',name:'routing_name_dis',id:'routing_name_dis',width:80,align: 'left'},
+                        //{display:'任务项类别',name:'task_routing_type',width:80,render:function(item){return paramRender(item,'product.task_type',item.task_routing_type);}},
                         {display:'任务项数量',name:'task_routing_qty',width:80,render:sum_qty},
                         {display:'计划工时',name:'plan_hours',width:80,render:sum_hour},
                         {display:'当日完成工时',name:'day_finish_hours',width:80,align:'right',editor:{type:'string'},render:day_finish_hours_change},
@@ -58,7 +59,7 @@
                     clickToEdit:true,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     alternatingRow: false, 
-                    tree: { columnId: 'task_routing_name',
+                    tree: { columnId: 'task_name_dis',
                             idField: 'task_routing_code',
                             parentIDField: 'up_task_routing_code' },
                 });
@@ -91,7 +92,7 @@
             // 查询时数据值绑定  应该可以抽象为公共的功能
             function bindVal(data) {
                 if (data.Rows && data.Rows.length === 1) {
-                    data = data.Rows[0];
+                    data = data.Rows[0]; 
                     $('#production_task_codeS').val(data.production_task_code);
                     $('#production_plan_codeS').val(data.production_plan_code);
                     $('#partner_nameS').val(paramRender(null,'partner_list',data.partner_id));
@@ -111,6 +112,21 @@
                 if (item.task_routingqty && product_qty) {
                     return (parseFloat(item.task_routingqty) * parseFloat(product_qty)).toFixed(2);
                 }
+            	if (item.task_routing_type=='3'){
+                    // 计算 工时项的数量
+                    var param2 = {task_routing_id:item.task_routing_id};
+                    var data = JSON.stringify(reqObj('q','production.select.plan_hours.query',JSON.stringify(param2)));
+                    ajaxSubmit("/cm/rbac/cm.do?m=q", data, function(data) {
+                        pdata = data['data'];
+                    }, null, false);
+                    if (pdata.Rows && pdata.Rows.length === 1){
+                        pdata = pdata.Rows[0];
+						return (parseFloat(pdata.task_routing_qty) * parseFloat(product_qty)).toFixed(2);
+                      
+                    }
+            		
+            	}
+
                 return '';
             }
             //计划工时计算
