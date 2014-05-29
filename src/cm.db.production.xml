@@ -10,6 +10,17 @@
     <bean id="production" class="com.ruisoft.cm.rbac.util.DMLConfig">
         <property name="select">
             <map>
+            
+                 <!--产品任务项目查询  -->
+                 <entry key="mrp_routing_hours.pro_query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[select count(*) as count_num from  mrp_routing_hours where Product_ID = {product_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
              <!-- 查询任务项清单信息用SQL -->
               <entry key="mrp_task_routing.query">
                     <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
@@ -259,10 +270,60 @@ WHERE a.up_task_routing_code = b.product_id AND a.routing_task_code = b.up_task_
                         </property>
                     </bean>
                 </entry>
+               <!-- 检查是否存在可以汇总的层级用SQL -->
+                 <entry key="mrp_routing_hours.check">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT count(*) AS count_num  FROM 
+(SELECT a.task_routing_id, a.task_routing_code, a.task_routing_name, a.task_routing_type,a.up_task_routing_code, b.routing_task_code,a.Product_ID, a.Product_Name,
+a.task_routing_qty*b.task_routing_qty 
+FROM mrp_task_routing  AS  a
+, mrp_routing_hours  AS b WHERE  A.task_routing_code = b.up_task_routing_code
+AND  a.task_routing_type ='2' AND a.Product_ID={product_id} 
+) AS a WHERE 1=1 AND not  EXISTS (SELECT * FROM  mrp_routing_hours WHERE A.task_routing_code =task_routing_code AND a.routing_task_code=routing_task_code )]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
             </map>
         </property>
         <property name="add">
              <map>
+                <!-- 单一产品工时汇总SQL -->
+                <entry key="mrp_routing_hours.task_add">
+                    <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[INSERT INTO  mrp_routing_hours
+SELECT DISTINCT a.task_routing_id, a.task_routing_code, a.task_routing_name, a.task_routing_type, 
+a.up_task_routing_code,a.task_routing_code, a.Product_ID, a.Product_Name,a.task_routing_qty
+ FROM  
+ (SELECT * FROM mrp_task_routing WHERE task_routing_type  IN ('1','2')  ) AS a
+, (SELECT * FROM mrp_task_routing WHERE task_routing_type ='3') AS b 
+WHERE    a.Product_ID=b.Product_ID AND b.up_task_routing_code=a.task_routing_code
+AND  a.Product_ID={product_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                <!-- 多级产品工时汇总SQL -->
+                <entry key="mrp_routing_hours.product_add">
+                    <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[INSERT INTO mrp_routing_hours
+SELECT * FROM 
+(SELECT a.task_routing_id, a.task_routing_code, a.task_routing_name, a.task_routing_type,a.up_task_routing_code, b.routing_task_code,a.Product_ID, a.Product_Name,
+a.task_routing_qty*b.task_routing_qty 
+FROM mrp_task_routing  AS  a
+, mrp_routing_hours  AS b WHERE  A.task_routing_code = b.up_task_routing_code
+AND  a.task_routing_type ='2' AND a.Product_ID={product_id} 
+) AS a WHERE 1=1 AND not  EXISTS (SELECT * FROM  mrp_routing_hours WHERE A.task_routing_code =task_routing_code AND a.routing_task_code=routing_task_code )]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
                 <!-- 生产任务跟踪表 新增 数据SQL配置 -->
                 <entry key="mrp_task_routing.add">
                     <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
@@ -524,6 +585,16 @@ Product_ID = {product_id},Product_name = {product_name},Product_Uom = {product_u
                         <property name="sql">
                             <value>
 <![CDATA[DELETE from mrp_task_routing where Product_ID = {product_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                 <!-- 工时汇总删除SQL -->
+                 <entry key="mrp_routing_hours.pro_delete">
+                    <bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[ delete FROM mrp_routing_hours where Product_ID = {product_id}]]>
                             </value>
                         </property>
                     </bean>

@@ -25,3 +25,43 @@ function getProductRoutingColumns(){
 	             ]; 
 	return columns;
 }
+
+/**
+ * 产品中的工艺路线工时汇总表插入数据
+ * @param  product_id 产品ID
+ * @returns
+ */
+function insertSumTaskHours(product_id){
+	var param = {product_id:product_id};
+	var result,data;
+	var count = 0;
+	var selectValue = 0;
+    data = JSON.stringify(reqObj('q','production.select.mrp_routing_hours.pro_query',JSON.stringify(param)));
+    ajaxSubmit("/cm/rbac/cm.do?m=c", data,function(data) {
+    	selectValue = data['data'].Rows[0].count_num;
+    }, null, false);
+    if(selectValue > 0){
+    	data = JSON.stringify(reqObj('d','production.delete.mrp_routing_hours.pro_delete',JSON.stringify(param)));
+    	ajaxSubmit("/cm/rbac/cm.do?m=c", data,null, null, false);
+    }
+    data = JSON.stringify(reqObj('a','production.add.mrp_routing_hours.task_add',JSON.stringify(param)));
+    ajaxSubmit("/cm/rbac/cm.do?m=c", data,function(data) {
+    	result = data['status'];
+    }, null, false);
+    if(result > 0){
+    	while(1){
+    		data = JSON.stringify(reqObj('q','production.select.mrp_routing_hours.check',JSON.stringify(param)));
+        	ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+        		count = data['data'].Rows[0].count_num;
+        	}, null, false);
+        	if(count > 0){
+         		data = JSON.stringify(reqObj('a','production.add.mrp_routing_hours.product_add',JSON.stringify(param)));
+            	ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+            		return data['status'];
+            	}, null, false);
+        	}else{
+        		break;
+        	}
+    	}
+    }
+}
