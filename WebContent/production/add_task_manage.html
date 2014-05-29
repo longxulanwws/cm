@@ -209,8 +209,8 @@
                             br = 1;
                         }
                         if (ar > 0 && br > 0) {
+                        	insertSumTaskHours(c_product_id);
                             $.ligerDialog.success('保存成功', '操作完成', reloadPage);
-                            insertSumTaskHours(c_product_id);
                         }
             }
             //重新加载页面 ，在保存时调用

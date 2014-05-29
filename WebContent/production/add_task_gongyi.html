@@ -279,8 +279,8 @@
                             br = 1;
                        }
                        if (cr > 0 && ar > 0 && br > 0) {
+                    	   insertSumTaskHours(c_code);
                            $.ligerDialog.success('保存成功', '操作完成', reloadPage);
-                           insertSumTaskHours(c_code);
                         }
                     } else {
                         // 新增处理
@@ -297,9 +297,11 @@
                         var data = JSON.stringify(reqObj('ba','production.add.mrp_task_routing.add',rows));
                         ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(result) {
                             ar = result['status'];
-                            if (cr > 0 && ar > 0)
+                            if (cr > 0 && ar > 0){
+                            	insertSumTaskHours(c_code);
                                $.ligerDialog.success('保存成功', '操作完成', reloadPage);
-                               insertSumTaskHours(c_code);
+                            }
+                               
                         }, null, false);
                     }
             }
