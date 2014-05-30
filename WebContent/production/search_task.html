@@ -21,7 +21,7 @@
                         {display:'产品编码',name:'product_code',id:'product_code',width:80, frozen: true,align: 'left'},  
                         {display:'产品/部件/零件名称',name:'task_routing_name',id:'task_routing_name',width:120, frozen: true,align: 'left'},
                         {display:'部件/零件编号',name:'task_routing_code_display',id:'task_routing_code_display',width:80, frozen: true,align: 'left'},
-                        {display:'部件/零件数量',name:'task_routing_qty',width:100, frozen: true,render:function(item){return item.task_routing_qty&&item.task_routing_qty!='null'? parseFloat(item.task_routing_qty).toFixed(2) : '';}},
+                        {display:'部件/零件数量',name:'task_routing_qty',width:100, frozen: true,render:function(item){return item.task_routing_qty&&item.task_routing_qty!='null'? parseFloat(item.task_routing_qty).toFixed(0) : '';}},
                         {display:'工艺路线',columns:getProductRoutingColumns()},
 						],
                     pageSize:50,

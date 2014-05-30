@@ -121,7 +121,7 @@
                     }, null, false);
                     if (pdata.Rows && pdata.Rows.length === 1){
                         pdata = pdata.Rows[0];
-						return (parseFloat(pdata.task_routing_qty) * parseFloat(product_qty)).toFixed(2);
+						return (parseFloat(pdata.task_routing_qty) * parseFloat(product_qty)).toFixed(0);
                       
                     }
             		
