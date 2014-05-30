@@ -159,17 +159,22 @@ public class ReadExcelTest {
 					/*
 					 * 产品相关信息处理
 					 */
+					
 					String cellCoords = cellRef.formatAsString();
-					String cellCoordsX = cellCoords.substring(0, 1);
-					int cellCoordsY = Integer.valueOf(cellCoords.substring(1, cellCoords.length()));
-
+//					String cellCoordsX = cellCoords.substring(0, 1);
+//					int cellCoordsY = Integer.valueOf(cellCoords.substring(1, cellCoords.length()));
+					//row.getRowNum(), cell.getColumnIndex()
+//					String cellCoordsX = String.valueOf(cell.getColumnIndex());
+					int cellCoordsX = cell.getColumnIndex()+1;
+					int cellCoordsY = row.getRowNum()+1;
+					System.out.println("坐标："+cellCoordsX+" : " +cellCoordsY);
 					// 对excel中定义的“产品数据”区域处理
 					if (productConf.getCodeY() <= cellCoordsY) {
 						// 按设置的列进行赋值
 						// 产品编号赋值
 						//System.out.println("对excel中定义的“产品数据”区域处理"+cellValue);
 						System.out.println("对excel中定义的“产品数据”区域处理产品编号赋值"+product_code);
-						if (productConf.getCodeX().equalsIgnoreCase(cellCoordsX) && StringUtils.isNotBlank(cellValue)) {
+						if (productConf.getCodeX()==cellCoordsX && StringUtils.isNotBlank(cellValue)) {
 							System.out.println("对excel中定义的“产品数据”区域处理?????"+cellValue);
 							productRoutingEntiy.setCode(cellValue);
 							//有多个产品code,说明是多个单品
@@ -184,13 +189,13 @@ public class ReadExcelTest {
 						}
 
 						// 产品名称赋值
-						if (productConf.getNameX().equalsIgnoreCase(cellCoordsX) && StringUtils.isNotBlank(cellValue)) {
+						if (productConf.getNameX()==(cellCoordsX) && StringUtils.isNotBlank(cellValue)) {
 							productRoutingEntiy.setName(cellValue);
 							product_name = cellValue;
 						}
 
 						// 数量列
-						if (productConf.getSpecsX().equalsIgnoreCase(cellCoordsX))
+						if (productConf.getSpecsX()==(cellCoordsX))
 							productRoutingEntiy.setSpecs(cellValue);
 
 					}
@@ -205,16 +210,16 @@ public class ReadExcelTest {
 					if (productPartConf.getCodeY() <= cellCoordsY) {
 						// 按设置的列进行赋值
 						// 部件编号列
-						if (productPartConf.getCodeX().equalsIgnoreCase(cellCoordsX))
+						if (productPartConf.getCodeX()==(cellCoordsX))
 							task_routing_code = cellValue;
 						// 部件名称列
-						if (productPartConf.getNameX().equalsIgnoreCase(cellCoordsX))
+						if (productPartConf.getNameX()==(cellCoordsX))
 							task_routing_name = cellValue;
 						// 部件数量列
-						if (productPartConf.getNumX().equalsIgnoreCase(cellCoordsX))
+						if (productPartConf.getNumX()==(cellCoordsX))
 							task_routing_qty = cellValue;
 						// 该部件需要的全部工艺项 列
-						if (productPartConf.getRoutingNameX().equalsIgnoreCase(cellCoordsX))
+						if (productPartConf.getRoutingNameX()==(cellCoordsX))
 							task_routing_routingName = cellValue;
 
 					}
@@ -223,11 +228,11 @@ public class ReadExcelTest {
 					 * 工艺相关赋值 根据对工艺路线是否赋值判断是否此部件需要哪项工艺
 					 */
 					// 工艺项名称
-					String routing_name = cellCoordsX.compareToIgnoreCase(routingConf.getNameX()) >= 0 && routingConf.getNameY() == cellCoordsY ? cellValue : "";
-					// 将解析的excel中设置的工艺项列，生成map,使用列标记出 如 A
+					String routing_name = cellCoordsX >= routingConf.getNameX() && routingConf.getNameY() == cellCoordsY ? cellValue : "";
+					// 将解析的excel中设置的工艺项列，生成map,使用列标记出 如 1
 					if (StringUtils.isNotBlank(routing_name)) {
 						System.out.println("routing_name:" + routing_name);
-						routingNameMap.put(cellCoordsX, routing_name);
+						routingNameMap.put(String.valueOf(cellCoordsX), routing_name);
 					}
 					// 各项工艺的工时定额（分）处理
 					String routing_hours = "";

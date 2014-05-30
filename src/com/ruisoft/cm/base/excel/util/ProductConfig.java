@@ -1,25 +1,30 @@
 package com.ruisoft.cm.base.excel.util;
 
 public class ProductConfig {
-	private String codeX = null;
-	private String nameX = null;
-	private String specsX = null;
+	private int codeX = 0;
+	private int nameX = 0;
+	private int specsX = 0;
 	private int codeY = 0;
 	private int nameY = 0;
 	private int specsY = 0;
-	public String getCodeX() {
+	public int getCodeX() {
 		return codeX;
 	}
-	public void setCodeX(String codeX) {
+	public void setCodeX(int codeX) {
 		this.codeX = codeX;
 	}
-	public String getNameX() {
+	public int getNameX() {
 		return nameX;
 	}
-	public void setNameX(String nameX) {
+	public void setNameX(int nameX) {
 		this.nameX = nameX;
 	}
-
+	public int getSpecsX() {
+		return specsX;
+	}
+	public void setSpecsX(int specsX) {
+		this.specsX = specsX;
+	}
 	public int getCodeY() {
 		return codeY;
 	}
@@ -32,20 +37,11 @@ public class ProductConfig {
 	public void setNameY(int nameY) {
 		this.nameY = nameY;
 	}
-	public String getSpecsX() {
-		return specsX;
-	}
-	public void setSpecsX(String specsX) {
-		this.specsX = specsX;
-	}
 	public int getSpecsY() {
 		return specsY;
 	}
 	public void setSpecsY(int specsY) {
 		this.specsY = specsY;
 	}
-
-
-
-
+	
 }

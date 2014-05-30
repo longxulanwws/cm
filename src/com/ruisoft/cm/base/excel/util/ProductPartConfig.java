@@ -1,40 +1,41 @@
 package com.ruisoft.cm.base.excel.util;
 
 public class ProductPartConfig {
-	private String codeX = null;
-	private String nameX = null;
+	private int codeX = 0;
+	private int nameX = 0;
 	// 部件数量
-	private String numX = null;
+	private int numX = 0;
 
 	private int codeY = 0;
 	private int nameY = 0;
 	// 部件数量
 	private int numY = 0;
 
-	private String routingNameX = null;
+	private int routingNameX = 0;
 	private int routingNameY = 0;
 
-	public String getCodeX() {
+
+	public int getCodeX() {
 		return codeX;
 	}
 
-	public void setCodeX(String codeX) {
+	public void setCodeX(int codeX) {
 		this.codeX = codeX;
 	}
 
-	public String getNameX() {
+	public int getNameX() {
 		return nameX;
 	}
 
-	public void setNameX(String nameX) {
+	public void setNameX(int nameX) {
 		this.nameX = nameX;
 	}
 
-	public String getNumX() {
+	public int getNumX() {
 		return numX;
 	}
 
-	public void setNumX(String numX) {
+	public void setNumX(int numX) {
 		this.numX = numX;
 	}
 
@@ -62,11 +63,13 @@ public class ProductPartConfig {
 		this.numY = numY;
 	}
 
-	public String getRoutingNameX() {
+
+
+	public int getRoutingNameX() {
 		return routingNameX;
 	}
 
-	public void setRoutingNameX(String routingNameX) {
+	public void setRoutingNameX(int routingNameX) {
 		this.routingNameX = routingNameX;
 	}
 
