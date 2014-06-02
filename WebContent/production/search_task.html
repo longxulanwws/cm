@@ -76,7 +76,7 @@
                         toQuery(item, cp);
                     },
                 });
-                appendAddBtn(openDictDef, '复杂产品','复杂产品','first');
+                appendAddBtn(openDictDef, '组件','组件','first');
                 appendAddBtn(openDictDefTask, '单品','单品','second');
                 appendDeleteBtn(deleteRow, "删除产品部件项");
                 appendModifyBtn(openModify, "编辑产品部件项");                 
@@ -192,46 +192,34 @@
                         defGrid.set({data: data['data']});
                     });  
                 }
-                //导入验证和处理机制
-                function OK() { //点击确定按钮的时候
-                      var filename = ($("#nwOfficeId").val());
-                alert(filename);
-                        if (filename == "") {
-                        $.messager.alert('系统提示', '请选择将要上传的文件!');
-                        document.forms[0].submit();
-                        }
-                       else {
-                       var stuff = filename.substring( filename.lastIndexOf('.')+1 );
-                       alert(stuff);
-                       if (stuff != 'xls' && stuff != 'xlsx') {
-                       alert('文件类型不正确，请选择.xls或者.xlsx文件!');
-                       document.forms[0].submit();
-                       }
-                       else {
-                    	   var data = {file:filename};
-                           ajaxSubmit("/cm/rbac/impExcel.do?method=impExcel", data, function(data) {
-                        	   alert(data);
-                          }); 
-                     }
-                 }
-                }
-                
+               
                 function importExcel(){  
                         var upfileId = jQuery('#fileUpload')[0].value;
-                        alert(upfileId);
-                        
                         $.ajaxFileUpload({  
                             url:'/cm/rbac/impExcel.do?method=impExcel',             //需要链接到服务器地址  
                             secureuri:false,  
                             fileElementId:'fileUpload',                   //文件选择框的id属性  
                             dataType: 'text',                             //服务器返回的格式，可以是json  
                             data:{upfileId:upfileId},  
-                            success: function (data, status) {     
-                                 $('#result').html(data).attr("class",'error');  
+                            success: function (data, status) {
+                            	var isSucc = data.indexOf("success");
+                            	if(isSucc >= 0){
+                            		var num = data.lastIndexOf("product_id");
+                            		var pro_id = data.substring(num+"product_id".length);
+                            		if(pro_id!=null && pro_id != ""){
+                            			insertSumTaskHours(pro_id);
+                            		}
+                            		$("#task_routing_codeQ").val(pro_id);
+                                    toQuery();  
+                                    $.ligerDialog.success('导入成功！');	
+                                 
+                            	}else{
+                            		 $.ligerDialog.error(data,'数据错误');  
+                            	}
+            
                             },  
                             error: function (data, status, e){ 
-                            	alert($('#result').html(data));
-                                 $('#result').html("上传失败!").attr("class",'error'); 
+                                 $.ligerDialog.error(e,'上传失败');  
                                  
                             }  
                           }  

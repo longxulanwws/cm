@@ -38,6 +38,7 @@ import com.ruisoft.test.poi.ProductionTaskRouting;
 import com.ruisoft.test.poi.ReadExcelTest;
 import com.ruisoft.test.poi.RoutingEntity;
 import com.ruisoft.test.poi.TaskRoutingEntity;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 @Controller
 @RequestMapping("/rbac/impExcel.do")
@@ -51,6 +52,15 @@ public class CmImpExcelAction extends BaseAction{
 	//导入用SQLID
 	private final String SQL = "INSERT INTO mrp_task_routing (task_routing_id, task_routing_code, task_routing_name, task_routing_type, up_task_routing_code, Product_ID, Product_Name, task_routing_qty, task_routing_standard_hour, task_routing_level, CreateUser, CreateDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
+	private final String HOURS_SQL = "INSERT INTO  mrp_routing_hours SELECT DISTINCT a.task_routing_id, a.task_routing_code, a.task_routing_name, a.task_routing_type,"+
+			" a.up_task_routing_code,a.task_routing_code, a.Product_ID, a.Product_Name,a.task_routing_qty "+
+			" FROM   "+
+			" (SELECT * FROM mrp_task_routing WHERE task_routing_type  IN ('1','2')  ) AS a "+
+			" , (SELECT * FROM mrp_task_routing WHERE task_routing_type ='3') AS b  "+
+			" WHERE    a.Product_ID=b.Product_ID AND b.up_task_routing_code=a.task_routing_code "+
+			" AND  a.Product_ID=? ;";
+	//复杂产品ID
+	private String product_id = "";
 	@Resource
 	protected CmImpDAO cmImpDAO = null;
 	
@@ -104,7 +114,9 @@ public class CmImpExcelAction extends BaseAction{
 		//把文件内容导入数据库存储
 		Map reMap = ImportDbData(FullfileName,createuser);
 		if("true".equals(reMap.get("result"))){
-			out.print("导入成功！");
+			out.print("success!");
+			out.print("product_id");
+			out.print(product_id);
 		}else {
 			out.print(reMap.get("message"));
 		}
@@ -650,6 +662,11 @@ public class CmImpExcelAction extends BaseAction{
 							}
 						}
 					}
+					if(result){
+					Object hours_data[] = new Object[1];
+					hours_data[0] = code;
+					result = cmImpDAO.proAdd(hours_data,HOURS_SQL);
+					}
 				}
 			}
 		}
@@ -784,6 +801,9 @@ public class CmImpExcelAction extends BaseAction{
 					}
 				}
 			}
+		}
+		if(result){
+			product_id = code;
 		}
 		return result;
 	}

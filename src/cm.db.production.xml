@@ -244,7 +244,7 @@ AND B.task_routing_id ={task_routing_id} AND A.production_task_code = {productio
                         <property name="sql">
                             <value>
 <![CDATA[SELECT CASE a.task_routing_type WHEN '3' THEN '-' ELSE a.task_routing_name END AS task_name_dis,
-CASE a.task_routing_type WHEN '3' THEN a.task_routing_name ELSE ''END AS routing_name_dis,a.* FROM(
+CASE a.task_routing_type WHEN '3' THEN a.task_routing_name ELSE ''END AS routing_name_dis,a.*,b.* FROM(
 select task_routing_id, task_routing_code, task_routing_name, task_routing_type, up_task_routing_code, Product_ID, Product_Name, task_routing_qty AS task_routingQty, task_routing_standard_hour, 
 task_routing_level, Note, WriteUser, WriteDate, CreateUser, CreateDate from mrp_task_routing where FIND_IN_SET(task_routing_code, getChildLst({task_routing_code})) AND Product_ID = {product_id}) AS A 
 LEFT JOIN mrp_production_task_track AS B
