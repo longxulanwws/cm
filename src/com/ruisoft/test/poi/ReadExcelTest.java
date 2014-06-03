@@ -240,8 +240,8 @@ public class ReadExcelTest {
 					if (routingConf.getHoursY() <= cellCoordsY) {
 						RoutingEntity = new RoutingEntity();
 						// 通过excel中设置的工艺项列map 要从那些cell中取工时定额数据
-						if (StringUtils.isNotBlank(routingNameMap.get(cellCoordsX))) {
-							RoutingEntity.setName(routingNameMap.get(cellCoordsX));
+						if (StringUtils.isNotBlank(routingNameMap.get(String.valueOf(cellCoordsX)))) {
+							RoutingEntity.setName(routingNameMap.get(String.valueOf(cellCoordsX)));
 							if (StringUtils.isNotBlank(cellValue))
 								routing_hours = cellValue;
 							// 只有设置了工时定额的工艺项才插入 每项部件对象下的工艺路线项对象list中
