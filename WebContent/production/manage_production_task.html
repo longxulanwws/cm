@@ -18,7 +18,7 @@
             $(function(){   
                 udata = getData('user',{orgid:$("#deptCodeS").val()},false);
                 $("#layout_main").ligerLayout({
-                    bottomHeight: "80%",
+                    bottomHeight: "75%",
                     allowBottomResize:true
                 });
                 $("form").ligerForm();
@@ -44,8 +44,8 @@
                         {display:'当日实际耗时',name:'day_real_hours',width:80,align:'right',editor:{type:'string'},render:day_real_hours_change},
                         {display:'实际耗时',name:'real_hours',width:80,align:'right',editor:{type:'string'},render:real_hours_change}
                     ],
-                    pageSize:20,
-                    usePager: true,
+                    pageSize:200,
+                    usePager: false,
                     dataAction:'server', 
                     url: '../common/q.jsp', 
                     width:'100%',
