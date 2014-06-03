@@ -41,7 +41,7 @@
                              },frozen:true},
                              {display:'部件编号',name:'task_routing_code',width:160,align:'left',editor:{type:'string'}},
                              {display:'部件名称',name:'task_routing_name',width:160,align:'left',editor:{type:'string'}},
-                             {display:'部件数量',name:'task_routing_qty',width:100,align:'right',editor:{type:'string'},render:function(item){return item.task_routing_qty ? parseFloat(item.task_routing_qty).toFixed(2) : '';}},
+                             {display:'部件数量',name:'task_routing_qty',width:100,align:'right',editor:{type:'string'},render:function(item){return item.task_routing_qty ? parseFloat(item.task_routing_qty).toFixed(0) : '';}},
                              {display:'备注',name:'note',width:160,align:'right',editor:{type:'string'}}
                              ],
                     pageSize:20,

@@ -12,12 +12,12 @@
 		<property name="product">
 			<!-- 设置产品相关数据的坐标 value=(2,3) -->
 			<bean id="productConfig" class="com.ruisoft.cm.base.excel.util.ProductConfig">
-				<property name="codeX" value="B" />
+				<property name="codeX" value="2" />
 				<property name="codeY" value="4" />
-				<property name="nameX" value="C" />
+				<property name="nameX" value="3" />
 				<property name="nameY" value="4" />
 				<!-- 规格型号 -->
-				<property name="specsX" value="D" />
+				<property name="specsX" value="4" />
 				<property name="specsY" value="4" />
 				<!-- 单位 -->
 
@@ -27,17 +27,17 @@
 		<property name="productPart">
 			<!-- 设置‘部件/组件’相关数据的坐标 value=(2,3) -->
 			<bean id="productPartConfig" class="com.ruisoft.cm.base.excel.util.ProductPartConfig">
-				<property name="codeX" value="E" />
+				<property name="codeX" value="5" />
 				<property name="codeY" value="4" />
 				
-				<property name="nameX" value="F" />
+				<property name="nameX" value="6" />
 				<property name="nameY" value="4" />
 				<!-- 单件产品下的部件数量 -->
-				<property name="numX" value="G" />
+				<property name="numX" value="7" />
 				<property name="numY" value="4" />
 				
 				<!--单件产品下的部件工艺路线名称 -->
-				<property name="routingNameX" value="H" />
+				<property name="routingNameX" value="8" />
 				<property name="routingNameY" value="6" />				
 				<!-- 单位 
 				<property name="uom" value="" />
@@ -50,13 +50,13 @@
 
 				<!-- 设置‘工艺路线’相关数据的坐标 value=(2,3) -->
 				<!-- 工艺路线 列明配置  -->
-				<property name="nameX" value="I" />
+				<property name="nameX" value="9" />
 				<property name="nameY" value="3" />
 				<!-- 工艺路线  列数，即有多少种工艺 -->
 				<property name="columnNum" value="15" />
 								
 				<!-- 工艺工时配额（分） 取值开始列-->
-				<property name="hoursX" value="I" />
+				<property name="hoursX" value="9" />
 				<property name="hoursY" value="4" />
 			</bean>
 		</property>
