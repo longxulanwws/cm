@@ -247,26 +247,27 @@ alter table mrp_routing_hours comment '汇总产品、部件的数量，部件逐层汇总';
    第一层汇总view，实现将单个产品的工时定额汇总数据
    及含多级部件的各级汇总数量后的工时定额汇总数据
  */
-DROP VIEW IF EXISTS vw_task_housrs;
+
+-- DROP VIEW  vw_task_housrs;
 
 CREATE VIEW vw_task_housrs AS
 SELECT a. *
-    , sum (CASE b.task_routing_code WHEN '001' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS waixie
-    , sum (CASE b.task_routing_code WHEN '002' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS beiliao
-    , sum (CASE b.task_routing_code WHEN '003' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS jiguang
-    , sum (CASE b.task_routing_code WHEN '004' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS shuchong
-    , sum (CASE b.task_routing_code WHEN '005' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS zhewan
-    , sum (CASE b.task_routing_code WHEN '006' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS yamao
-    , sum (CASE b.task_routing_code WHEN '007' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS yahan
-    , sum (CASE b.task_routing_code WHEN '008' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS qiege
-    , sum (CASE b.task_routing_code WHEN '009' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS dakong
-    , sum (CASE b.task_routing_code WHEN '010' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS gongsi
-    , sum (CASE b.task_routing_code WHEN '011' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS hanjie
-    , sum (CASE b.task_routing_code WHEN '012' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS damo
-    , sum (CASE b.task_routing_code WHEN '013' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS lasi
-    , sum (CASE b.task_routing_code WHEN '014' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS siyin
-    , sum (CASE b.task_routing_code WHEN '015' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS peitu
-    , sum (CASE b.task_routing_code WHEN '016' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS zuzhuang
+	, sum(CASE b.task_routing_code WHEN 'r001' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS waixie
+    , sum(CASE b.task_routing_code WHEN 'r002' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS beiliao
+    , sum(CASE b.task_routing_code WHEN 'r003' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS jiguang
+    , sum(CASE b.task_routing_code WHEN 'r004' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS shuchong
+    , sum(CASE b.task_routing_code WHEN 'r005' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS zhewan
+    , sum(CASE b.task_routing_code WHEN 'r006' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS yamao
+    , sum(CASE b.task_routing_code WHEN 'r007' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS yahan
+    , sum(CASE b.task_routing_code WHEN 'r008' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS qiege
+    , sum(CASE b.task_routing_code WHEN 'r009' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS dakong
+    , sum(CASE b.task_routing_code WHEN 'r010' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS gongsi
+    , sum(CASE b.task_routing_code WHEN 'r011' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS hanjie
+    , sum(CASE b.task_routing_code WHEN 'r012' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS damo
+    , sum(CASE b.task_routing_code WHEN 'r013' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS lasi
+    , sum(CASE b.task_routing_code WHEN 'r014' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS siyin
+    , sum(CASE b.task_routing_code WHEN 'r015' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS peitu
+    , sum(CASE b.task_routing_code WHEN 'r016' THEN a.task_routing_qty * b.task_routing_standard_hour ELSE '' END) AS zuzhuang
 FROM mrp_routing_hours AS a
     LEFT JOIN mrp_task_routing AS b ON a.Product_ID = b.Product_ID AND a.routing_task_code = b.up_task_routing_code AND b.task_routing_type = '3'
 GROUP BY task_routing_id, task_routing_code, task_routing_name, task_routing_type, up_task_routing_code, routing_task_code, Product_ID, Product_Name, task_routing_qty
@@ -279,48 +280,48 @@ GROUP BY task_routing_id, task_routing_code, task_routing_name, task_routing_typ
    及含多级部件的各级汇总数量后的工时定额汇总数据
    及将多及部件汇总中产品层的工时定额汇总数据  
 */
-DROP VIEW IF EXISTS vw_product_task_housrs;
+-- DROP VIEW IF EXISTS vw_product_task_housrs;
 
 CREATE VIEW vw_product_task_housrs AS
 SELECT a.task_routing_id
-    , sum (waixie) AS waixie
-    , sum (beiliao) AS beiliao
-    , sum (jiguang) AS jiguang
-    , sum (shuchong) AS shuchong
-    , sum (zhewan) AS zhewan
-    , sum (yamao) AS yamao
-    , sum (yahan) AS yahan
-    , sum (qiege) AS qiege
-    , sum (dakong) AS dakong
-    , sum (gongsi) AS gongsi
-    , sum (hanjie) AS hanjie
-    , sum (damo) AS damo
-    , sum (lasi) AS lasi
-    , sum (siyin) AS siyin
-    , sum (peitu) AS peitu
-    , sum (zuzhuang) AS zuzhuang
+    , sum(waixie) AS waixie
+    , sum(beiliao) AS beiliao
+    , sum(jiguang) AS jiguang
+    , sum(shuchong) AS shuchong
+    , sum(zhewan) AS zhewan
+    , sum(yamao) AS yamao
+    , sum(yahan) AS yahan
+    , sum(qiege) AS qiege
+    , sum(dakong) AS dakong
+    , sum(gongsi) AS gongsi
+    , sum(hanjie) AS hanjie
+    , sum(damo) AS damo
+    , sum(lasi) AS lasi
+    , sum(siyin) AS siyin
+    , sum(peitu) AS peitu
+    , sum(zuzhuang) AS zuzhuang
 FROM mrp_task_routing AS a
     LEFT JOIN vw_task_housrs AS b ON a.task_routing_id = b.task_routing_id
 WHERE a.task_routing_type = '2'
 GROUP BY a.task_routing_id
 UNION
 SELECT a.task_routing_id
-    , sum (waixie) AS waixie
-    , sum (beiliao) AS beiliao
-    , sum (jiguang) AS jiguang
-    , sum (shuchong) AS shuchong
-    , sum (zhewan) AS zhewan
-    , sum (yamao) AS yamao
-    , sum (yahan) AS yahan
-    , sum (qiege) AS qiege
-    , sum (dakong) AS dakong
-    , sum (gongsi) AS gongsi
-    , sum (hanjie) AS hanjie
-    , sum (damo) AS damo
-    , sum (lasi) AS lasi
-    , sum (siyin) AS siyin
-    , sum (peitu) AS peitu
-    , sum (zuzhuang) AS zuzhuang
+    , sum(waixie) AS waixie
+    , sum(beiliao) AS beiliao
+    , sum(jiguang) AS jiguang
+    , sum(shuchong) AS shuchong
+    , sum(zhewan) AS zhewan
+    , sum(yamao) AS yamao
+    , sum(yahan) AS yahan
+    , sum(qiege) AS qiege
+    , sum(dakong) AS dakong
+    , sum(gongsi) AS gongsi
+    , sum(hanjie) AS hanjie
+    , sum(damo) AS damo
+    , sum(lasi) AS lasi
+    , sum(siyin) AS siyin
+    , sum(peitu) AS peitu
+    , sum(zuzhuang) AS zuzhuang
 FROM mrp_task_routing AS a
     LEFT JOIN vw_task_housrs AS b ON a.Product_ID = b.Product_ID
 WHERE a.task_routing_type = '1'
@@ -329,10 +330,11 @@ GROUP BY a.task_routing_id
 /*
  * 获取下级数据，组织成树形数据
  */
+-- DROP  FUNCTION getChildLst;
 CREATE  FUNCTION getChildLst(rootId VARCHAR(100)) RETURNS varchar(1000) CHARSET utf8
 BEGIN 
-   DECLARE sTemp VARCHAR(1000); 
-   DECLARE sTempChd VARCHAR(1000); 
+   DECLARE sTemp VARCHAR(10000); 
+   DECLARE sTempChd VARCHAR(10000); 
  
    SET sTemp = '$'; 
    SET sTempChd =cast(rootId as CHAR); 

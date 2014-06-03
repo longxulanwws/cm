@@ -284,10 +284,15 @@
                     param.dept_id = $("#deptCodeS").val();
                     param.createuser = $("#createUserCodeS").val();
                     param.createdate = $("#createDateS").val();
+                    param.company_id = '';
+                    param.busiorg_id = '';
                     param.state="00";
                     param.flow_state="00";
+                    //生产任务跟踪状态 00 正常
+                    param.task_track_state="00"
                     //生产任务类型：生产任务
                     param.production_task_type="2";
+                    
                 }
                 var data = JSON.stringify(reqObj(optType,en,JSON.stringify(param)));
                 ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
