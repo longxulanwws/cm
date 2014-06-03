@@ -18,7 +18,7 @@
             $(function(){   
                 udata = getData('user',{orgid:$("#deptCodeS").val()},false);
                 $("#layout_main").ligerLayout({
-                    bottomHeight: "50%",
+                    bottomHeight: "80%",
                     allowBottomResize:true
                 });
                 $("form").ligerForm();
@@ -57,6 +57,7 @@
                     colDraggable:true,
                     enabledEdit:true,
                     clickToEdit:true,
+                    onBeforeSubmitEdit: f_onBeforeSubmitEdit,
                     onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
                     alternatingRow: false, 
                     tree: { columnId: 'task_name_dis',
@@ -86,23 +87,32 @@
                     ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
                        pGrid.set({data: data['data']});
                        }, null, false);
-                }
+                };
                 $("#pageloading").hide();
             });
+            function f_onBeforeSubmitEdit(e)
+            { 
+            	var  rowData = pGrid.rows[e.rowindex];
+            	var  finish_hours = rowData.finish_hours;
+                if (e.column.name == "finish_hours")
+                {
+                    if (finish_hours > e.value) {
+                    	if(confirm("今天已完成工时小于昨天已完成工时，确认保存吗？")){
+                    		return true;
+                    	}else{
+                    		return false;
+                    	}
+                    }
+                }
+                return true;
+            }
+
             // 查询时数据值绑定  应该可以抽象为公共的功能
             function bindVal(data) {
                 if (data.Rows && data.Rows.length === 1) {
                     data = data.Rows[0]; 
                     $('#production_task_codeS').val(data.production_task_code);
-                    $('#production_plan_codeS').val(data.production_plan_code);
-                    $('#partner_nameS').val(paramRender(null,'partner_list',data.partner_id));
-                    $('#task_cycleS').val(data.task_cycle);
-                    $('#task_plan_start_dateS').val(data.task_plan_start_date);
-                    $('#task_plan_finish_dateS').val(data.task_plan_finish_date);
-                    $('#product_idS').val(data.product_id);
-                    $('#product_nameS').val(data.product_name);                    
                     $('#product_qtyS').val(parseFloat(data.production_product_qty).toFixed(1));
-                    $('#product_uomS').val(paramRender(null,'uom',data.product_uom));
                     $('#genz_userS').val(paramRender(null,'user',uerid));
                 }
             }
@@ -156,17 +166,21 @@
             }
             // 已完成工时
             function finish_hours_change(item){
+            	var hid_finish_hours = item.hid_finish_hours;
                 if (item.task_routing_type!='3'){
                     return item.finish_hours = '';
+                } else{
+                	var finish_hours = item.finish_hours ? parseFloat(item.finish_hours).toFixed(2) : '0';
+                    return finish_hours;
                 }
-                return item.finish_hours ? parseFloat(item.finish_hours).toFixed(2) : '0';
             }
             // 完成进度
             function finish_percent_change(item){
                 if (item.finish_hours && item.plan_hours){
                 	var finishpercent = (parseFloat(item.finish_hours)* 100.00 / parseFloat(item.plan_hours) ).toFixed(2);
-                	item.finish_percent = finishpercent;
+                    item.finish_percent = finishpercent;
                     return finishpercent;
+                
                 }
                 if (item.task_routing_type!='3'){
                     return item.finish_percent = '';
@@ -202,7 +216,11 @@
                     r = pGrid.rows[i];
                     if (r.task_routing_type =='3'){
                         if (r.day_finish_hours < 0) {
-                            result = '已完成工时有错误，请重新输入！';
+                            result = '当日完成工时不能小于零，请重新输入！';
+                            break;
+                        }
+                        if (r.day_finish_hours > 24) {
+                            result = '当日完成工时不能大于24，请重新输入！';
                             break;
                         }
                     }
@@ -261,38 +279,8 @@
                 <div id="d-menu" class="toolbar"></div>
                 <div style="height:25px;"></div>
                 <form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
-                    <div class="line-div">
-                        <div class="label-div"><label>生产任务单编号</label></div>
-                        <div class="in-div"><input type="text" id="production_task_codeS" ltype="text" class="readonly diff" readonly="readonly" /></div>
-                        <div class="label-div"> <label>订单计划编号</label></div>
-                        <div class="in-div"><input type="text" id="production_plan_codeS" ltype="text" class="readonly diff" readonly="readonly" /></div>
-                    </div>
-                     <div class="line-div">
-                        <div class="label-div"><label>客户名称</label></div>
-                        <div class="in-div"><input type="text" id="partner_nameS" ltype="text" class="readonly diff" readonly="readonly"  />
-                        </div>
-                        <div class="label-div"><label>计划周期（日）</label></div>
-                        <div class="in-div"><input type="text" id="task_cycleS" ltype="text" class="readonly diff" readonly="readonly" />
-                        </div>
-                    </div>
-                    <div class="line-div">
-                        <div class="label-div"><label>计划开始日期</label></div>
-                        <div class="in-div"><input type="text" id="task_plan_start_dateS" ltype="text" class="readonly diff" readonly="readonly"/></div>
-                        <div class="label-div"><label>计划截止周期</label></div>
-                        <div class="in-div"><input type="text" id="task_plan_finish_dateS" ltype="text" class="readonly diff" readonly="readonly" /></div>
-                    </div>
-                    <div class="line-div">
-                        <div class="label-div"><label>产品编号</label></div>
-                        <div class="in-div"><input type="text" id="product_idS" ltype="text" class="readonly diff" readonly="readonly" /></div>
-                        <div class="label-div"><label>产品名称</label></div>
-                        <div class="in-div"><input type="text" id="product_nameS" ltype="text" class="readonly diff" readonly="readonly" /></div>
-                    </div>
-                    <div class="line-div">
-                        <div class="label-div"><label>生产数量</label></div>
-                        <div class="in-div"><input type="text" id="product_qtyS" ltype="text" class="readonly diff" readonly="readonly" /></div>
-                        <div class="label-div"><label>计量单位</label></div>
-                        <div class="in-div"><input type="text" id="product_uomS" ltype="text" class="readonly diff" readonly="readonly" /></div>
-                    </div>
+                 <input type="hidden" id="production_task_codeS" />
+                 <input type="hidden" id="product_qtyS" />
                     <div class="line-div">
                         <div class="label-div"><label>跟踪日期</label></div>
                         <div class="in-div"><input type="text" id="genz_dataS" ltype="text" class="readonly diff" readonly="readonly" /></div>
