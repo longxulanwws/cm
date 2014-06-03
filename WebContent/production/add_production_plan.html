@@ -282,6 +282,8 @@
                     param.dept_id = $("#deptCodeS").val();
                     param.createuser = $("#createUserCodeS").val();
                     param.createdate = $("#createDateS").val();
+                    param.company_id = '';
+                    param.busiorg_id = '';
                     param.state="00";
                     param.flow_state="00";
                 }
@@ -355,6 +357,8 @@
                             rows[i].createuser = $('#createUserCodeS').val();
                             rows[i].createdate = $('#createDateS').val();
                             rows[i].dept_id = $('#deptCodeS').val();
+							rows[i].company_id = '';
+							rows[i].busiorg_id = '';
                         }
                         var data = JSON.stringify(reqObj('ba','production.add.mrp_plan_task.add',rows));
                         ajaxSubmit("/cm/rbac/cm.do?m=ba", data, function(data) {

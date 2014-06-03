@@ -31,7 +31,7 @@
 							 {display:'产品ID',name:'product_id',id:'product_id',width:1, hide: true},   
                              {display:'部件ID',name:'task_routing_id',id:'task_routing_id',width:1, hide: true}, 
                              ],
-                    pageSize:10,
+                    pageSize:50,
                     usePager: true,
                     width:'100%',
                     height:'99%',
@@ -108,6 +108,8 @@
                     defGrid.data = data['data'];
                      //增加分页信息  end 
                     defGrid.set({data: data['data']});
+                    //默认收缩全部树
+                    defGrid.collapseAll();
 				},null,true);
 			}
 			//新增 帮助选择 方法
