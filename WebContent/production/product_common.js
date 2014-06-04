@@ -5,7 +5,7 @@
  */
 function getProductRoutingColumns(){
 	var columns=[
-                 {display:'外协',name:'waixie',width:60,align:'right',render:function(item){return item.beiliao&&item.waixie!='null'&&item.waixie > 0.00001 ? parseFloat(item.beiliao).toFixed(2) : '';}},
+                 {display:'外协',name:'waixie',width:60,align:'right',render:function(item){return item.waixie&&item.waixie!='null'&&item.waixie > 0.00001 ? parseFloat(item.waixie).toFixed(2) : '';}},
                  {display:'备料',name:'beiliao',width:60,align:'right',render:function(item){return item.beiliao&&item.beiliao!='null'&&item.beiliao > 0.00001 ? parseFloat(item.beiliao).toFixed(2) : '';}},
                  {display:'激光',name:'jiguang',width:60,align:'right',render:function(item){return item.jiguang&&item.jiguang!='null'&&item.jiguang > 0.00001 ? parseFloat(item.jiguang).toFixed(2) : '';}},
                  {display:'数冲',name:'shuchong',width:60,align:'right',render:function(item){return item.shuchong&&item.shuchong!='null'&&item.shuchong > 0.00001 ? parseFloat(item.shuchong).toFixed(2) : '';}},
