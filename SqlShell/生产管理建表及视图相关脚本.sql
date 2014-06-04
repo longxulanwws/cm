@@ -1,3 +1,36 @@
+DROP TABLE IF EXISTS cm_compact;
+/*
+ * 合同基本信息表（临时表，未建pdm）
+ */
+CREATE TABLE `cm_compact` (
+  `ID` varchar(36) NOT NULL,
+  `Company_ID` varchar(36) DEFAULT NULL,
+  `Dept_ID` varchar(36) DEFAULT NULL,
+  `BusiOrg_ID` varchar(36) DEFAULT NULL,
+  `Code` varchar(36) NOT NULL,
+  `Name` varchar(60) DEFAULT NULL,
+  `partner_id` varchar(36) DEFAULT NULL,
+  `product_code` varchar(36) DEFAULT NULL,
+  `product_name` varchar(36) DEFAULT NULL,
+  `product_qty` decimal(28,6) DEFAULT NULL,
+  `product_uom` varchar(36) DEFAULT NULL,
+  `Link_Man` varchar(36) DEFAULT NULL,
+  `telephone` varchar(30) DEFAULT NULL,
+  `Signed_Date` varchar(20) DEFAULT NULL,
+  `Start_Date` varchar(20) DEFAULT NULL,
+  `End_Date` varchar(20) DEFAULT NULL,
+  `CreateDept` varchar(36) DEFAULT NULL,
+  `CreateUser` varchar(36) DEFAULT NULL,
+  `CreateDate` varchar(20) DEFAULT NULL,
+  `WriteDate` varchar(20) DEFAULT NULL,
+  `WriteUser` varchar(36) DEFAULT NULL,
+  `Description` varchar(360) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+
 /*
  * 订单计划安排
  */
@@ -169,9 +202,9 @@ create table mrp_production_task_track
    task_routing_qty     decimal(28,6),
    task_routing_standard_hour decimal(28,6),
    plan_hours           decimal(28,6),
-   day_finish_hours     decimal(28,6) not null,
-   finish_hours         decimal(28,6) not null,
-   finish_percent       decimal(28,6) not null,
+   day_finish_hours     decimal(28,6),
+   finish_hours         decimal(28,6),
+   finish_percent       decimal(28,6),
    day_real_hours       decimal(28,6) comment '00  新建 
             10  收、发货完成
             ',
