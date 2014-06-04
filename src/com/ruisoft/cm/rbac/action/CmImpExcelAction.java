@@ -546,23 +546,23 @@ public class CmImpExcelAction extends BaseAction{
 				int count = cmImpDAO.queryIsProCode(code,name,specs);
 				//如果产品已经存在
 				if(count <= 0){
-					repeatData.add(code);
+					repeatData.add(code+":"+name+":"+specs);
 					result = "false";
 				}
 			}
 		}else{
 			ProductRoutingEntiy productRoutingEntiy = productRoutingEntityList.get(0);
 			//产品编号
-			String code = productRoutingEntiy.getCode();
+			String code = productRoutingEntiy.getCode().trim();
 			//产品名称
-			String name = productRoutingEntiy.getName();
+			String name = productRoutingEntiy.getName().trim();
 			//产品规格
-			String specs = productRoutingEntiy.getSpecs();
+			String specs = productRoutingEntiy.getSpecs().trim();
 			System.out.println("产品编号"+code);
 			int count = cmImpDAO.queryIsProCode(code,name,specs);
 			//如果产品已经存在
 			if(count <= 0){
-				repeatData.add(code);
+				repeatData.add(code+":"+name+":"+specs);
 				result = "false";
 			}
 		}
