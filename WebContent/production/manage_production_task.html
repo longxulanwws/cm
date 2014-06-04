@@ -90,18 +90,30 @@
                 };
                 $("#pageloading").hide();
             });
+            //编辑表格后事件
             function f_onBeforeSubmitEdit(e)
             { 
             	var  rowData = pGrid.rows[e.rowindex];
             	var  finish_hours = rowData.finish_hours;
+            	var  real_hours = rowData.real_hours;
                 if (e.column.name == "finish_hours")
                 {
                     if (finish_hours > e.value) {
-                    	if(confirm("今天已完成工时小于昨天已完成工时，确认保存吗？")){
+                    	if(confirm("已完成工时小于修改前数据，确认保存吗？")){
                     		return true;
                     	}else{
                     		return false;
                     	}
+                    }
+                }
+                if (e.column.name == "real_hours")
+                {
+                    if (real_hours > e.value) {
+                        if(confirm("实际耗时小于修改前数据，确认保存吗？")){
+                            return true;
+                        }else{
+                            return false;
+                        }
                     }
                 }
                 return true;
