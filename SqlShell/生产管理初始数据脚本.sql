@@ -46,3 +46,23 @@ insert  INTO ruitest.cm_dict_item (ID, CODE, DICT_DEF_ID, HIGHER_ID, NAME, VALUE
 insert  INTO ruitest.cm_dict_item (ID, CODE, DICT_DEF_ID, HIGHER_ID, NAME, VALUE, SEQ, Path, Layer, Detail, STATUS, DESCRIPTION)VALUES ('000245', 'r016', '0061', '0', '组装', 'r016', 16, 'null', 1, '1', '1', '');
 
 
+
+INSERT INTO cm_menu VALUES ('0068', '0350', '库存盘点', '0300', 5, '0350', '', '', '1', 1, '1', '1', '');
+INSERT INTO cm_menu VALUES ('0070', '0205', '合同信息管理', '0200', 5, '0205', '', '', '2', 2, '1', '1', '');
+INSERT INTO cm_menu VALUES ('0073', '0206', '产品工时定额管理', '0200', 6, '0206', '', '产品信息维护', '6', 6, '1', '1', '');
+INSERT INTO cm_menu VALUES ('0075', '0680', '订单计划', '0800', 1, '0680', '', '', '1', 1, '1', '1', '');
+INSERT INTO cm_menu VALUES ('0077', '0670', '生产任务单', '0800', 3, '0670', '', '', '1', 1, '1', '1', '');
+INSERT INTO cm_menu VALUES ('0079', '0681', '订单计划跟踪', '0800', 2, '0681', '', '1', '1', 1, '1', '1', '');
+INSERT INTO cm_menu VALUES ('0081', '0671', '生产任务日跟踪', '0800', 4, '0671', '', '1', '1', 1, '1', '1', '');
+INSERT INTO cm_menu VALUES ('0082', '0800', '计划管理', '0000', 8, '0800', '0', '1', '1', 1, '1', '1', '1');
+
+
+INSERT INTO cm_resource VALUES ('0205', '合同信息管理', './sysmgt/Compact.html', '1', '1', '');
+INSERT INTO cm_resource VALUES ('0206', '产品信息维护', './production/search_task.html', '1', '1', '');
+INSERT INTO cm_resource VALUES ('0350', '库存盘点', './stock/stock_taking.html', '0', '1', '');
+INSERT INTO cm_resource VALUES ('0670', '生产任务单', './production/search_production_task.html', '0', '1', '');
+INSERT INTO cm_resource VALUES ('0671', '生产任务日跟踪', './production/search_production_task.html%3Fm%3Dmng', '', '1', '');
+INSERT INTO cm_resource VALUES ('0680', '订单计划', './production/search_production_plan.html', '0', '1', '');
+INSERT INTO cm_resource VALUES ('0681', '订单计划跟踪', './production/search_production_plan.html%3Fm%3Dmng', '0', '1', '');
+INSERT INTO cm_resource VALUES ('0800', '计划管理', ' ', '0', '1', '');
+

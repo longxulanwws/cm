@@ -366,8 +366,8 @@ GROUP BY a.task_routing_id
 -- DROP  FUNCTION getChildLst;
 CREATE  FUNCTION getChildLst(rootId VARCHAR(100)) RETURNS varchar(1000) CHARSET utf8
 BEGIN 
-   DECLARE sTemp VARCHAR(10000); 
-   DECLARE sTempChd VARCHAR(10000); 
+   DECLARE sTemp VARCHAR(2000); 
+   DECLARE sTempChd VARCHAR(2000); 
  
    SET sTemp = '$'; 
    SET sTempChd =cast(rootId as CHAR); 
