@@ -138,19 +138,19 @@
 				//param.state = $("#moveState").val();
 
 				var data = JSON.stringify(reqObj('q','stock.select.product.stock.qty.query',JSON.stringify(param),'l',true,page,pageSize));
-				ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
-					 //wws 2014-2-23 增加分页信息 start 
-					var d = data['data'].Rows;
-					var ps = defGrid.options.pageSize, p = defGrid.options.page, t = parseInt(data['data'].Total);
-					if (t > ps) {
-						for (var i = 0; i < (p - 1) * ps; i++) {
-							d.unshift(null);
-						}
-					}
-					defGrid.data = data['data'];
-					 //wws 2014-2-23 增加分页信息  end 
-					defGrid.set({data: data['data']});
-				},null,false);
+                ajaxSubmit("/cm/rbac/cm.do?m=q", data, function(data) {
+                    //wws 2014-2-23 增加分页信息 start 
+                    var d = data['data'].Rows;
+                    var ps = defGrid.options.pageSize, p = defGrid.options.page, t = parseInt(data['data'].Total);
+                    if (t > ps) {
+                        for (var i = 0; i < (p - 1) * ps; i++) {
+                            d.unshift(null);
+                        }
+                    }
+                    defGrid.data = data['data'];
+                     //wws 2014-2-23 增加分页信息  end 
+                    defGrid.set({data: data['data']});
+                });
 			}
 
 			var addDialog;
