@@ -247,7 +247,7 @@ AND B.task_routing_id ={task_routing_id} AND A.production_task_code = {productio
 CASE a.task_routing_type WHEN '3' THEN a.task_routing_name ELSE ''END AS routing_name_dis,a.*,b.* FROM(
 select task_routing_id, task_routing_code, task_routing_name, task_routing_type, up_task_routing_code, Product_ID, Product_Name, task_routing_qty AS task_routingQty, task_routing_standard_hour, 
 task_routing_level, Note, WriteUser, WriteDate, CreateUser, CreateDate from mrp_task_routing where FIND_IN_SET(task_routing_code, getChildLst({task_routing_code})) AND Product_ID = {product_id}) AS A 
-LEFT JOIN mrp_production_task_track AS B
+LEFT JOIN ( SELECT * FROM mrp_production_task_track WHERE  production_task_id = {production_task_code} ) AS B
 ON A.task_routing_id =B.task_routing_id
 WHERE B.production_task_track_date = 
 (SELECT max(production_task_track_date) FROM mrp_production_task_track AS c 
@@ -255,7 +255,7 @@ WHERE C.production_task_id={production_task_code} AND c.task_routing_id={task_ro
 OR production_task_track_date IS NULL]]>
                             </value>
                         </property>
-                        <property name="order" value="a.up_task_routing_code"/>
+                        <property name="order" value="a.task_routing_code"/>
                     </bean>
                 </entry>
               <!-- 获取上级生产数量查询用SQL -->
