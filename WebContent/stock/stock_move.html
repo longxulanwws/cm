@@ -20,7 +20,7 @@
 							{display:'商品编号',name:'code',width:130,minWidth:60},
 		                    {display:'品	名',name:'name',width:130,minWidth:60},
 		                    {display:'规格/型号',name:'specs',width:130},
-				            {display:'单	位',name:'uom_id',width:80,align:'left'},
+				            {display:'单	位',name:'uom_id',width:80,align:'left',render:function(item){return paramRender(item,'uom',item.uom_id);}},
 				            //{display:'仓	库',name:'ware_hose_id',width:80},
 				            {display:'库存数量',name:'product_actual_qty',width:80,align:'left',render:function(item){return item.product_actual_qty?parseFloat(item.product_actual_qty).toFixed(2):'';}},
 				            {display:'已占用数量',name:'product_occupy_qty',width:100,align:'right',render:function(item){return item.product_occupy_qty?parseFloat(item.product_occupy_qty).toFixed(2):'';}},
