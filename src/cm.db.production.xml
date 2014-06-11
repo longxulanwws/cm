@@ -255,7 +255,7 @@ WHERE C.production_task_id={production_task_code} AND c.task_routing_id={task_ro
 OR production_task_track_date IS NULL]]>
                             </value>
                         </property>
-                        <property name="order" value="a.task_routing_code"/>
+                        <property name="order" value="a.up_task_routing_code,a.task_routing_code"/>
                     </bean>
                 </entry>
               <!-- 获取上级生产数量查询用SQL -->

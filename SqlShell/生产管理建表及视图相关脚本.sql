@@ -357,7 +357,7 @@ SELECT a.task_routing_id
     , sum(zuzhuang) AS zuzhuang
 FROM mrp_task_routing AS a
     LEFT JOIN vw_task_housrs AS b ON a.Product_ID = b.Product_ID
-WHERE a.task_routing_type = '1'
+WHERE a.task_routing_type = '1' AND b.up_task_routing_code=b.Product_ID
 GROUP BY a.task_routing_id
 
 /*

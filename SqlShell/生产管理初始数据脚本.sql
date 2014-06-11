@@ -9,12 +9,48 @@ VALUES ('0061', 'gongyi_luxian', '工艺路线项目', '1',  '1', '');
 
 INSERT INTO cm_dict_def (ID, CODE, NAME, TYPE,  STATUS, DESCRIPTION)
 VALUES ('0064', 'product.task_type', '任务项类型', '1',  '1', '');
-
+INSERT INTO cm_dict_def (ID, CODE, NAME, TYPE,  STATUS, DESCRIPTION)
+VALUES ('0070', 'production.state', '任务执行情况', '1',  '1', '');
+INSERT INTO cm_dict_def (ID, CODE, NAME, TYPE,  STATUS, DESCRIPTION)
+VALUES ('0057', 'StockProductionState', '生产订单状态', '1',  '1', '');
+INSERT INTO cm_dict_def (ID, CODE, NAME, TYPE,  STATUS, DESCRIPTION)
+VALUES ('0055', 'stock.takingtype', '库存盘点单据类型', 'yw',  '1', '');
+INSERT INTO cm_dict_def (ID, CODE, NAME, TYPE,  STATUS, DESCRIPTION)
+VALUES ('0056', 'StockTakingState', '库存单据性质', 'yw',  '1', '');
+INSERT INTO cm_dict_def (ID, CODE, NAME, TYPE,  STATUS, DESCRIPTION)
+VALUES ('0072', 'product_type', 'product_type', 'uu',  '1', 'sddfs');
 INSERT INTO cm_dict_def (ID, CODE, NAME, TYPE,  STATUS, DESCRIPTION)
 VALUES ('0070', 'production.state', '任务执行情况', '1',  '1', '');
 
-INSERT INTO cm_dict_def (ID, CODE, NAME, TYPE,  STATUS, DESCRIPTION)
-VALUES ('0057', 'StockProductionState', '生产订单状态', '1',  '1', '');
+
+
+INSERT INTO cm_dict_item (ID, CODE, DICT_DEF_ID, HIGHER_ID, NAME, VALUE, SEQ, Path, Layer, Detail, STATUS, DESCRIPTION)
+VALUES ('000254', '1', '0070', '0', '正常', '1', 1, NULL, 1, '1', '1', '');
+
+INSERT INTO cm_dict_item (ID, CODE, DICT_DEF_ID, HIGHER_ID, NAME, VALUE, SEQ, Path, Layer, Detail, STATUS, DESCRIPTION)
+VALUES ('000255', '2', '0070', '0', '延迟', '2', 2, NULL, 1, '1', '1', '');
+
+INSERT INTO cm_dict_item (ID, CODE, DICT_DEF_ID, HIGHER_ID, NAME, VALUE, SEQ, Path, Layer, Detail, STATUS, DESCRIPTION)
+VALUES ('000256', '3', '0070', '0', '提前', '3', 3, NULL, 1, '1', '1', '');
+
+INSERT INTO cm_dict_item (ID, CODE, DICT_DEF_ID, HIGHER_ID, NAME, VALUE, SEQ, Path, Layer, Detail, STATUS, DESCRIPTION)
+VALUES ('000258', '0', '0072', '0', '产品', '0', 0, NULL, 1, '1', '1', '');
+
+INSERT INTO cm_dict_item (ID, CODE, DICT_DEF_ID, HIGHER_ID, NAME, VALUE, SEQ, Path, Layer, Detail, STATUS, DESCRIPTION)
+VALUES ('000259', '1', '0072', '0', '部件', '1', 1, NULL, 1, '1', '1', '1');
+
+
+
+INSERT INTO cm_dict_item (ID, CODE, DICT_DEF_ID, HIGHER_ID, NAME, VALUE, SEQ, Path, Layer, Detail, STATUS, DESCRIPTION)
+VALUES ('000218', '0', '0055', '0', '盘盈', '0', 0, NULL, 1, '1', '1', '');
+
+INSERT INTO cm_dict_item (ID, CODE, DICT_DEF_ID, HIGHER_ID, NAME, VALUE, SEQ, Path, Layer, Detail, STATUS, DESCRIPTION)
+VALUES ('000219', '1', '0055', '0', '盘亏', '1', 1, NULL, 1, '1', '1', '');
+INSERT INTO cm_dict_item (ID, CODE, DICT_DEF_ID, HIGHER_ID, NAME, VALUE, SEQ, Path, Layer, Detail, STATUS, DESCRIPTION)
+VALUES ('000220', '00', '0056', '0', '未审核', '00', 0, '1', 1, '1', '1', '');
+
+INSERT INTO cm_dict_item (ID, CODE, DICT_DEF_ID, HIGHER_ID, NAME, VALUE, SEQ, Path, Layer, Detail, STATUS, DESCRIPTION)
+VALUES ('000221', '10', '0056', '0', '审核', '10', 1, '1', 1, '1', '1', '');
 
 
 INSERT INTO cm_dict_item (ID, CODE, DICT_DEF_ID, HIGHER_ID, NAME, VALUE, SEQ, Path, Layer, Detail, STATUS, DESCRIPTION)
