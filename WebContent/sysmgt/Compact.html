@@ -11,7 +11,7 @@
         <script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
         <script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
         <script src="../js/validate/messages_zh.js" type="text/javascript"></script>
-        <script src="../ligerUI/js/ligerui.min.js" type="text/javascript"></script>
+        <script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
         <script src="../js/common.js" type="text/javascript"></script>
         <script src="../js/json2.js" type="text/javascript"></script>
         <script type="text/javascript">
@@ -190,6 +190,10 @@
             //新增用户弹出窗口
             var addDialog;
             function openUserDef() {
+                toReset('#new_user_def input,select,textarea,date');
+                partner.setValue('');
+                uom.setValue('');
+                
                 addDialog = $.ligerDialog.open({
                     target:$("#new_user_def"),
                     title:"新增合同信息",
@@ -197,12 +201,6 @@
                     height:500
                  
                 });
-                toReset('#new_user_def input,select,textarea,date');
-                partner.setValue('');
-                uom.setValue('');
-                
-
-
             }
             
             // 新增保存处理
@@ -305,10 +303,10 @@
             </div>
         </div>
         <div id="new_user_def" style="display:none;overflow:hidden;">
+            <form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
             <div class="line-div" style="margin-bottom:10px;">
                 <span class="title l-icon-add">添加合同信息</span>
             </div>
-            <form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
                 <div class="line-div">
                     <div class="label-div"><label>合同编号</label></div>
                     <div class="in-div"><input type="text" class="required s-text txt-def" id="codeS" /></div>
@@ -360,11 +358,12 @@
                     <div class="label-div"><label>说明</label></div>
                     <div class="in-div"><textarea cols="80" rows="3" id="newDesc"></textarea></div>
                 </div>
-            </form>
+
             <div class="line-div" style="margin-top:95px;padding-left:40%;">
                 <input type="button" value="保存" onclick="toAdd();" />
                 <input type="button" value="清空" onclick="toReset('#new_user_def input,select,textarea,date')" />
             </div>
+        </form>
         </div>
         
         

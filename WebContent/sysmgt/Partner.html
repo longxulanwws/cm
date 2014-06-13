@@ -428,11 +428,11 @@
 			</div>
 		</div>
 		<div id="new_user_def" style="display:none;overflow:hidden;">
+		<form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
 			<div class="line-div" style="margin-bottom:10px;">
 				<span class="title l-icon-add">添加往来单位</span>
 			</div>
-			<form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
-				<div class="line-div">
+			<div class="line-div">
 					<div class="label-div"><label>编号</label></div>
 					<div class="in-div"><input type="text" class="required s-text txt-def" id="codeS" /></div>
 					<div class="label-div"><label>名称</label></div>
@@ -498,11 +498,12 @@
 					<div class="label-div"><label>说明</label></div>
 					<div class="in-div"><textarea cols="80" rows="5" id="newDesc"></textarea></div>
 				</div>
+			
+				<div class="line-div" style="margin-top:95px;padding-left:40%;">
+					<input type="button" value="保存" onclick="toAdd();" />
+					<input type="button" value="清空" onclick="toReset('#new_user_def input,select,textarea')" />
+				</div>
 			</form>
-			<div class="line-div" style="margin-top:95px;padding-left:40%;">
-				<input type="button" value="保存" onclick="toAdd();" />
-				<input type="button" value="清空" onclick="toReset('#new_user_def input,select,textarea')" />
-			</div>
 		</div>
 		
 		

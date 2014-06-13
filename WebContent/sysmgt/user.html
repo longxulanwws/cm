@@ -364,6 +364,7 @@
 			</div>
 		</div>
 		<div id="new_user_def" style="display:none;overflow:hidden;">
+		<form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
 			<div class="lineD" style="margin-bottom:10px;">
 				<span class="title l-icon-add">添加用户</span>
 			</div>
@@ -371,8 +372,7 @@
 				<div class="labelD"><label>编号</label></div>
 				<div class="dplD"><input type="text" class="s-text txt-def" id="code" /></div>
 			</div>
-			-->
-			<form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
+			-->		
 			<div class="lineD">
 				<div class="labelD"><label>账号</label></div>
 				<div class="dplD"><input type="text" ltype="text" class="required s-text txt-def" id="accountS" /></div>
@@ -394,7 +394,8 @@
 			<!--  <select class="txt-def" id="orgid" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
 			-->
 			</div>
-			</form>
+			
+
 			<div class="lineD">
 				<div class="labelD"><label>状态</label></div>
 				<div class="dplD"><select class="txt-def" id="newStatus" param="rbac.status" default="1" style="margin-right: 30px;"></select></div>
@@ -407,6 +408,7 @@
 				<input type="button" value="保存" onclick="toAdd();" />
 				<input type="button" value="清空" onclick="toReset('#new_user_def input,select,textarea')" />
 			</div>
+			</form>
 		</div>
 		
 		<div id="up_dict_pw" style="display:none;overflow:hidden;">
