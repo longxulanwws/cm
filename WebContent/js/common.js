@@ -256,14 +256,18 @@ function toTree(data) {
  * @param action Function 按钮的onclick事件
  * @param title String 鼠标指向该按钮时的提示信息
  */
-function appendBtnForGridToolbar(divStyle, btnStyle, action, title,btnName) {
+function appendBtnForGridToolbar(divStyle, btnStyle, action, title,btnName,containerId) {
 	if (!divStyle && !btnStyle)
 		return;
 	var showBtNameStr='';
 	if(btnName)
 		showBtNameStr='<div style="color: #2C4D79;width:100px;height: 22px;line-height:22px;text-align:center;"><span>' + btnName	+ '</span></div>';
-		
-	$(".l-panel-bbar-inner .l-clear").before('<div class="l-bar-group"><div class="l-bar-button '
+	
+	var endTag = ".l-panel-bar .l-panel-bbar-inner .l-clear";
+	if (containerId)
+		endTag = containerId + " " + endTag;
+	
+	$(endTag).before('<div class="l-bar-group"><div class="l-bar-button '
 			+ divStyle + '"><span class="' + btnStyle + '" title="' + title
 			+ '"></span></div>'+showBtNameStr+'</div><div class="l-bar-separator"></div>');
 	var s = "div.l-bar-button";
@@ -285,14 +289,14 @@ function appendBtnForGridToolbar(divStyle, btnStyle, action, title,btnName) {
  * @param action Function 按钮的onclick事件
  * @param title String 鼠标指向该按钮时的提示信息
  */
-function appendAddBtn(action, title,btnName,buttonId) {
+function appendAddBtn(action, title,btnName,buttonId,containerId) {
 	if (!title)
 		title = "新增";
 	if(!buttonId)
 		buttonId = "l-bar-btnadd";
 	else
 		buttonId = "l-bar-btnadd-"+buttonId;
-	appendBtnForGridToolbar(buttonId, "l-icon-add", action, title,btnName);
+	appendBtnForGridToolbar(buttonId, "l-icon-add", action, title,btnName,containerId);
 }
 /**
  * 向Grid组件中的Toolbar中添加“修改”按钮
@@ -322,10 +326,10 @@ function appendSearchBtn(action, title) {
  * @param action Function 按钮的onclick事件
  * @param title String 鼠标指向该按钮时的提示信息
  */
-function appendDeleteBtn(action, title) {
+function appendDeleteBtn(action, title,containerId) {
 	if (!title)
 		title = "删除";
-	appendBtnForGridToolbar("l-bar-btndel", "l-icon-delete", action, title);
+	appendBtnForGridToolbar("l-bar-btndel", "l-icon-delete", action, title, null, containerId);
 }
 /**
  * 向Grid组件中的Toolbar中添加“管理”按钮
