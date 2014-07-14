@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>我的已办任务</title>
+        
+        <link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
+        <script src="../js/jquery-min.js" type="text/javascript"></script>
+        <script src="../ligerUI/js/ligerui.min.js" type="text/javascript"></script>
+        <script src="../js/common.js" type="text/javascript"></script>
+        <script src="../js/json2.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var defGrid;
+            $(function(){
+                $("#layout_main").ligerLayout({
+                });
+                defGrid = $("#query_list").ligerGrid({
+                    columns:[
+                             {display:'流程编号',name:'flow_code',width:150,minWidth:100,align:'left'},
+                             {display:'业务名称',name:'business_name',width:150,minWidth:100,align:'left'},
+                             {display:'收到时间',name:'receive_time',width:150,minWidth:100,align:'left'},
+                             {display:'提交时间',name:'submit_time',width:150,minWidth:100,align:'left'},
+                             {display:'已办理环节',name:'prev_link',width:100,minWidth:100,align:'left'},
+                             {display:'当前环节',name:'present_link',width:150,minWidth:100,align:'left'},
+                             {display:'当前办理人',name:'present_man',width:150,minWidth:100,align:'left'},
+                             {display:'操作',isSort:false,width:100,render:function(rowdata,rowindex,value){
+                                 return "<a href='javascript:void(0);' class='opt-link' onclick='open_flow_map(" + rowindex + ")'>查看流程图</a>";
+                             }},
+                    ],
+                    pageSize:10,
+                    usePager: true,
+                    width:'100%',
+                    height:'99%',
+                    dataAction:'server',
+                    checkbox:false,
+                    rownumbers:true,
+                    fixedCellHeight:false,
+                    colDraggable:true,
+                    enabledEdit:true,
+                    clickToEdit:false,
+                    onDblClickRow:searchRow,  //双击查询
+                    onSelectRow:function(rowdata, rowindex){$("#txtrowindex").val(rowindex);},
+                    url: '../common/q.jsp',
+                    onToFirst: function(item) {
+                        toQuery(item, 1);
+                    },
+                    onToLast: function(item) {
+                        var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+                        if (defGrid.options.total % defGrid.options.pageSize > 0)
+                            p += 1;
+                        toQuery(item, p);
+                    },
+                    onToPrev: function(item) {
+                        var p = parseInt(defGrid.options.page);
+                        if (p > 1)
+                            p -= 1;
+                        else
+                            return;
+                        toQuery(item, p);
+                    },
+                    onToNext: function(item) {
+                        var p = parseInt(defGrid.options.total / defGrid.options.pageSize);
+                        if (defGrid.options.total % defGrid.options.pageSize > 0)
+                            p += 1;
+                        var cp = parseInt(defGrid.options.page); 
+                        if (cp < p)
+                            cp += 1;
+                        toQuery(item, cp);
+                    }
+                });
+                appendSearchBtn(searchRow, "查看任务明细"); 
+                $("#pageloading").hide();
+                //默认查询全部数据 
+                toQuery();
+            });
+            
+            function toQuery(item, page, pageSize) {
+                if (!page)
+                    page = defGrid.options.page;
+                if (!pageSize)
+                    pageSize = defGrid.options.pageSize;
+                
+                var param = new Object();
+                param.code=$("#flow_codeQ").val();
+                param.name = $("#business_nameQ").val();
+                var data = JSON.stringify(reqObj('q','snaker.select.sna_select_htasks',JSON.stringify(param),'l',true,page,pageSize));
+                ajaxSubmit("/cm/rbac/cm.do?m=q", data, function(data) {
+                    var d = data['data'].Rows;
+                    var ps = defGrid.options.pageSize, p = defGrid.options.page, t = parseInt(data['data'].Total);
+                    if (t > ps) {
+                        for (var i = 0; i < (p - 1) * ps; i++) {
+                            d.unshift(null);
+                        }
+                    }
+                    defGrid.data = data['data'];
+                    defGrid.set({data: data['data']});
+                },null,true);
+            }
+            //查看流程图
+            function open_flow_map(rowid) {
+                var flow_code = defGrid.getRow(rowid)['flow_code'];;
+                if (flow_code) {
+                    //未完待续
+                }
+            }
+            //查看任务明细
+            function searchRow(){
+                var row = defGrid.getSelectedRow();
+
+                if (!row) {
+                    $.ligerDialog.error('请先选择要查看的任务！','错误');
+                    return;
+                }
+                var flow_id=row.flow_code;
+                parent.f_addTab('new_search_flowS'+flow_id,'任务明细信息('+flow_id+')','./snaker/query_flow_tasks.html?o=m&code='.concat(row.flow_code));
+            }
+        </script>
+        <style type="text/css">
+            label{margin: 5px 20px 5px 15px;}
+            .fields{height:35px;padding-top:5px;}
+            .dict-info{width: 260px;padding: 10px;}
+            .diff {margin:3px 0;}
+            .lineD {width:99%;float:left;position:relative;overflow:hidden;margin:10px 0 2px 2px}
+            .labelD {width:13%;position:relative;float:left;padding-top:3px;}
+            .dplD {width:36%;position:relative;float:left;}
+            .title{font-size:14px;font-weight:bold;background-position:left;padding-left:18px;}
+            .l-dialog-content-nopadding{padding:0 !important;}
+        </style>
+    </head>
+    <body style="padding:0;">
+        <div id="pageloading"></div>  
+        <div id="layout_main">
+            <div position="center" id="a_center" title="已办任务列表">
+                <div id="query_cond" class="fields">
+                    <label>流程编号</label><input type="text" class="s-text-sort txt-def" id="flow_codeQ" />
+                    <label>业务名称</label><input type="text" class="s-text-sort txt-def" id="business_nameQ" />
+                    <input type="button" value="查询" style="margin-left:25px;" onclick="toQuery();" />
+                    <input type="button" value="清空" onclick="toReset('#flow_codeQ,#business_nameQ,');" />
+                </div>
+                <div id="query_list"></div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+    <bean id="snaker" class="com.ruisoft.cm.rbac.util.DMLConfig">
+        <property name="select">
+            <map>
+                 <entry key="sna_select">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[select 'CGCG20140714001' AS  flow_code,'常规采购申请' AS  flow_name,'2014/7/14 14:45' AS  start_time, '2014/7/16 14:45' AS  end_time,
+'审批中' AS  flow_state,'采购部长审批' AS  present_link,'采购部长XXX' AS  present_man from cm_user]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                <entry key="sna_select_gtasks">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[select 'CGCG20140714001' AS  flow_code,'常规采购申请' AS  business_name,'2014/7/14 14:45' AS  start_time, '2014/7/14 16:45' AS  receive_time,
+'采购部长审批' AS  present_link,'采购员申请' AS  prev_link,'采购部长XXX' AS  present_man from cm_user]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                <entry key="sna_select_htasks">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[select 'CGCG20140714001' AS  flow_code,'常规采购申请' AS  business_name,'2014/7/14 16:45' AS  receive_time, '2014/7/15 13:45' AS  submit_time,
+'采购部长审批' AS  prev_link,'部门经理审批' AS  present_link,'部门经理XXX' AS  present_man from cm_user]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="add">
+             <map>
+                <entry key="sna_insert">
+                    <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[INSERT INTO  mrp_routing_hours
+SELECT DISTINCT a.task_routing_id, a.task_routing_code, a.task_routing_name, a.task_routing_type, 
+a.up_task_routing_code,a.task_routing_code, a.Product_ID, a.Product_Name,a.task_routing_qty
+ FROM  
+ (SELECT * FROM mrp_task_routing WHERE task_routing_type  IN ('1','2')  ) AS a
+, (SELECT * FROM mrp_task_routing WHERE task_routing_type ='3') AS b 
+WHERE    a.Product_ID=b.Product_ID AND b.up_task_routing_code=a.task_routing_code
+AND  a.Product_ID={product_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="update">
+            <map>
+                <entry key="sna_update">
+                    <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[UPDATE mrp_task_routing
+SET task_routing_code = {task_routing_code},
+    task_routing_name = {task_routing_name},
+    task_routing_type = {task_routing_type},
+    up_task_routing_code = {up_task_routing_code},
+    Product_ID = {product_id},
+    Product_Name = {product_name},
+    task_routing_qty = {task_routing_qty},
+    task_routing_standard_hour = {task_routing_standard_hour},
+    task_routing_level = {task_routing_level},
+    Note = {note},
+    WriteUser = {writeuser},
+    WriteDate = {writedate}
+    WHERE task_routing_id = {task_routing_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+            </map>  
+        </property>
+        <property name="delete">
+            <map>
+                 <entry key="sna_delete">
+                    <bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[DELETE FROM mrp_production_task WHERE production_task_code = {production_task_code}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean>
+</beans>
