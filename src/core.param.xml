@@ -103,9 +103,19 @@
                         </property>
                             </bean>
                         </property>
-       
                     </bean>
-                </entry>  								
+                </entry> 
+               <entry key="attrib_help.query">
+                    <bean class="com.ruisoft.core.param.SQLParamEntity">
+                        <property name="sql">
+                            <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                             <property name="sql">
+                                    <value><![CDATA[SELECT NAME,ID VALUE,ID SEQ,STATUS FROM cm_dict_def WHERE TYPE='HP']]></value>
+                                </property>
+                            </bean>
+                        </property>
+                    </bean>
+                </entry>   								
 			</map>
 		</property>
 	</bean>

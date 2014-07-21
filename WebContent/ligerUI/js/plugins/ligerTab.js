@@ -556,11 +556,13 @@
         {
             var g = this, p = this.options;
             g.overrideTabItem(g.getSelectedTabItemID(), options);
+            alert(1111);
         },
         //覆盖
         overrideTabItem: function (targettabid, options)
         {
             var g = this, p = this.options;
+            alert(g.trigger('beforeOverrideTabItem', [targettabid]));
             if (g.trigger('beforeOverrideTabItem', [targettabid]) == false)
                 return false;
             var tabid = options.tabid;
@@ -572,10 +574,10 @@
             var showClose = options.showClose;
             var height = options.height;
             //如果已经存在
-            if (g.isTabItemExist(tabid))
-            {
-                return;
-            }
+//            if (g.isTabItemExist(tabid))
+//            {
+//                return;
+//            }
             var tabitem = $("li[tabid=" + targettabid + "]", g.tab.links.ul);
             var contentitem = $(".l-tab-content-item[tabid=" + targettabid + "]", g.tab.content);
             if (!tabitem || !contentitem) return;

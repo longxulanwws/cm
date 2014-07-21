@@ -10,6 +10,72 @@
 	<bean id="stock" class="com.ruisoft.cm.rbac.util.DMLConfig">
 		<property name="select">
 			<map>
+			     <entry key="matter_categ_item.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+                        <![CDATA[SELECT ID, CODE, DICT_DEF_ID, HIGHER_ID, NAME, VALUE, SEQ, Path, Layer, Detail, STATUS, DESCRIPTION FROM cm_dict_item]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="dict_def_id" value="" />
+                                <entry key="code" value=":like(lr)" />
+                                <entry key="name" value=":like(lr)" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+                
+			      <entry key="cm_matter_categ.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+                        <![CDATA[SELECT categ_id, categ_code, attrib_id, attrib_code, attrib_name, attrib_help_code, attrib_help_name FROM cm_matter_categ]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="categ_code" value="" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+                
+			      <entry key="product_category.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+                        <![CDATA[SELECT ID, Company_ID, Dept_ID, BusiOrg_ID, Code, Name, Path, Layer, Detail, Note, status FROM product_category]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="code" value="" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
+                <entry key="cm_matter_categ_contrast.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+                        <![CDATA[SELECT attrib_id, categ_code, attrib_sort, attrib_difid,attrib_code, attrib_value FROM cm_matter_categ_contrast]]>
+                            </value>
+                        </property>
+                        <property name="order" value="attrib_difid"/>
+                        <property name="conditions">
+                            <map>
+                                <entry key="categ_code" value="" />
+                                <entry key="attrib_sort" value="" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
 				<entry key="picking.query">
 					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
 						<property name="dmlType" value="cond" />
@@ -563,6 +629,26 @@ LEFT JOIN product_product t2 ON t1.Code=t2.Code) t]]>
 		</property>
 		<property name="add">
 			<map>
+                <entry key="cm_matter_categ_contrast.insert">
+                    <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[INSERT INTO cm_matter_categ_contrast (attrib_id, categ_code, attrib_sort, attrib_difid,attrib_code, attrib_value)
+  VALUES ({#uuid}, {categ_code}, {attrib_sort},{attrib_difid}, {attrib_code}, {attrib_value})]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+                <entry key="cm_matter_categ.insert">
+                    <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[INSERT INTO cm_matter_categ (categ_id, categ_code, attrib_id, attrib_code, attrib_name, attrib_help_code, attrib_help_name)
+ VALUES ({#uuid}, {categ_code}, {attrib_id}, {attrib_code}, {attrib_name}, {attrib_help_code}, {attrib_help_name})]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
 			    <!-- 生产领用单 新增 数据SQL配置 -->
 				<entry key="ly.ck.picking.add">
 					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
@@ -778,6 +864,24 @@ VALUES({#product_Detailmaintain.id},{code},{val},{status},{desc},{maintain_id})]
 		</property>
 		<property name="update">
 			<map>
+			 <entry key="cm_matter_categ_contrast.update">
+                    <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[UPDATE cm_matter_categ_contrast SET attrib_difid={attrib_difid},attrib_code = {attrib_code},attrib_value = {attrib_value} WHERE attrib_id={attrib_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+               <entry key="cm_matter_categ.update">
+                    <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[UPDATE cm_matter_categ SET attrib_code = {attrib_code},attrib_name = {attrib_name},attrib_help_code = {attrib_help_code},attrib_help_name = {attrib_help_name} WHERE categ_id = {categ_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
 			<entry key="product">
 					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
 						<property name="sql">
@@ -1066,6 +1170,25 @@ Warehose_ID={warehose_id},Move_IN_User={move_in_user},Note={note},WriteUser={wri
 						</property>
 					</bean>
 				</entry>
+				<entry key="cm_matter_categ_contrast.delete">
+                    <bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[DELETE FROM cm_matter_categ_contrast WHERE attrib_id={attrib_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+               <entry key="cm_matter_categ.delete">
+                    <bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[DELETE FROM cm_matter_categ WHERE categ_id={categ_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+				
 			</map>
 		</property>
 	</bean>

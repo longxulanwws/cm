@@ -100,6 +100,15 @@
                         $("#newStatuS").val(v);
                     }
 				});
+	            var tyoeInBox = $("#newTypeNameS").ligerComboBox({
+                    autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:getType,
+                    onSelected:function(v,t) {
+                        $("#newTypeS").val(v);
+                    }
+                });
 				//默认查询全部数据 
 				toQuery();
 			});
@@ -133,6 +142,9 @@
 			var getStatus = new function () {
 				return getData('rbac.status');
 			}
+			 var getType = new function () {
+	                return getData('rbac.difType');
+	            }
 			function toQuery(item, page, pageSize) {
 				if (!page)
 					page = defGrid.options.page;
@@ -312,7 +324,10 @@
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>类型</label></div>
-				<div class="dplD"><input type="text" ltype="text" class="required s-text txt-def" id="newTypeS" /></div>
+				<div class="dplD">
+				<input type="text" id="newTypeNameS" ltype="combobox" class="required s-text txt-def" />
+                 <input type="hidden" id="newTypeS" />
+				</div>
 			</div>
 			<div class="lineD">
 				<div class="labelD"><label>状态</label></div>

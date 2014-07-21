@@ -266,7 +266,6 @@ function appendBtnForGridToolbar(divStyle, btnStyle, action, title,btnName,conta
 	var endTag = ".l-panel-bar .l-panel-bbar-inner .l-clear";
 	if (containerId)
 		endTag = containerId + " " + endTag;
-	
 	$(endTag).before('<div class="l-bar-group"><div class="l-bar-button '
 			+ divStyle + '"><span class="' + btnStyle + '" title="' + title
 			+ '"></span></div>'+showBtNameStr+'</div><div class="l-bar-separator"></div>');
@@ -304,10 +303,10 @@ function appendAddBtn(action, title,btnName,buttonId,containerId) {
  * @param action Function 按钮的onclick事件
  * @param title String 鼠标指向该按钮时的提示信息
  */
-function appendModifyBtn(action, title) {
+function appendModifyBtn(action, title,containerId) {
 	if (!title)
 		title = "修改";
-	appendBtnForGridToolbar("l-bar-btnedit", "l-icon-modify", action, title);
+	appendBtnForGridToolbar("l-bar-btnedit", "l-icon-modify", action, title,null, containerId);
 }
 /**
  * 向Grid组件中的Toolbar中添加“查询”按钮

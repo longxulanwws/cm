@@ -16856,10 +16856,10 @@
             var showClose = options.showClose;
             var height = options.height;
             //如果已经存在
-            if (g.isTabItemExist(tabid))
-            {
-                return;
-            }
+//            if (g.isTabItemExist(tabid))
+//            {
+//                return;
+//            }
             var tabitem = $("li[tabid=" + targettabid + "]", g.tab.links.ul);
             var contentitem = $(".l-tab-content-item[tabid=" + targettabid + "]", g.tab.content);
             if (!tabitem || !contentitem) return;

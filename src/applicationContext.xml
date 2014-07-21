@@ -57,7 +57,7 @@
         <property name="poolProperties"> 
             <bean class="org.apache.tomcat.jdbc.pool.PoolProperties">   
                 <property name="driverClassName" value="com.mysql.jdbc.Driver"/> 
-                <property name="url" value="jdbc:mysql://localhost:3306/ruicmdb"/>   
+                <property name="url" value="jdbc:mysql://localhost:3306/ruitest"/>   
                 <property name="username" value="root"/>   
                 <property name="password" value="root"/> 
                 <property name="jmxEnabled" value="true"/> 
