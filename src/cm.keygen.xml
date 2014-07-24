@@ -177,6 +177,23 @@
                         <property name="init" value="10" />
                     </bean>
                 </entry>
+                <!-- 采购订单编号规则 -->           
+                <entry key="purchase.picking.pr.code">
+                    <bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+                        <property name="rule" value="'CGDD'{date}{seq(4)}" />
+                        <property name="circle" value="year" />
+                        <property name="group" value="true" />
+                    </bean>
+                </entry>
+                <!-- 采购订单分录编码规则   -->
+                <entry key="purchase.picking.prd.code">
+                    <bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+                        <property name="rule" value="'DDFL'{date}{seq(4)}" />
+                        <property name="circle" value="year" />
+                        <property name="group" value="true" />
+                    </bean>
+                </entry>
+                
 			</map>
 		</property>
 	</bean>

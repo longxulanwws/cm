@@ -10,6 +10,40 @@
 	<bean id="paramGenerator" class="com.ruisoft.core.param.ParamGenerator" lazy-init="false">
 		<property name="config">
 			<map>
+			   <entry key="inAttrib_help">
+                    <bean class="com.ruisoft.core.param.SQLParamEntity">
+                        <property name="sql">
+                            <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                            <property name="dmlType" value="cond" />
+                                <property name="sql">
+                                    <value><![CDATA[SELECT attrib_code value, attrib_value NAME FROM cm_matter_categ_contrast]]></value>
+                                </property>
+                                <property name="conditions">
+                                    <map>
+                                        <entry key="categ_code" value="" />
+                                    </map>
+                                </property>
+                            </bean>
+                        </property>
+                    </bean>
+                </entry>
+                <entry key="Attrib_help">
+                    <bean class="com.ruisoft.core.param.SQLParamEntity">
+                        <property name="sql">
+                            <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                            <property name="dmlType" value="cond" />
+                                <property name="sql">
+                                    <value><![CDATA[SELECT code value,name FROM cm_dict_item]]></value>
+                                </property>
+                                <property name="conditions">
+                                    <map>
+                                        <entry key="dict_def_id" value="" />
+                                    </map>
+                                </property>
+                            </bean>
+                        </property>
+                    </bean>
+                </entry>
 				<!-- 查询系统用户,可按机构代码查询 -->
 				<entry key="user">
 					<bean class="com.ruisoft.core.param.SQLParamEntity">

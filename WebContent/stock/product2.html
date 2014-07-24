@@ -18,7 +18,6 @@
             var pTree, pGrid;
             var pType = getData('product.type');
             var pNode;
-            var uomSel, uomPreSel, typeSel;
             var ff = true;var pp = true;var dd = true;
             $(function() {
                 $("#layout_main").ligerLayout({leftWidth:200,onHeightChanged:f_heightChanged});
@@ -71,8 +70,8 @@
                         url: '../common/q.jsp',                   
                     });
                         appendAddBtn(addProRow, "增加", null, null, "#pro-div");
-                        appendDeleteBtn(addProRow, "删除", "#pro-div");
-                        appendModifyBtn(addProRow, "编辑", "#pro-div");
+                        appendModifyBtn(modyProRow, "编辑", "#pro-div");
+                        appendDeleteBtn(delProRow, "删除", "#pro-div");
                         pp = false;
                     }
                     toQuery();
@@ -103,8 +102,55 @@
                 });
             }
             function addProRow(){
-            	
+                var selDialog = $.ligerDialog.open({height:550,width:650,url:'./new_add_product.html?categ_code='+pNode});
             }
+            function modyProRow(){
+                var row = pGrid.getSelectedRow();
+
+                if (!row) {
+                    $.ligerDialog.error('请先选择要编辑的商品物料记录。','错误');
+                    return;
+                }
+            	var selDialog = $.ligerDialog.open({height:550,width:650,url:'./new_add_product.html?o=m&categ_code='+pNode+'&code='+row.code});
+            }
+            /*   删除处理 
+             */
+              function delProRow(rowid) {
+                  
+                  var row = pGrid.getSelectedRow();
+                 if (!row) {
+                     $.ligerDialog.error('请先选择要删除的生产领用单记录。','错误');
+                     return;
+                 }                
+                     $.ligerDialog.confirm('您确定要删除该项数据吗？', function(r) {
+                         if (!r)
+                             return;
+                         if (row['__status'] !== 'add')
+                        	   toDel(JSON.stringify(row));
+                         pGrid.deleteRow(rowid);
+                     })
+                 }
+             // 删除处理业务处理
+              function toDel(row) {
+                  var param = JSON.stringify(reqObj('d','stock.delete.product',row));
+                     ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
+                         if (data) {
+                             if (parseInt(data['status']) > 0) {
+                              var param = JSON.stringify(reqObj('d','stock.delete.product_attrib.deleteid',row));
+                               ajaxSubmit("/cm/rbac/cm.do?m=d", param, function(data) {
+                                 if (parseInt(data['status']) > 0) {
+                                   $.ligerDialog.success('删除成功');
+                                 }
+                                 else{
+                                    $.ligerDialog.error('删除失败');
+                                     }
+                                     });
+                             } else {
+                                 $.ligerDialog.error('删除失败');
+                             }
+                         }
+                     });
+             }
             function afterSelectTab(){
             	var tabid = tabManager.getSelectedTabItemID();
             	if(tabid=="proTab"){
@@ -148,44 +194,6 @@
                   </div>
                 </div>
             </div>
-        </div>
-        <div id="detail" style="display:none;">
-            <div id="d-menu"></div>
-            <div style="height:5px;"></div>
-            <form id="detail_form" class="liger-form" data-validate="{}">
-                <div class="line-div">
-                    <div class="label-div"><label>物料编号</label></div>
-                    <div class="in-div"><input type="text" id="codeS" ltype="text" class="required diff"   /></div>
-                    <div class="label-div"><label>物料名称</label></div>
-                    <div class="in-div"><input type="text" id="nameS" ltype="text" class="required diff" /></div>
-                </div>
-                <div class="line-div">                  
-                    <div class="label-div"> <label>规格型号</label></div>
-                    <div class="in-div"><input type="text" id="specsS" ltype="text" class="diff" /></div>
-                </div>
-                <div class="line-div">
-                    <div class="label-div"><label>计量单位</label></div>
-                    <div class="in-div"><input type="text" id="uomIdS" ltype="combobox" class="required diff" /></select></div>
-                    <div class="label-div"><label>单位精度</label></div>
-                    <div class="in-div"><input type="text" id="uomPresS" ltype="combobox" class="diff" /></div>
-                </div>
-                <div class="line-div">
-                    <div class="label-div"><label>物料性质</label></div>
-                    <div class="in-div" style="width:72%;"><input type="text" id="typeS" ltype="combobox" class="required diff" /></div>
-                </div>
-                <div class="line-div" style="height:76px;">
-                    <div class="label-div"><label>备注</label></div>
-                    <div class="in-div" style="width:72%;">
-                        <textarea cols="73" rows="3" id="noteS"></textarea>
-                    </div>
-                </div>
-                <input type="hidden" id="idS" />
-                <input type="hidden" id="companyIdS" />
-                <input type="hidden" id="stateS" value="1" />
-                <input type="hidden" id="createCompanyIdS" />
-                <input type="hidden" id="createUserS" />
-                <input type="hidden" id="categoryIdS" />
-            </form>
         </div>
     </body>
 </html>

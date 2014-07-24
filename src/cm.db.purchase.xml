@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+	<bean id="purchase" class="com.ruisoft.cm.rbac.util.DMLConfig">
+		<property name="select">
+			<map>
+				<!-- 采购订单查询 -->
+				<entry key="pur.queryMain">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="dmlType" value="cond" />
+						<property name="sql">
+							<value>
+								<![CDATA[SELECT PR_id, CompanyID, DeptID, BusiOrgID, PR_CODE, PR_TYPE, PR_CONTRACT, PR_PLANCODE, PR_proposer, PR_PRODEPT, PR_PROReasons, PR_STATE, FLOW_ID, FLOW_STATE, NOTE, CreateUser, CreateDate, WriteDate, WriteUser FROM purchase_requisition ]]>
+							</value>
+						</property>
+						<property name="conditions">
+							<map>
+								<entry key="PR_CODE" value="str:like(lr):and" />
+								<entry key="PR_CONTRACT" value=":like(lr)" />
+							</map>
+						</property>
+						<property name="order" value="PR_CODE"/> 
+					</bean>
+				</entry>
+				<!-- 采购订单查询编辑 -->
+				<entry key="pur.queryMainEdit">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="dmlType" value="cond" />
+						<property name="sql">
+							<value>
+								<![CDATA[SELECT PR_id, CompanyID, DeptID, BusiOrgID, PR_CODE, PR_TYPE, PR_CONTRACT, PR_PLANCODE, PR_proposer, PR_PRODEPT, PR_PROReasons, PR_STATE, FLOW_ID, FLOW_STATE, NOTE, CreateUser, CreateDate, WriteDate, WriteUser FROM purchase_requisition ]]>
+							</value>
+						</property>
+						<property name="conditions">
+							<map>
+								<entry key="pr_code" value="" />
+							</map>
+						</property>
+					</bean>
+				</entry>
+				<!-- 采购订单明细查询编辑 -->
+				<entry key="pur.queryItemEdit">
+					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+						<property name="dmlType" value="cond" />
+						<property name="sql">
+							<value>
+								<![CDATA[SELECT PRD_ID, PRD.CompanyID, PRD.DeptID, PRD.BusiOrgID, PRD.PR_CODE, PRD.PRD_CODE, PRD.PRD_TYPE, PRD.Partner_CODE, PRD.Product_Uom, PRD.PRD_Currency, PRD.PRD_Price, PRD.PRD_DEMAND_QTY,  PRD.PRD_NEWoccupy_QTY, PRD.PRD_apply_QTY, PRD.PRD_SPARE_QTY, PRD.PRD_TaxRate, PRD.PRD_AmountUntaxed, PRD.PRD_AmountTotal, PRD.buyer, PRD.PRD_cycle, PRD.PRD_PredDate, PRD.PRD_inquiry, PRD.NOTE, PRD.PRD_STATE, PRD.FLOW_ID, PRD.FLOW_STATE, PRD.WriteDate, PRD.WriteUser ,PRD.CODE AS code,product_product.Name AS name,product_product.Specs,PRD.Product_Uom,PRD.brand,PRD.PRD_STOCK_QTY as product_actual_qty, PRD.PRD_OLDoccupy_QTY as product_occupy_qty, PRD.PRD_USABLE_QTY as product_enable_qty, PRD.PRD_Purch_Qty as product_qty FROM purchase_req_detail PRD LEFT JOIN product_product ON PRD.CODE=product_product.Code ]]>
+							</value>
+						</property>
+						<property name="conditions">
+							<map>
+								<entry key="pr_code" value="" />
+							</map>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="add">
+			<map>
+				<!-- 采购订单插入 -->
+				<entry key="pur.addMain">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+								<![CDATA[INSERT INTO purchase_requisition (PR_id, CompanyID, DeptID, BusiOrgID, PR_CODE, PR_TYPE, PR_CONTRACT, PR_PLANCODE, PR_proposer, PR_PRODEPT, PR_PROReasons, PR_STATE, FLOW_ID, FLOW_STATE, NOTE, CreateUser, CreateDate, WriteDate, WriteUser) VALUES ({#uuid},{companyid},{deptid},{busiorgid},{pr_code},{pr_type},{pr_contract},{pr_plancode},{pr_proposer},{pr_prodept},{pr_proreasons},{pr_state},{flow_id},{flow_state},{note},{createuser},{createdate},{writedate},{writeuser})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<!-- 采购订单插入 -->
+				<entry key="pur.addMain.newCode">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+								<![CDATA[INSERT INTO purchase_requisition (PR_id, CompanyID, DeptID, BusiOrgID, PR_CODE, PR_TYPE, PR_CONTRACT, PR_PLANCODE, PR_proposer, PR_PRODEPT, PR_PROReasons, PR_STATE, FLOW_ID, FLOW_STATE, NOTE, CreateUser, CreateDate, WriteDate, WriteUser) VALUES ({#uuid},{companyid},{deptid},{busiorgid},{#purchase.picking.pr.code},{pr_type},{pr_contract},{pr_plancode},{pr_proposer},{pr_prodept},{pr_proreasons},{pr_state},{flow_id},{flow_state},{note},{createuser},{createdate},{writedate},{writeuser})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<!-- 采购订单从表插入 -->
+				<entry key="pur.addItem">
+					<bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+						<property name="sql">
+							<value>
+								<![CDATA[insert into purchase_req_detail (prd_id, companyid, deptid, busiorgid, pr_code, prd_code, prd_type, code, partner_code, product_uom, prd_currency, prd_price, prd_demand_qty, prd_stock_qty, prd_oldoccupy_qty, prd_usable_qty, prd_newoccupy_qty, prd_apply_qty, prd_spare_qty, prd_purch_qty, prd_taxrate, prd_amountuntaxed, prd_amounttotal, buyer, prd_cycle, prd_preddate, prd_inquiry, note, prd_state, flow_id, flow_state, writedate, writeuser) values ({#uuid},{companyid},{deptid},{busiorgid},{pr_code},{#purchase.picking.prd.code},{prd_type},{code},{partner_code},{product_uom},{prd_currency},{prd_price},{prd_demand_qty},{prd_stock_qty},{prd_oldoccupy_qty},{prd_usable_qty},{prd_newoccupy_qty},{prd_apply_qty},{prd_spare_qty},{prd_purch_qty},{prd_taxrate},{prd_amountuntaxed},{prd_amounttotal},{buyer},{prd_cycle},{prd_preddate},{prd_inquiry},{note},{prd_state},{flow_id},{flow_state},{writedate},{writeuser})]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+			</map>	
+		</property>
+		<property name="update">
+			<map>
+				<entry key="pur.updateMain">
+					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+						<property name="sql">
+							<value>
+								<![CDATA[update purchase_requisition set companyid={companyid},deptid={deptid},busiorgid={busiorgid},pr_type={pr_type},pr_contract={pr_contract},pr_plancode={pr_plancode},pr_proposer={pr_proposer},pr_prodept={pr_prodept},pr_proreasons={pr_proreasons},pr_state={pr_state},flow_id={flow_id},flow_state={flow_state},note={note},createuser={createuser},createdate={createdate},writedate={writedate},writeuser={writeuser} where pr_code={pr_code}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="pur.updateItme">
+					<bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+						<property name="sql">
+							<value>
+								<![CDATA[update purchase_req_detail set companyid={companyid}, deptid={deptid}, busiorgid={busiorgid}, pr_code={pr_code}, prd_type={prd_type}, code={code}, partner_code={partner_code}, product_uom={product_uom}, prd_currency={prd_currency}, prd_price={prd_price}, prd_demand_qty={prd_demand_qty}, prd_stock_qty={prd_stock_qty}, prd_oldoccupy_qty={prd_oldoccupy_qty}, prd_usable_qty={prd_usable_qty}, prd_newoccupy_qty={prd_newoccupy_qty}, prd_apply_qty={prd_apply_qty}, prd_spare_qty={prd_spare_qty}, prd_purch_qty={prd_purch_qty}, prd_taxrate={prd_taxrate}, prd_amountuntaxed={prd_amountuntaxed}, prd_amounttotal={prd_amounttotal}, buyer={buyer}, prd_cycle={prd_cycle}, prd_preddate={prd_preddate}, prd_inquiry={prd_inquiry}, note={note}, prd_state={prd_state}, flow_id={flow_id}, flow_state={flow_state}, writedate={writedate}, writeuser={writeuser}  where prd_code={prd_code} and prd_code={prd_code}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+			</map>	
+		</property>
+		<property name="delete">
+			<map>
+				<entry key="pur.deleteMain">
+					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+						<property name="sql">
+							<value>
+								<![CDATA[delete from purchase_requisition where pr_code={pr_code}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="pur.deleteItemPRCode">
+					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+						<property name="sql">
+							<value>
+								<![CDATA[delete from purchase_req_detail where pr_code={pr_code}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				<entry key="pur.deleteItme">
+					<bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+						<property name="sql">
+							<value>
+								<![CDATA[delete from purchase_req_detail where prd_code={prd_code}]]>
+							</value>
+						</property>
+					</bean>
+				</entry>
+				
+			</map>	
+		</property>
+	</bean>
+</beans>

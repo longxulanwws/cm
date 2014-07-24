@@ -10,6 +10,28 @@
 	<bean id="stock" class="com.ruisoft.cm.rbac.util.DMLConfig">
 		<property name="select">
 			<map>
+			<entry key="inAttrib_help">
+			    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="sql">
+                            <value>
+                        <![CDATA[SELECT code,name FROM cm_dict_item WHERE DICT_DEF_ID={dict_def_id} AND ID IN (SELECT attrib_difid FROM cm_matter_categ_contrast WHERE categ_code={categ_code})]]>
+                            </value>
+                        </property>
+                 </bean>
+              </entry>
+                <entry key="Attrib_help">
+                            <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                            <property name="dmlType" value="cond" />
+                                <property name="sql">
+                                    <value><![CDATA[SELECT code,name FROM cm_dict_item]]></value>
+                                </property>
+                                <property name="conditions">
+                                    <map>
+                                        <entry key="dict_def_id" value="" />
+                                    </map>
+                                </property>
+                            </bean>
+                </entry>
 			     <entry key="matter_categ_item.query">
                     <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
                         <property name="dmlType" value="cond" />
@@ -467,6 +489,22 @@ FROM mrp_routing_hour GROUP BY  task_id
 						<property name="order" value="code"/>
 					</bean>
 				</entry>
+			    <entry key="product_product_attrib.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT product_detail_id, categ_code, product_code, attrib_code, attrib_name,attrib_help_code,attrib_value_code, attrib_value_name FROM product_product_attrib]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="categ_code" value="" />
+                                <entry key="product_code" value="" />
+                            </map>
+                        </property>
+                    </bean>
+                </entry>
 				<entry key="product_maintain.query">
 					<bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
 						<property name="dmlType" value="cond" />
@@ -629,6 +667,16 @@ LEFT JOIN product_product t2 ON t1.Code=t2.Code) t]]>
 		</property>
 		<property name="add">
 			<map>
+			   <entry key="product_product_attrib.add">
+                    <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[INSERT INTO product_product_attrib (product_detail_id, categ_code, product_code, attrib_code, attrib_name, attrib_help_code,attrib_value_code, attrib_value_name)
+VALUES ({#uuid}, {categ_code}, {product_code}, {attrib_code}, {attrib_name}, {attrib_help_code}, {attrib_value_code}, {attrib_value_name})]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
                 <entry key="cm_matter_categ_contrast.insert">
                     <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
                         <property name="sql">
@@ -864,6 +912,15 @@ VALUES({#product_Detailmaintain.id},{code},{val},{status},{desc},{maintain_id})]
 		</property>
 		<property name="update">
 			<map>
+			<entry key="product_product_attrib.update">
+                    <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[UPDATE product_product_attrib SET attrib_value_code = {attrib_value_code},attrib_value_name = {attrib_value_name} WHERE product_detail_id = {product_detail_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+             </entry>
 			 <entry key="cm_matter_categ_contrast.update">
                     <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
                         <property name="sql">
@@ -1188,7 +1245,15 @@ Warehose_ID={warehose_id},Move_IN_User={move_in_user},Note={note},WriteUser={wri
                         </property>
                     </bean>
                 </entry>
-				
+                <entry key="product_attrib.deleteid">
+                    <bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[DELETE FROM product_product_attrib WHERE product_code={code}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
 			</map>
 		</property>
 	</bean>
