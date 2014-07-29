@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>采购组维护</title>
+        
+        <link rel="stylesheet" type="text/css" href="../css/cm-default.css"  />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/Aqua/css/ligerui-all.css" />
+        <link rel="stylesheet" type="text/css" href="../ligerUI/skins/ligerui-icons.css" />
+        <script src="../js/jquery-min.js" type="text/javascript"></script>
+        <script src="../ligerUI/js/ligerui.all.js" type="text/javascript"></script>
+        <script src="../js/common.js" type="text/javascript"></script>
+        <script src="../js/validate/jquery.validate.js" type="text/javascript"></script>
+        <script src="../js/validate/jquery.metadata.js" type="text/javascript"></script>
+        <script src="../js/validate/messages_zh.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var opt, c_code;
+            var udata;
+            $(function(){
+                udata = getData('user',{orgid:$("#deptCodeS").val()},false)
+                $("#layout_main").ligerLayout({
+                    bottomHeight: "55%",
+                    allowBottomResize:false
+                });
+                $("form").ligerForm();
+                $(".l-textarea").each(function(index){
+                    $(this).removeClass("l-textarea");
+                });
+                $("#d-menu").ligerToolBar({items:[
+                    {text:'保存',click:toAdd,icon:'save'},
+                    {line:true},
+                ]});
+                var height = $(".l-layout-bottom").height();
+                var tab = $("#a_bottom").ligerTab({height:height});  //Tab
+                tabManager = $("#a_bottom").ligerGetTabManager();
+                tab.bind('afterSelectTabItem', afterSelectTab);
+                var query = getQueryString(window.location.toString());
+                opt = query.o;
+                c_code = query.code;
+                if (opt === 'm') {
+                   var param = {purchateam_code:c_code};
+                   var data = JSON.stringify(reqObj('q','purcontract.select.purchase_group.query',JSON.stringify(param)));
+                   ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+                      bindVal(data['data']);
+                   }, null, false);
+                   ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
+                       $('#WriteUserCodeS').val(data['uid']);
+                       $("#WriteDateS").val(data['date']);
+                   }, null, false);
+                } else {
+                   ajaxSubmit("/cm/rbac/cmUser.do?method=getUserInfo", null, function(data) {
+                       $('#createUserS').val(data['uname']);
+                       $('#createUserCodeS').val(data['uid']);
+                       $("#createDateS").val(data['date']);
+                   }, null, false);
+                }
+                $("#personS").ligerComboBox({
+                    autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:udata,
+                    onSelected:function(v,t) {
+                        $("#personIdS").val(v);
+                    }
+                });
+                $("#typeS").ligerComboBox({
+                    autocomplete: true,
+                    valueField:'value',
+                    textField:'name',
+                    data:get_warehose_list,
+                    onSelected:function(v,t) {
+                        $("#typeIdS").val(v);
+                    }
+                });
+                $("#pageloading").hide();
+            });
+            var get_warehose_list=new function () {
+                return getData('purchase.type');
+            }
+            function bindVal(data) {
+                if (data.Rows && data.Rows.length === 1) {
+                    data = data.Rows[0];
+                    $('#codeS').val(data.purchateam_code);
+                    $('#nameS').val(data.purchateam_name);
+                    $('#typeS').val(paramRender(null,'purchase.type',data.purchase_type));
+                    $('#typeIdS').val(data.purchase_type);
+                    $('#personS').val(paramRender(null,'user',data.purchase_per));
+                    $('#personIdS').val(data.purchase_per);
+                    $('#noteS').val(data.note);
+                    $('#createUserS').val(paramRender(null,'user',data.createuser));
+                    $('#createUserCodeS').val(data.createuser);
+                    $('#createDateS').val(data.createdate);
+                }
+            }
+            function validate() {
+                var valid = true;
+                $('*[id$="S"],*[id$="S_txt"]').each(function(index, element) {
+                    if (!$(this).rules()) return;
+                    if (!$(element).valid()) {
+                        valid = false;
+                        return;
+                    }
+                });
+                if (!valid) return false;
+                return true;
+            }
+            // 保存业务处理
+            function toAdd() {
+                if (!validate())
+                    return;
+                var param = {
+                    purchateam_name:$("#nameS").val(),
+                    purchase_type:$("#typeIdS").val(),
+                    purchase_per:$("#personIdS").val(),
+                    note:$("#noteS").val()
+                };
+                var en = 'purcontract.add.purchase_group.insert', optType = 'a';
+                if (opt === 'm') {
+                	param.purchateam_code = $('#codeS').val();
+                    param.writeuser=$('#WriteUserCodeS').val();
+                    param.writedate=$('#WriteDateS').val();
+                    en = 'purcontract.update.purchase_group.update';
+                    optType = 'u';
+                } else {
+                    param.createuser = $("#createUserCodeS").val();
+                    param.createdate = $("#createDateS").val();
+                }
+                var data = JSON.stringify(reqObj(optType,en,JSON.stringify(param)));
+                ajaxSubmit("/cm/rbac/cm.do?m=c", data, function(data) {
+                	if(opt != 'm'){
+                        var picking = data['added'];
+                        c_code = picking['#purchase.group.code'];
+                	}
+                    $.ligerDialog.success('保存成功', '操作完成', reloadPage);
+                   });
+            }
+             function reloadPage() {
+                    window.location = './purchase_group.html?o=m&code='.concat(c_code);
+                    tabManager.selectTabItem("perTab");
+                }
+             function afterSelectTab(){
+                 var tabid = tabManager.getSelectedTabItemID();
+                 if(tabid == "perTab"){
+                	 if(c_code){
+                		tabManager.overrideSelectedTabItem({url: "./purchase_person_help.html?code=".concat(c_code),tabid:"perTab",text:"采购员列表",showClose:false});	 
+                	 }else{
+                		 alert('请先保存采购组信息！');
+                	 }
+                 }else if(tabid == "proTab"){
+                	 if(c_code){
+                	    tabManager.overrideSelectedTabItem({url: "./purchase_person_help.html?code=".concat(c_code),tabid:"proTab",text:"商品列表",showClose:false});  
+                     }else{
+                         alert('请先保存采购组信息！');
+                     }
+                     
+                 }
+             }
+        </script>
+        <style type="text/css">
+            .center-height{height: 100%;}
+        </style>
+    </head>
+    <body style="padding:0;">
+        <div id="pageloading"></div>  
+        <div id="layout_main">
+            <div position="center" id="a_center" title="基本信息" style="overflow:auto;">
+                <div id="d-menu" class="toolbar"></div>
+                <div style="height:25px;"></div>
+                <form name="basic-form" method="post" id="basic_form" class="liger-form" data-validate="{}">
+                    <div class="line-div">
+                        <div class="label-div"><label>采购组编号</label></div>
+                        <div class="in-div"><input type="text" id="codeS" ltype="text" class="readonly diff" readonly="readonly" value="由系统自动生成" /></div>
+                        <div class="label-div"><label>采购组名</label></div>
+                        <div class="in-div"><input type="text" id="nameS" ltype="text" class="required diff" /></div>
+                    </div>
+                    <div class="line-div">
+                        <div class="label-div"><label>采购组类型</label></div>
+                        <div class="in-div">
+                        <input type="text" id="typeS" ltype="combobox" class="required diff" />
+                        <input type="hidden" id="typeIdS" />
+                        </div>
+                        <div class="label-div"><label>负责人</label></div>
+                        <div class="in-div"><input type="text" id="personS" ltype="combobox" class="required diff" /></div>
+                        <input type="hidden" id="personIdS" />
+                    </div>
+                    <div class="line-div" style="height:76px;">
+                        <div class="label-div"><label>备注</label></div>
+                        <div class="in-div" style="width:72%;">
+                            <textarea cols="80" rows="2" id="noteS"></textarea>
+                        </div>
+                    </div>
+                    <div class="line-div">
+                        <div class="label-div"><label>制单人</label></div>
+                        <div class="in-div"><input type="text" id="createUserS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                        <div class="label-div"><label>制单日期</label></div>
+                        <div class="in-div"><input type="text" id="createDateS" ltype="text" class="readonly diff" readonly="readonly" /></div>
+                        <input type="hidden" id="createUserCodeS" />
+                        <input type="hidden" id="WriteUserCodeS" />
+                        <input type="hidden" id="WriteDateS" />
+                    </div>
+                </form>
+            </div>
+            <div position="bottom" id="a_bottom">
+                <div title="采购员列表" tabid="perTab">
+                  <div id="person-div"></div>
+                </div>
+                <div title="商品列表" tabid="proTab">
+                  <div id="product-div"></div>
+                </div>
+           </div>
+            </div>
+        </div>
+    </body>
+</html>

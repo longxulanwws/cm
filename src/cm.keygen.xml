@@ -193,7 +193,13 @@
                         <property name="group" value="true" />
                     </bean>
                 </entry>
-                
+                 <!-- 采购组编码规则   -->
+                <entry key="purchase.group.code">
+                    <bean class="com.ruisoft.cm.rbac.entity.KeyEntity">
+                        <property name="rule" value="'CGZ'{seq(4)}" />
+                        <property name="init" value="10" />
+                    </bean>
+                </entry>
 			</map>
 		</property>
 	</bean>

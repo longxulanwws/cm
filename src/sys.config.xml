@@ -15,7 +15,8 @@
 				<entry key="production" value-ref="production" />
 				<entry key="param" value-ref="paramGenerator" />
 				<entry key="snaker" value-ref="snaker" />
-				<entry key="purchase" value-ref="purchase" />				
+				<entry key="purchase" value-ref="purchase" />
+				<entry key="purcontract" value-ref="purcontract" />   				
 			</map>
 		</property>
 	</bean>

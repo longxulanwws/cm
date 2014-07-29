@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+    <bean id="purcontract" class="com.ruisoft.cm.rbac.util.DMLConfig">
+        <property name="select">
+            <map>
+                <entry key="purchase_group.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+                                <![CDATA[SELECT purchase_id, purchateam_code, purchateam_name, purchase_type, purchase_per, note, CreateUser, CreateDate, WriteUser, WriteDate FROM purchase_group ]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="purchateam_code" value=":like(lr)" />
+                                <entry key="purchateam_name" value=":like(lr)" />
+                                <entry key="purchase_type" value="" />                               
+                            </map>
+                        </property>
+                        <property name="order" value="purchateam_code"/> 
+                    </bean>
+                </entry>
+               <entry key="purchase_person.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="dmlType" value="cond" />
+                        <property name="sql">
+                            <value>
+                                <![CDATA[SELECT purchaseper_id, purchateam_code, purchaser_code, purchaser_name, purchaser_phone, note, CreateUser, CreateDate, WriteUser, WriteDate FROM purchase_person
+                                ]]>
+                            </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="purchateam_code" value="" />
+                            </map>
+                        </property>
+                        <property name="order" value="purchateam_code"/> 
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="add">
+            <map>
+                <entry key="purchase_group.insert">
+                    <bean class="com.ruisoft.cm.rbac.entity.AddEntity">
+                        <property name="sql">
+                            <value>
+                                <![CDATA[
+                                INSERT INTO purchase_group (purchase_id, purchateam_code, purchateam_name, purchase_type, purchase_per, note, CreateUser, CreateDate, WriteUser, WriteDate)
+                                VALUES ({#uuid}, {#purchase.group.code}, {purchateam_name}, {purchase_type}, {purchase_per}, {note}, {createuser}, {createdate}, {writeuser}, {writedate})
+                                ]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+            </map>  
+        </property>
+        <property name="update">
+            <map>
+                <entry key="purchase_group.update">
+                    <bean class="com.ruisoft.cm.rbac.entity.UpdateEntity">
+                        <property name="sql">
+                            <value>
+                                <![CDATA[
+                                UPDATE purchase_group SET purchateam_name = {purchateam_name},purchase_type = {purchase_type},
+                                purchase_per = {purchase_per},note = {note},WriteUser = {writeuser},WriteDate = {writedate} 
+                                WHERE purchateam_code = {purchateam_code}
+                                ]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+            </map>  
+        </property>
+        <property name="delete">
+            <map>
+                <entry key="pur.deleteMain">
+                    <bean class="com.ruisoft.cm.rbac.entity.DeleteEntity">
+                        <property name="sql">
+                            <value>
+                                <![CDATA[delete from purchase_group where purchase_id = {purchase_id}]]>
+                            </value>
+                        </property>
+                    </bean>
+                </entry>
+            </map>  
+        </property>
+    </bean>
+</beans>

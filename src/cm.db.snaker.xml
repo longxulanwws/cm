@@ -10,6 +10,22 @@
     <bean id="snaker" class="com.ruisoft.cm.rbac.util.DMLConfig">
         <property name="select">
             <map>
+                   <entry key="wf_process.query">
+                    <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
+                        <property name="sql">
+                            <value>
+<![CDATA[SELECT id, name, display_Name, type, instance_Url, state, content, version, create_Time, creator FROM wf_process]]>
+                        </value>
+                        </property>
+                        <property name="conditions">
+                            <map>
+                                <entry key="name" value=":like(lr)" />
+                                <entry key="display_name" value=":like(lr)" />
+                            </map>
+                        </property>
+                        <property name="order" value="name"/> 
+                    </bean>
+                </entry>
                  <entry key="sna_select">
                     <bean class="com.ruisoft.cm.rbac.entity.QueryEntity">
                         <property name="sql">

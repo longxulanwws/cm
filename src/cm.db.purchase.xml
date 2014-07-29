@@ -147,7 +147,6 @@
 						</property>
 					</bean>
 				</entry>
-				
 			</map>	
 		</property>
 	</bean>
